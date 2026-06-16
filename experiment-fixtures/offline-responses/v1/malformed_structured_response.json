@@ -1,0 +1,9 @@
+{
+  "fixture_id": "malformed_structured_response",
+  "label": "Simulated malformed structured response",
+  "simulated_output": true,
+  "variant": "single_generalist",
+  "response_schema": "project-recovery-council.qwen.recovery-analysis-response.v1",
+  "correlation_id": "offline-malformed-response",
+  "raw_response_text": "{\"schema_version\":\"project-recovery-council.qwen.recovery-analysis-response.v1\",\"agent_role\":\"GeneralistAgent\",\"status\":\"completed\",\"projected_slip_days\":\"thirteen\"}"
+}

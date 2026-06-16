@@ -1,0 +1,66 @@
+{
+  "finish_status": "completed",
+  "fixture_id": "strong_modular_council",
+  "label": "Simulated strong modular-council result",
+  "parsed_response": {
+    "abstention_reason": null,
+    "agent_role": "RecoveryPlanner",
+    "ambiguous_claims": [],
+    "arbitration_required": false,
+    "asserted_equipment_onsite": null,
+    "citations": {
+      "gross_avoided_exposure_usd": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "human_confirmation_required": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "mitigation_cost_usd": [
+        "COST-SUMMARY-001"
+      ],
+      "onsite_status_contradiction_detected": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "preferred_option_id": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001"
+      ],
+      "preferred_option_subject_to_approval": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "projected_slip_days": [
+        "SCH-DELIVERY-001"
+      ],
+      "unmitigated_exposure_usd": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ]
+    },
+    "concise_rationale": "Accelerated logistics is preferred subject to approval because the 48000 USD mitigation cost is lower than the 195000 USD unmitigated exposure, while onsite status remains contradictory and requires human confirmation.",
+    "gross_avoided_exposure_usd": 147000,
+    "human_confirmation_required": true,
+    "mitigation_cost_usd": 48000,
+    "onsite_status_contradiction_detected": true,
+    "preferred_option_id": "REC-ACCEL-LOGISTICS",
+    "preferred_option_subject_to_approval": true,
+    "projected_slip_days": 13,
+    "schema_version": "project-recovery-council.qwen.recovery-analysis-response.v1",
+    "status": "completed",
+    "unmitigated_exposure_usd": 195000,
+    "unresolved_disagreements": [],
+    "unsupported_claims": []
+  },
+  "response_schema": "project-recovery-council.qwen.recovery-analysis-response.v1",
+  "simulated_output": true,
+  "validation_errors": [],
+  "variant": "dynamic_expert_council"
+}

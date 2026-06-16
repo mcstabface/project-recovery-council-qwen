@@ -1,0 +1,37 @@
+{
+  "fixture_id": "fixed_chain_result",
+  "label": "Simulated fixed expert-chain result",
+  "simulated_output": true,
+  "variant": "fixed_expert_chain",
+  "response_schema": "project-recovery-council.qwen.recovery-analysis-response.v1",
+  "correlation_id": "offline-fixed-chain",
+  "response": {
+    "schema_version": "project-recovery-council.qwen.recovery-analysis-response.v1",
+    "agent_role": "RecoveryPlanner",
+    "status": "completed",
+    "projected_slip_days": 13,
+    "unmitigated_exposure_usd": 195000,
+    "mitigation_cost_usd": 48000,
+    "gross_avoided_exposure_usd": 147000,
+    "onsite_status_contradiction_detected": true,
+    "asserted_equipment_onsite": null,
+    "human_confirmation_required": true,
+    "preferred_option_id": "REC-ACCEL-LOGISTICS",
+    "preferred_option_subject_to_approval": true,
+    "citations": {
+      "projected_slip_days": ["SCH-DELIVERY-001"],
+      "unmitigated_exposure_usd": ["SCH-DELIVERY-001", "COST-SUMMARY-001", "CTR-DELAY-001"],
+      "mitigation_cost_usd": ["COST-SUMMARY-001"],
+      "gross_avoided_exposure_usd": ["COST-SUMMARY-001", "CTR-DELAY-001"],
+      "onsite_status_contradiction_detected": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+      "human_confirmation_required": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+      "preferred_option_id": ["COST-SUMMARY-001", "SCH-DELIVERY-001"],
+      "preferred_option_subject_to_approval": ["COST-SUMMARY-001", "PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"]
+    },
+    "unsupported_claims": [],
+    "ambiguous_claims": [],
+    "arbitration_required": false,
+    "unresolved_disagreements": [],
+    "concise_rationale": "The fixed expert chain supports accelerated logistics subject to human confirmation of onsite status and approval."
+  }
+}

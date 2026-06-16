@@ -1,0 +1,464 @@
+{
+  "abstentions": [],
+  "ai_competitor": true,
+  "citation_assessments": [
+    {
+      "claim_id": "projected_slip_days",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "SCH-DELIVERY-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "SCH-DELIVERY-001"
+      ],
+      "valid_record_ids": [
+        "SCH-DELIVERY-001"
+      ]
+    },
+    {
+      "claim_id": "unmitigated_exposure_usd",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "valid_record_ids": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ]
+    },
+    {
+      "claim_id": "mitigation_cost_usd",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "COST-SUMMARY-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "COST-SUMMARY-001"
+      ],
+      "valid_record_ids": [
+        "COST-SUMMARY-001"
+      ]
+    },
+    {
+      "claim_id": "gross_avoided_exposure_usd",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "valid_record_ids": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ]
+    },
+    {
+      "claim_id": "onsite_status_contradiction_detected",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "valid_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ]
+    },
+    {
+      "claim_id": "human_confirmation_required",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "valid_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ]
+    },
+    {
+      "claim_id": "preferred_option_id",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001"
+      ],
+      "valid_record_ids": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001"
+      ]
+    },
+    {
+      "claim_id": "preferred_option_subject_to_approval",
+      "invalid_record_ids": [],
+      "precision": 1.0,
+      "provided_record_ids": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "recall": 1.0,
+      "required_record_ids": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "valid_record_ids": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ]
+    }
+  ],
+  "claim_assessments": [
+    {
+      "claim_id": "projected_slip_days",
+      "expected_value": 13,
+      "notes": null,
+      "observed_value": 13,
+      "provided_record_ids": [
+        "SCH-DELIVERY-001"
+      ],
+      "required_record_ids": [
+        "SCH-DELIVERY-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "unmitigated_exposure_usd",
+      "expected_value": 195000,
+      "notes": null,
+      "observed_value": 195000,
+      "provided_record_ids": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "required_record_ids": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "mitigation_cost_usd",
+      "expected_value": 48000,
+      "notes": null,
+      "observed_value": 48000,
+      "provided_record_ids": [
+        "COST-SUMMARY-001"
+      ],
+      "required_record_ids": [
+        "COST-SUMMARY-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "gross_avoided_exposure_usd",
+      "expected_value": 147000,
+      "notes": null,
+      "observed_value": 147000,
+      "provided_record_ids": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "required_record_ids": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "onsite_status_contradiction_detected",
+      "expected_value": true,
+      "notes": null,
+      "observed_value": true,
+      "provided_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "required_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "human_confirmation_required",
+      "expected_value": true,
+      "notes": null,
+      "observed_value": true,
+      "provided_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "required_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "preferred_option_id",
+      "expected_value": "REC-ACCEL-LOGISTICS",
+      "notes": null,
+      "observed_value": "REC-ACCEL-LOGISTICS",
+      "provided_record_ids": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001"
+      ],
+      "required_record_ids": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "preferred_option_subject_to_approval",
+      "expected_value": true,
+      "notes": null,
+      "observed_value": true,
+      "provided_record_ids": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "required_record_ids": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "status": "correct"
+    },
+    {
+      "claim_id": "unsupported_onsite_assertion_prohibited",
+      "expected_value": true,
+      "notes": null,
+      "observed_value": true,
+      "provided_record_ids": [],
+      "required_record_ids": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "status": "correct"
+    }
+  ],
+  "contradiction_assessment": {
+    "detected": true,
+    "evidence_record_ids": [
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001"
+    ],
+    "human_confirmation_required": true,
+    "issue": "equipment_onsite_status",
+    "required": true,
+    "status": "correct"
+  },
+  "disagreements": [],
+  "efficiency_metrics": {
+    "agent_invocation_count": 1,
+    "estimated_provider_cost_usd": null,
+    "input_tokens": null,
+    "latency_seconds": null,
+    "output_tokens": null,
+    "retry_count": 0,
+    "simulated_measurements": true,
+    "total_tokens": null
+  },
+  "evaluation_case": {
+    "case_id": "PRC-EQ-DELAY-001",
+    "evidence_record_ids": [
+      "CASE-INTAKE-001",
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001",
+      "LOG-STATUS-001",
+      "PRG-ONSITE-001",
+      "RISK-001",
+      "SCH-DELIVERY-001",
+      "SUP-NOT-ARRIVED-001"
+    ],
+    "expected_results": {
+      "calculated_milestone_delay_days": 13,
+      "case_id": "PRC-EQ-DELAY-001",
+      "contradiction_detected": true,
+      "delivery_shift_days": 21,
+      "equipment_onsite_status": "unresolved_until_human_confirmation",
+      "gross_avoided_exposure_before_secondary_effects_usd": 147000,
+      "human_escalation_required": true,
+      "mitigation_cost_usd": 48000,
+      "preferred_option_id": "REC-ACCEL-LOGISTICS",
+      "preferred_option_label": "accelerated logistics",
+      "preferred_option_subject_to_approval": true,
+      "unmitigated_exposure_usd": 195000,
+      "unsupported_equipment_onsite_assertion_prohibited": true
+    }
+  },
+  "fixture_id": "strong_modular_council",
+  "limitations": [
+    "Offline fixtures are simulated outputs for contract testing, not empirical Qwen results.",
+    "Token, latency, and cost metrics remain null unless a provider reports them or explicit pricing is supplied."
+  ],
+  "malformed_response": false,
+  "metric_results": [
+    {
+      "details": {},
+      "metric_id": "required_fact_accuracy",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "monetary_calculation_accuracy",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "schedule_impact_accuracy",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "evidence_citation_precision",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "evidence_citation_recall",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "contradiction_detection",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "unsupported_claim_count",
+      "passed": true,
+      "score": 0.0
+    },
+    {
+      "details": {},
+      "metric_id": "correct_human_escalation",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "preferred_recovery_option",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "schema_valid_response_rate",
+      "passed": true,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "agent_invocation_count",
+      "passed": null,
+      "score": 1.0
+    },
+    {
+      "details": {},
+      "metric_id": "input_tokens",
+      "passed": null,
+      "score": null
+    },
+    {
+      "details": {},
+      "metric_id": "output_tokens",
+      "passed": null,
+      "score": null
+    },
+    {
+      "details": {},
+      "metric_id": "total_tokens",
+      "passed": null,
+      "score": null
+    },
+    {
+      "details": {},
+      "metric_id": "latency",
+      "passed": null,
+      "score": null
+    },
+    {
+      "details": {},
+      "metric_id": "retry_count",
+      "passed": null,
+      "score": 0.0
+    },
+    {
+      "details": {},
+      "metric_id": "estimated_provider_cost",
+      "passed": null,
+      "score": null
+    }
+  ],
+  "schema_valid": true,
+  "schema_version": "project-recovery-council.qwen.evaluation-report.v1",
+  "variant": "dynamic_expert_council"
+}

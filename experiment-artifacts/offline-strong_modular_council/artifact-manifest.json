@@ -1,0 +1,53 @@
+{
+  "artifact_contract_version": "project-recovery-council.qwen.experiment-artifacts.v1",
+  "artifacts": [
+    {
+      "generated_at": "2026-06-16T14:30:36+00:00",
+      "media_type": "application/json",
+      "name": "experiment-config",
+      "relative_path": "experiment-config.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.experiment-config.v1",
+      "sha256": "be58418bfd0a72a4f10e1f1f5d02a64d534db23a6cbc07d36bfb5332bfab3047"
+    },
+    {
+      "generated_at": "2026-06-16T14:30:36+00:00",
+      "media_type": "application/json",
+      "name": "invocation-records",
+      "relative_path": "invocation-records.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.agent-invocations.v1",
+      "sha256": "ef1a1598072b7eb7d63df7fcd76e59a56adb6cff02d1059d90d03a39fc4af3ab"
+    },
+    {
+      "generated_at": "2026-06-16T14:30:36+00:00",
+      "media_type": "application/json",
+      "name": "variant-results",
+      "relative_path": "variant-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.variant-results.v1",
+      "sha256": "72eba3674fdc2defedeb41231ff375b06da24ab32e801f341c66d7a5ebbf805f"
+    },
+    {
+      "generated_at": "2026-06-16T14:30:36+00:00",
+      "media_type": "application/json",
+      "name": "evaluation-results",
+      "relative_path": "evaluation-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.evaluation-report.v1",
+      "sha256": "11291f587f5c80b9ceca2783419e6285e257c2c50a0350f7e2edb366f6ab92bf"
+    },
+    {
+      "generated_at": "2026-06-16T14:30:36+00:00",
+      "media_type": "application/json",
+      "name": "comparison-report",
+      "relative_path": "comparison-report.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.experiment-comparison.v1",
+      "sha256": "63ea00a89621c2d19e6a557ed702dc5642311cc70eaeea63865f593516c2c35b"
+    }
+  ],
+  "case_id": "PRC-EQ-DELAY-001",
+  "experiment_id": "offline-strong_modular_council",
+  "generated_at": "2026-06-16T14:30:36+00:00"
+}

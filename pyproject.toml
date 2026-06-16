@@ -3,9 +3,9 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "project-recovery-council"
+name = "project-recovery-council-qwen"
 version = "0.1.0"
-description = "Deterministic foundation for a governed project recovery expert system."
+description = "Qwen Agent Society competition adaptation of the deterministic Project Recovery Council."
 readme = "README.md"
 license = "MIT"
 requires-python = ">=3.12"
@@ -17,6 +17,7 @@ dependencies = [
 ]
 
 [project.scripts]
+prc-qwen = "project_recovery_council.__main__:main"
 project-recovery-council = "project_recovery_council.__main__:main"
 
 [project.optional-dependencies]
@@ -28,3 +29,6 @@ dev = [
 addopts = "-q"
 pythonpath = ["src"]
 testpaths = ["tests"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/project_recovery_council"]

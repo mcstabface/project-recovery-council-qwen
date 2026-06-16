@@ -1,0 +1,86 @@
+{
+  "case_id": "PRC-EQ-DELAY-001",
+  "execution_plan": {
+    "ai_competitor": true,
+    "description": "Director selects relevant experts; specialists return independent findings; Evidence Auditor checks claims; Arbiter resolves or escalates disagreement; Recovery Planner produces the recommendation.",
+    "plan_id": "dynamic_expert_council.v1",
+    "steps": [
+      {
+        "agent_role": "DirectorAgent",
+        "depends_on": [],
+        "description": "Select only evidence-relevant specialists.",
+        "dynamic": true,
+        "expected_response_schema": "project-recovery-council.qwen.director-routing-response.v1",
+        "model_identifier": "qwen-disabled-offline-placeholder",
+        "prompt_id": "DirectorAgent.v1",
+        "required": true,
+        "sequence": 1,
+        "step_id": "director_routing"
+      },
+      {
+        "agent_role": "DirectorSelectedExperts",
+        "depends_on": [
+          "director_routing"
+        ],
+        "description": "Run specialists selected by the Director independently.",
+        "dynamic": true,
+        "expected_response_schema": "project-recovery-council.qwen.specialist-finding-response.v1",
+        "model_identifier": "qwen-disabled-offline-placeholder",
+        "prompt_id": "SelectedSpecialists.v1",
+        "required": true,
+        "sequence": 2,
+        "step_id": "selected_specialists"
+      },
+      {
+        "agent_role": "EvidenceAuditor",
+        "depends_on": [
+          "selected_specialists"
+        ],
+        "description": "Check cited claims and unsupported assertions.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.specialist-finding-response.v1",
+        "model_identifier": "qwen-disabled-offline-placeholder",
+        "prompt_id": "EvidenceAuditor.v1",
+        "required": true,
+        "sequence": 3,
+        "step_id": "evidence_audit"
+      },
+      {
+        "agent_role": "ArbiterAgent",
+        "depends_on": [
+          "selected_specialists",
+          "evidence_audit"
+        ],
+        "description": "Resolve or preserve specialist disagreement.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.arbiter-response.v1",
+        "model_identifier": "qwen-disabled-offline-placeholder",
+        "prompt_id": "ArbiterAgent.v1",
+        "required": true,
+        "sequence": 4,
+        "step_id": "arbitration"
+      },
+      {
+        "agent_role": "RecoveryPlanner",
+        "depends_on": [
+          "arbitration"
+        ],
+        "description": "Produce final recommendation subject to gates.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.recovery-analysis-response.v1",
+        "model_identifier": "qwen-disabled-offline-placeholder",
+        "prompt_id": "RecoveryPlanner.v1",
+        "required": true,
+        "sequence": 5,
+        "step_id": "recovery_recommendation"
+      }
+    ],
+    "variant": "dynamic_expert_council"
+  },
+  "experiment_id": "offline-strong_modular_council",
+  "fixture_id": "strong_modular_council",
+  "live_provider_enabled": false,
+  "schema_version": "project-recovery-council.qwen.experiment-config.v1",
+  "simulated_outputs": true,
+  "variant": "dynamic_expert_council"
+}

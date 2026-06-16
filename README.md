@@ -1,11 +1,12 @@
-# Project Recovery Council
+# Project Recovery Council - Qwen Agent Society Edition
 
 Project Recovery Council is a governed case-management foundation for
-investigating project-delivery exceptions. This repository currently contains a
-deterministic, provider-independent architecture slice for a synthetic major
-equipment delay case.
+investigating project-delivery exceptions. This repository is the Qwen Agent
+Society competition adaptation of the deterministic reference implementation.
+The deterministic implementation remains the ground-truth oracle and regression
+baseline.
 
-This run does not build the full application. It establishes:
+This edition establishes:
 
 - strict case and expert contracts
 - source-cited synthetic evidence fixtures
@@ -17,6 +18,11 @@ This run does not build the full application. It establishes:
 - schema drift checking
 - canonical deterministic demo evidence
 - expected results for the demonstration case
+- provider-neutral model-client contracts
+- disabled-by-default Qwen adapter placeholder
+- offline simulated response fixtures
+- prompt contracts for generalist, director, specialists, arbiter, and planner
+- typed experiment variants and deterministic evaluation metrics
 - tests and process artifacts
 
 ## Boundaries
@@ -24,7 +30,10 @@ This run does not build the full application. It establishes:
 - Synthetic data only.
 - No external system connections.
 - No UiPath runtime implementation.
-- No LLM provider SDK.
+- No live Qwen API implementation in this run.
+- No provider credentials required.
+- No network calls in tests.
+- Offline fixtures are simulated outputs, not empirical model results.
 - No web framework.
 - Python 3.12 or later.
 - MIT licensed.
@@ -51,6 +60,9 @@ Core facts:
 ```text
 docs/                         Architecture and case documentation
 decisions/                    Architecture decision records
+experiment-fixtures/          Simulated offline model responses for tests
+experiment-artifacts/         Local generated experiment outputs
+prompts/v1/                   Versioned competition prompt contracts
 sample-data/equipment-delay-case/
                                Synthetic evidence pack and expected results
 src/project_recovery_council/ Contracts, interfaces, stubs, workflow, validators
@@ -68,6 +80,11 @@ python -m pip install -e ".[dev]"
 After installation, the console command is available:
 
 ```bash
+prc-qwen validate
+prc-qwen evaluate-offline
+prc-qwen compare-offline
+prc-qwen validate-prompts
+prc-qwen inspect-experiment experiment-artifacts/offline-strong_modular_council
 project-recovery-council validate
 project-recovery-council demo
 project-recovery-council inspect session-artifacts/canonical-demo
@@ -93,6 +110,10 @@ python -m project_recovery_council run --inject-commercial-failure
 python -m project_recovery_council replay session-artifacts/runs/equipment-delay-standard
 python -m project_recovery_council export-schemas
 python -m project_recovery_council check-schema-drift
+python -m project_recovery_council evaluate-offline --fixture strong_modular_council
+python -m project_recovery_council compare-offline
+python -m project_recovery_council validate-prompts
+python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
 ```
 
 From this source tree without installing first:
@@ -111,6 +132,10 @@ PYTHONPATH=src python -m project_recovery_council run --inject-commercial-failur
 PYTHONPATH=src python -m project_recovery_council replay session-artifacts/runs/equipment-delay-standard
 PYTHONPATH=src python -m project_recovery_council export-schemas
 PYTHONPATH=src python -m project_recovery_council check-schema-drift
+PYTHONPATH=src python -m project_recovery_council evaluate-offline --fixture strong_modular_council
+PYTHONPATH=src python -m project_recovery_council compare-offline
+PYTHONPATH=src python -m project_recovery_council validate-prompts
+PYTHONPATH=src python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
 ```
 
 Workflow runs write inspectable artifacts under:
@@ -184,6 +209,40 @@ python scripts/run_demo.py --replace-existing
 Run creation fails if the target run directory already exists. Use
 `--replace-existing` only for local deterministic regeneration.
 
+## Qwen Competition Layer
+
+The competition claim is tested through four typed variants:
+
+- `deterministic_oracle`: the inherited deterministic expected-result source,
+  not an AI competitor
+- `single_generalist`: one model agent receives the full evidence package and
+  returns the final recommendation directly
+- `fixed_expert_chain`: all experts run in a fixed sequence, with final
+  synthesis
+- `dynamic_expert_council`: a Director dynamically selects experts, specialists
+  work independently, an Evidence Auditor checks claims, an Arbiter preserves or
+  resolves disagreement, and the Recovery Planner recommends the recovery path
+
+Live Qwen execution is disabled by default. `DisabledQwenModelClient` returns a
+typed configuration failure and records that no network call was attempted.
+`OfflineModelClient` replays deterministic simulated fixtures from
+`experiment-fixtures/offline-responses/v1/`.
+
+Offline experiment outputs use:
+
+```text
+experiment-artifacts/<experiment-id>/
+├── experiment-config.json
+├── invocation-records.json
+├── variant-results.json
+├── evaluation-results.json
+├── comparison-report.json
+└── artifact-manifest.json
+```
+
+These outputs are manifest-backed with SHA-256 checksums and can be inspected
+with `prc-qwen inspect-experiment <path>`.
+
 ## Run Tests
 
 ```bash
@@ -194,7 +253,7 @@ The test configuration adds `src/` to the Python path.
 
 ## Integration Direction
 
-Future work can attach LLM-backed experts or UiPath Maestro orchestration behind
-the existing interfaces. Those integrations must preserve the local contracts,
-source-level evidence citations, audit history, human gates, and deterministic
-expected-result fixtures.
+Future work can attach live Qwen-backed experts or UiPath Maestro orchestration
+behind the existing interfaces. Those integrations must preserve the local
+contracts, source-level evidence citations, audit history, human gates,
+deterministic expected-result fixtures, and offline regression tests.

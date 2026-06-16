@@ -1,0 +1,44 @@
+{
+  "ai_competitor_variants": [
+    "single_generalist",
+    "fixed_expert_chain",
+    "dynamic_expert_council"
+  ],
+  "case_id": "PRC-EQ-DELAY-001",
+  "comparison_id": "offline-strong_modular_council-single-report",
+  "limitations": [
+    "Comparison uses deterministic simulated offline fixtures only.",
+    "No real Qwen performance result is claimed.",
+    "The deterministic oracle remains the expected-result source and is not an AI competitor."
+  ],
+  "oracle_variant": "deterministic_oracle",
+  "rows": [
+    {
+      "fixture_id": "strong_modular_council",
+      "metric_scores": {
+        "agent_invocation_count": 1.0,
+        "contradiction_detection": 1.0,
+        "correct_human_escalation": 1.0,
+        "estimated_provider_cost": null,
+        "evidence_citation_precision": 1.0,
+        "evidence_citation_recall": 1.0,
+        "input_tokens": null,
+        "latency": null,
+        "monetary_calculation_accuracy": 1.0,
+        "output_tokens": null,
+        "preferred_recovery_option": 1.0,
+        "required_fact_accuracy": 1.0,
+        "retry_count": 0.0,
+        "schedule_impact_accuracy": 1.0,
+        "schema_valid_response_rate": 1.0,
+        "total_tokens": null,
+        "unsupported_claim_count": 0.0
+      },
+      "schema_valid": true,
+      "simulated": true,
+      "unsupported_claim_count": 0,
+      "variant": "dynamic_expert_council"
+    }
+  ],
+  "schema_version": "project-recovery-council.qwen.experiment-comparison.v1"
+}

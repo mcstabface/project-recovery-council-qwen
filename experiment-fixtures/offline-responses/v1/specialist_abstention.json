@@ -1,0 +1,18 @@
+{
+  "fixture_id": "specialist_abstention",
+  "label": "Simulated specialist abstention",
+  "simulated_output": true,
+  "variant": "dynamic_expert_council",
+  "response_schema": "project-recovery-council.qwen.specialist-finding-response.v1",
+  "correlation_id": "offline-specialist-abstention",
+  "response": {
+    "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "agent_role": "RiskExpert",
+    "status": "abstained",
+    "claims": {},
+    "citations": {},
+    "unsupported_claims": [],
+    "abstention_reason": "Risk register evidence was not included in the specialist work packet.",
+    "warnings": ["No risk conclusion should be inferred from this abstention."]
+  }
+}

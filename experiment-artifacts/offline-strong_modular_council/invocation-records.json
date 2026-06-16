@@ -1,0 +1,98 @@
+[
+  {
+    "agent_role": "RecoveryPlanner",
+    "completed_at": null,
+    "invocation_id": "INV-strong_modular_council",
+    "prompt_id": "RecoveryPlanner.v1",
+    "request": {
+      "correlation_id": "offline-strong-modular-council",
+      "expected_response_schema": "project-recovery-council.qwen.recovery-analysis-response.v1",
+      "generation_parameters": {},
+      "metadata": {
+        "fixture_id": "strong_modular_council",
+        "simulated_output": true
+      },
+      "model_identifier": "qwen-disabled-offline-placeholder",
+      "system_instructions": "Offline fixture replay. No provider call.",
+      "user_payload": {
+        "case_id": "PRC-EQ-DELAY-001"
+      }
+    },
+    "result": {
+      "failure": null,
+      "finish_status": "completed",
+      "input_token_count": null,
+      "latency_seconds": null,
+      "model_identifier": "qwen-disabled-offline-placeholder",
+      "output_token_count": null,
+      "parsed_response": {
+        "abstention_reason": null,
+        "agent_role": "RecoveryPlanner",
+        "ambiguous_claims": [],
+        "arbitration_required": false,
+        "asserted_equipment_onsite": null,
+        "citations": {
+          "gross_avoided_exposure_usd": [
+            "COST-SUMMARY-001",
+            "CTR-DELAY-001"
+          ],
+          "human_confirmation_required": [
+            "PRG-ONSITE-001",
+            "SUP-NOT-ARRIVED-001",
+            "LOG-STATUS-001"
+          ],
+          "mitigation_cost_usd": [
+            "COST-SUMMARY-001"
+          ],
+          "onsite_status_contradiction_detected": [
+            "PRG-ONSITE-001",
+            "SUP-NOT-ARRIVED-001",
+            "LOG-STATUS-001"
+          ],
+          "preferred_option_id": [
+            "COST-SUMMARY-001",
+            "SCH-DELIVERY-001"
+          ],
+          "preferred_option_subject_to_approval": [
+            "COST-SUMMARY-001",
+            "PRG-ONSITE-001",
+            "SUP-NOT-ARRIVED-001",
+            "LOG-STATUS-001"
+          ],
+          "projected_slip_days": [
+            "SCH-DELIVERY-001"
+          ],
+          "unmitigated_exposure_usd": [
+            "SCH-DELIVERY-001",
+            "COST-SUMMARY-001",
+            "CTR-DELAY-001"
+          ]
+        },
+        "concise_rationale": "Accelerated logistics is preferred subject to approval because the 48000 USD mitigation cost is lower than the 195000 USD unmitigated exposure, while onsite status remains contradictory and requires human confirmation.",
+        "gross_avoided_exposure_usd": 147000,
+        "human_confirmation_required": true,
+        "mitigation_cost_usd": 48000,
+        "onsite_status_contradiction_detected": true,
+        "preferred_option_id": "REC-ACCEL-LOGISTICS",
+        "preferred_option_subject_to_approval": true,
+        "projected_slip_days": 13,
+        "schema_version": "project-recovery-council.qwen.recovery-analysis-response.v1",
+        "status": "completed",
+        "unmitigated_exposure_usd": 195000,
+        "unresolved_disagreements": [],
+        "unsupported_claims": []
+      },
+      "provider": "offline-fixture",
+      "provider_metadata": {
+        "fixture_key": "strong_modular_council"
+      },
+      "raw_response_text": "{\"agent_role\": \"RecoveryPlanner\", \"ambiguous_claims\": [], \"arbitration_required\": false, \"asserted_equipment_onsite\": null, \"citations\": {\"gross_avoided_exposure_usd\": [\"COST-SUMMARY-001\", \"CTR-DELAY-001\"], \"human_confirmation_required\": [\"PRG-ONSITE-001\", \"SUP-NOT-ARRIVED-001\", \"LOG-STATUS-001\"], \"mitigation_cost_usd\": [\"COST-SUMMARY-001\"], \"onsite_status_contradiction_detected\": [\"PRG-ONSITE-001\", \"SUP-NOT-ARRIVED-001\", \"LOG-STATUS-001\"], \"preferred_option_id\": [\"COST-SUMMARY-001\", \"SCH-DELIVERY-001\"], \"preferred_option_subject_to_approval\": [\"COST-SUMMARY-001\", \"PRG-ONSITE-001\", \"SUP-NOT-ARRIVED-001\", \"LOG-STATUS-001\"], \"projected_slip_days\": [\"SCH-DELIVERY-001\"], \"unmitigated_exposure_usd\": [\"SCH-DELIVERY-001\", \"COST-SUMMARY-001\", \"CTR-DELAY-001\"]}, \"concise_rationale\": \"Accelerated logistics is preferred subject to approval because the 48000 USD mitigation cost is lower than the 195000 USD unmitigated exposure, while onsite status remains contradictory and requires human confirmation.\", \"gross_avoided_exposure_usd\": 147000, \"human_confirmation_required\": true, \"mitigation_cost_usd\": 48000, \"onsite_status_contradiction_detected\": true, \"preferred_option_id\": \"REC-ACCEL-LOGISTICS\", \"preferred_option_subject_to_approval\": true, \"projected_slip_days\": 13, \"schema_version\": \"project-recovery-council.qwen.recovery-analysis-response.v1\", \"status\": \"completed\", \"unmitigated_exposure_usd\": 195000, \"unresolved_disagreements\": [], \"unsupported_claims\": []}",
+      "retry_count": 0,
+      "simulated": true,
+      "total_token_count": null,
+      "validation_errors": []
+    },
+    "started_at": null,
+    "variant": "dynamic_expert_council"
+  }
+]

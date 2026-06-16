@@ -1,0 +1,131 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "qwen-competition-adaptation",
+  "repository": "project-recovery-council-qwen",
+  "status": "complete",
+  "objectives": [
+    "Preserve deterministic reference implementation",
+    "Add provider-neutral model-client abstraction",
+    "Define Qwen competition prompt contracts",
+    "Define experiment variants and evaluation metrics",
+    "Add deterministic offline response fixtures",
+    "Add experiment artifact validation",
+    "Add competition documentation and ADR",
+    "Keep live-provider execution disabled by default"
+  ],
+  "created_files": [
+    "src/project_recovery_council/model_client.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/prompt_catalog.py",
+    "src/project_recovery_council/experiments.py",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/offline_experiments.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "prompts/v1/generalist_agent.md",
+    "prompts/v1/director_agent.md",
+    "prompts/v1/schedule_expert.md",
+    "prompts/v1/commercial_expert.md",
+    "prompts/v1/evidence_auditor.md",
+    "prompts/v1/risk_expert.md",
+    "prompts/v1/recovery_planner.md",
+    "prompts/v1/arbiter_agent.md",
+    "experiment-fixtures/offline-responses/v1/strong_modular_council.json",
+    "experiment-fixtures/offline-responses/v1/generalist_missed_onsite_contradiction.json",
+    "experiment-fixtures/offline-responses/v1/fixed_chain_result.json",
+    "experiment-fixtures/offline-responses/v1/malformed_structured_response.json",
+    "experiment-fixtures/offline-responses/v1/specialist_abstention.json",
+    "experiment-fixtures/offline-responses/v1/disagreement_requires_arbitration.json",
+    "experiment-artifacts/offline-strong_modular_council/experiment-config.json",
+    "experiment-artifacts/offline-strong_modular_council/invocation-records.json",
+    "experiment-artifacts/offline-strong_modular_council/variant-results.json",
+    "experiment-artifacts/offline-strong_modular_council/evaluation-results.json",
+    "experiment-artifacts/offline-strong_modular_council/comparison-report.json",
+    "experiment-artifacts/offline-strong_modular_council/artifact-manifest.json",
+    "docs/QWEN_COMPETITION_STRATEGY.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/METRICS.md",
+    "docs/PROMPT_ARCHITECTURE.md",
+    "docs/LIVE_PROVIDER_PLAN.md",
+    "decisions/ADR-0005-qwen-agent-society-experiment-architecture.md",
+    "tests/test_qwen_model_clients.py",
+    "tests/test_qwen_prompts_and_plans.py",
+    "tests/test_qwen_evaluation.py",
+    "tests/test_qwen_artifacts_and_cli.py",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_QWEN_COMPETITION_ADAPTATION.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_QWEN_COMPETITION_ADAPTATION.json"
+  ],
+  "modified_files": [
+    "README.md",
+    "pyproject.toml",
+    "src/project_recovery_council/__main__.py"
+  ],
+  "architectural_decisions": [
+    {
+      "id": "ADR-0005",
+      "title": "Qwen Agent Society Experiment Architecture",
+      "path": "decisions/ADR-0005-qwen-agent-society-experiment-architecture.md"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "python -m pytest",
+      "exit_code": 1,
+      "result": "57 passed, 1 failed; editable install failed because Hatch inferred package name project_recovery_council_qwen after distribution rename"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "58 passed in 6.20s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council compare-offline",
+      "exit_code": 0,
+      "result": "offline comparison generated for dynamic council, single generalist, and fixed chain simulated fixtures"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council evaluate-offline --fixture strong_modular_council --experiment-id offline-strong_modular_council",
+      "exit_code": 0,
+      "result": "offline evaluation written: experiment-artifacts/offline-strong_modular_council"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council",
+      "exit_code": 0,
+      "result": "experiment artifact inspection passed"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "58 passed in 6.34s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    }
+  ],
+  "test_results": {
+    "pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "58 passed in 6.34s"
+    }
+  },
+  "offline_fixture_limitations": [
+    "All offline responses are simulated test doubles",
+    "No live Qwen model was invoked",
+    "No provider token counts, latency, or pricing are claimed as real measurements"
+  ],
+  "known_limitations": [
+    "No live Qwen API adapter",
+    "No Alibaba Cloud deployment proof",
+    "No live-provider retry, rate-limit, or credential handling implementation",
+    "Evaluation uses one synthetic equipment-delay case"
+  ],
+  "next_recommended_step": "Implement an opt-in live Qwen ModelClient adapter with structured output validation, credential loading, retry/timeout policy, token accounting, secrets handling, and reproducibility metadata."
+}
