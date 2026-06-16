@@ -1,0 +1,121 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "final-local-hardening",
+  "repository": "project-recovery-council",
+  "status": "complete",
+  "objectives": [
+    "Add continuous integration",
+    "Freeze and test v1 public schemas",
+    "Make package installable and CLI usable without PYTHONPATH",
+    "Prevent accidental run overwrite",
+    "Create deterministic end-to-end demo command and script",
+    "Produce canonical completed demo run"
+  ],
+  "created_files": [
+    ".github/workflows/ci.yml",
+    "docs/SCHEMA_VERSIONING_POLICY.md",
+    "decisions/ADR-0004-v1-contract-freeze-and-ci.md",
+    "scripts/run_demo.py",
+    "session-artifacts/canonical-demo/workflow-state.json",
+    "session-artifacts/canonical-demo/artifact-manifest.json",
+    "session-artifacts/canonical-demo/run-summary.json",
+    "session-artifacts/canonical-demo/audit-events.json",
+    "session-artifacts/canonical-demo/expert-findings.json",
+    "session-artifacts/canonical-demo/contradictions.json",
+    "session-artifacts/canonical-demo/human-decisions.json",
+    "session-artifacts/canonical-demo/human-decision-requests.json",
+    "session-artifacts/canonical-demo/recovery-options.json",
+    "session-artifacts/canonical-demo/draft-recommendation.json",
+    "session-artifacts/canonical-demo/final-recommendation.json",
+    "session-artifacts/canonical-demo/replay-input.json",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_FINAL_LOCAL_HARDENING.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_FINAL_LOCAL_HARDENING.json"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/DEVELOPMENT_PLAN.md",
+    "docs/RUN_ARTIFACT_CONTRACT.md",
+    "docs/UIPATH_MAESTRO_MAPPING.md",
+    "src/project_recovery_council/__init__.py",
+    "src/project_recovery_council/__main__.py",
+    "src/project_recovery_council/artifacts.py",
+    "src/project_recovery_council/persistence.py",
+    "src/project_recovery_council/runner.py",
+    "src/project_recovery_council/schemas.py",
+    "src/project_recovery_council/state.py",
+    "src/project_recovery_council/workflow.py",
+    "tests/test_contract_hardening.py"
+  ],
+  "architectural_decisions": [
+    {
+      "id": "ADR-0004",
+      "title": "V1 Contract Freeze and CI",
+      "path": "decisions/ADR-0004-v1-contract-freeze-and-ci.md"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate",
+      "exit_code": 0,
+      "result": "validation passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council demo --artifacts-root session-artifacts --run-id canonical-demo --replace-existing",
+      "exit_code": 0,
+      "result": "canonical demo completed and artifact inspection passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council inspect session-artifacts/canonical-demo",
+      "exit_code": 0,
+      "result": "artifact inspection passed"
+    },
+    {
+      "command": "python scripts/run_demo.py --artifacts-root /tmp/project-recovery-council-demo --run-id script-demo --replace-existing",
+      "exit_code": 0,
+      "result": "temporary script demo completed and artifact inspection passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council demo --artifacts-root /tmp/project-recovery-council-demo-cli --run-id cli-demo --replace-existing",
+      "exit_code": 0,
+      "result": "temporary CLI demo completed and artifact inspection passed"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "43 passed in 4.10s"
+    }
+  ],
+  "test_results": {
+    "pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "43 passed in 4.10s"
+    }
+  },
+  "canonical_evidence_run": {
+    "path": "session-artifacts/canonical-demo",
+    "workflow_status": "completed",
+    "projected_delay_days": 13,
+    "unmitigated_exposure_usd": 195000,
+    "mitigation_cost_usd": 48000,
+    "gross_avoided_exposure_usd": 147000,
+    "contradiction_status": "resolved",
+    "human_decision_status": "answered",
+    "final_approval_status": "approved",
+    "artifact_inspection": "passed"
+  },
+  "known_limitations": [
+    "No UiPath SDK or Maestro tenant behavior has been verified",
+    "ExternalExpertAdapter remains safely disabled",
+    "No schema migration tool exists beyond documented policy",
+    "Only one synthetic canonical case is included"
+  ],
+  "next_recommended_step": "Use the canonical run and frozen v1 schemas for a UiPath Labs integration spike."
+}

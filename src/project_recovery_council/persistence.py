@@ -70,6 +70,7 @@ def context_from_persisted_state(state: PersistedWorkflowState) -> WorkflowConte
         inject_commercial_failure=state.inject_commercial_failure,
         auto_human_decision=False,
         auto_final_approval=False,
+        replace_existing=False,
     )
     audit = AuditRecorder(
         state.case_id,
@@ -132,4 +133,3 @@ def _approval_state(context: WorkflowContext) -> str:
     if context.draft_recommendation:
         return context.draft_recommendation.approval_status
     return "not_requested"
-

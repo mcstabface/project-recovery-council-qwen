@@ -8,6 +8,7 @@ from pathlib import Path
 
 from project_recovery_council.runner import (
     approve_workflow,
+    demo_equipment_delay_case,
     inspect_run,
     replay_run,
     resume_workflow,
@@ -17,7 +18,7 @@ from project_recovery_council.runner import (
     validate_case_fixture,
     workflow_status,
 )
-from project_recovery_council.schemas import export_schemas
+from project_recovery_council.schemas import check_schema_drift, export_schemas
 from project_recovery_council.workflow import DEFAULT_ARTIFACTS_ROOT, DEFAULT_CASE_PATH
 
 
@@ -30,12 +31,14 @@ def build_parser() -> argparse.ArgumentParser:
     run_parser.add_argument("--artifacts-root", type=Path, default=DEFAULT_ARTIFACTS_ROOT)
     run_parser.add_argument("--run-id", default=None)
     run_parser.add_argument("--inject-commercial-failure", action="store_true")
+    run_parser.add_argument("--replace-existing", action="store_true")
 
     start_parser = subparsers.add_parser("start", help="start and pause at the first human gate")
     start_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
     start_parser.add_argument("--artifacts-root", type=Path, default=DEFAULT_ARTIFACTS_ROOT)
     start_parser.add_argument("--run-id", default="equipment-delay-paused")
     start_parser.add_argument("--inject-commercial-failure", action="store_true")
+    start_parser.add_argument("--replace-existing", action="store_true")
 
     status_parser = subparsers.add_parser("status", help="show persisted workflow status")
     status_parser.add_argument("run_path", type=Path)
@@ -59,6 +62,15 @@ def build_parser() -> argparse.ArgumentParser:
     schemas_parser = subparsers.add_parser("export-schemas", help="export v1 JSON Schemas")
     schemas_parser.add_argument("--output-dir", type=Path, default=Path("schemas") / "v1")
 
+    subparsers.add_parser("check-schema-drift", help="compare generated schemas with committed v1 schemas")
+
+    demo_parser = subparsers.add_parser("demo", help="run complete deterministic demo lifecycle")
+    demo_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
+    demo_parser.add_argument("--artifacts-root", type=Path, default=DEFAULT_ARTIFACTS_ROOT)
+    demo_parser.add_argument("--run-id", default="deterministic-demo")
+    demo_parser.add_argument("--inject-commercial-failure", action="store_true")
+    demo_parser.add_argument("--replace-existing", action="store_true")
+
     validate_parser = subparsers.add_parser("validate", help="validate the fixture bundle")
     validate_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
 
@@ -66,6 +78,7 @@ def build_parser() -> argparse.ArgumentParser:
     replay_parser.add_argument("path", type=Path)
     replay_parser.add_argument("--artifacts-root", type=Path, default=None)
     replay_parser.add_argument("--run-id", default=None)
+    replay_parser.add_argument("--replace-existing", action="store_true")
 
     return parser
 
@@ -95,6 +108,7 @@ def main(argv: list[str] | None = None) -> int:
                 artifacts_root=args.artifacts_root,
                 run_id=args.run_id or default_id,
                 inject_commercial_failure=args.inject_commercial_failure,
+                replace_existing=args.replace_existing,
             )
             print(f"run completed: {result.run_path}")
             return 0
@@ -105,6 +119,7 @@ def main(argv: list[str] | None = None) -> int:
                 artifacts_root=args.artifacts_root,
                 run_id=args.run_id,
                 inject_commercial_failure=args.inject_commercial_failure,
+                replace_existing=args.replace_existing,
             )
             print(f"run started: {result.run_path}")
             print(f"stage: {result.context.state.value}")
@@ -158,11 +173,42 @@ def main(argv: list[str] | None = None) -> int:
             print(f"schema count: {len(catalog)}")
             return 0
 
+        if args.command == "check-schema-drift":
+            result = check_schema_drift()
+            if result.passed:
+                print("schema drift check passed")
+                return 0
+            print("schema drift check failed:")
+            for message in result.messages:
+                print(f"- {message}")
+            return 1
+
+        if args.command == "demo":
+            summary = demo_equipment_delay_case(
+                case_path=args.case_path,
+                artifacts_root=args.artifacts_root,
+                run_id=args.run_id,
+                inject_commercial_failure=args.inject_commercial_failure,
+                replace_existing=args.replace_existing,
+            )
+            print("demo completed")
+            print(f"run_path: {summary['run_path']}")
+            print(f"projected_delay_days: {summary['projected_delay_days']}")
+            print(f"unmitigated_exposure_usd: {summary['unmitigated_exposure_usd']}")
+            print(f"mitigation_cost_usd: {summary['mitigation_cost_usd']}")
+            print(f"gross_avoided_exposure_usd: {summary['gross_avoided_exposure_usd']}")
+            print(f"contradiction_status: {summary['contradiction_status']}")
+            print(f"human_decision_status: {summary['human_decision_status']}")
+            print(f"final_approval_status: {summary['final_approval_status']}")
+            print(f"artifact_inspection: {'passed' if summary['inspection_passed'] else 'failed'}")
+            return 0
+
         if args.command == "replay":
             result = replay_run(
                 args.path,
                 artifacts_root=args.artifacts_root,
                 run_id=args.run_id,
+                replace_existing=args.replace_existing,
             )
             equivalent = result.replay_comparison["equivalent"] if result.replay_comparison else False
             print(f"replay completed: {result.run_path}")

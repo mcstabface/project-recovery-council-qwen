@@ -22,6 +22,8 @@ SDK code or tested Maestro implementation exists in this repository.
 | Expert retry behavior | Workflow retry and exception handling | CommercialExpert failure injection is the local retry reference. |
 | Final approval | Human approval task | Local `approve` command models the final authorization gate. |
 | `artifact-manifest.json` | Submission and verification evidence | Manifest and checksums provide portable verification evidence. |
+| `schemas/v1/` | Platform payload contracts | Frozen local schemas define the candidate integration payloads; exact Maestro schema constraints still require testing. |
+| `session-artifacts/canonical-demo/` | Reference evidence package | Canonical local run can be used as sample evidence when testing case creation and review workflows. |
 
 ## Assumptions Requiring Confirmation
 
@@ -34,7 +36,10 @@ SDK code or tested Maestro implementation exists in this repository.
 - Whether artifact manifests should be attached to a case, stored externally, or
   represented as case evidence.
 - How human approval actors and timestamps are normalized by Maestro.
+- Whether Maestro payload size limits or field naming rules require adapter-side
+  transformations of the v1 schemas.
+- Whether schema drift checks should run in the UiPath delivery pipeline or only
+  in the source repository CI.
 
 The local workflow should remain the deterministic reference until these
 assumptions are tested with UiPath Labs access.
-

@@ -22,24 +22,33 @@ Completed in this run:
 - run artifact manifest and inspect command
 - replay acceptance profile
 - UiPath Maestro mapping document
+- package installability with a console entry point
+- GitHub Actions CI for tests, schema drift, fixture validation, demo execution,
+  and artifact inspection
+- frozen v1 schema drift control
+- run directory overwrite protection
+- deterministic complete demo command and cross-platform demo script
+- canonical completed demo evidence run
 
 ## Next Slice
 
-Harden compatibility and review ergonomics:
+Prepare the UiPath integration spike:
 
-- add a small sample artifact index for human review
-- add explicit case-state mutation helpers if future workflows need persisted
-  case snapshots
-- add contract compatibility tests that compare generated schemas to checked-in
-  schemas
-- add a migration policy document before any v2 schema work begins
+- confirm Maestro case-state, Action Center, retry, artifact attachment, and
+  audit-history semantics against a real UiPath Labs tenant
+- map the v1 JSON Schemas into the exact payload constraints required by
+  Maestro workflows and agent tasks
+- decide how canonical local evidence will be attached to or referenced by a
+  governed Maestro case
+- define the first external expert adapter implementation behind the existing
+  platform-neutral adapter boundary
 
 ## Later Slices
 
-- Add schema export for platform integration.
-- Add richer case lifecycle state transitions.
 - Add provider-backed expert implementations behind the same interfaces.
 - Add UiPath Maestro orchestration only after the local contracts stabilize.
+- Add richer multi-case lifecycle behavior after the first platform integration
+  spike validates the current state model.
 
 ## Quality Gates
 

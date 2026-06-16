@@ -1,0 +1,45 @@
+{
+  "audit_event_count": 39,
+  "case_id": "PRC-EQ-DELAY-001",
+  "contradiction_count": 1,
+  "expert_finding_count": 3,
+  "expert_request_count": 5,
+  "human_decision_count": 2,
+  "inject_commercial_failure": false,
+  "run_id": "canonical-demo",
+  "run_path": "session-artifacts/canonical-demo",
+  "schema_version": "project-recovery-council.run-summary.v1",
+  "selected_experts": [
+    {
+      "expert_role": "ScheduleExpert",
+      "phase": "expert_analysis",
+      "rationale": "Delivery forecast moved later than baseline and milestone impact must be calculated.",
+      "required": true
+    },
+    {
+      "expert_role": "CommercialExpert",
+      "phase": "expert_analysis",
+      "rationale": "Cost summary contains delay exposure and mitigation economics.",
+      "required": true
+    },
+    {
+      "expert_role": "EvidenceAuditor",
+      "phase": "contradiction_review",
+      "rationale": "Onsite progress assertion conflicts with logistics arrival data.",
+      "required": true
+    },
+    {
+      "expert_role": "RiskExpert",
+      "phase": "expert_analysis",
+      "rationale": "Risk register contains an unresolved status-conflict risk.",
+      "required": true
+    },
+    {
+      "expert_role": "RecoveryPlanner",
+      "phase": "recovery_planning",
+      "rationale": "Approved accelerated logistics option is available subject to project approval.",
+      "required": true
+    }
+  ],
+  "state": "completed"
+}

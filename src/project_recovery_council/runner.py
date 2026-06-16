@@ -29,6 +29,7 @@ def run_equipment_delay_case(
     artifacts_root: Path | str = DEFAULT_ARTIFACTS_ROOT,
     run_id: str = "equipment-delay-standard",
     inject_commercial_failure: bool = False,
+    replace_existing: bool = False,
 ) -> WorkflowRunResult:
     config = default_workflow_config(
         case_path=case_path,
@@ -37,6 +38,7 @@ def run_equipment_delay_case(
         inject_commercial_failure=inject_commercial_failure,
         auto_human_decision=True,
         auto_final_approval=True,
+        replace_existing=replace_existing,
     )
     return LocalWorkflowRunner(config).run(write_artifacts=True)
 
@@ -47,6 +49,7 @@ def start_equipment_delay_case(
     artifacts_root: Path | str = DEFAULT_ARTIFACTS_ROOT,
     run_id: str = "equipment-delay-paused",
     inject_commercial_failure: bool = False,
+    replace_existing: bool = False,
 ) -> WorkflowRunResult:
     config = default_workflow_config(
         case_path=case_path,
@@ -55,6 +58,7 @@ def start_equipment_delay_case(
         inject_commercial_failure=inject_commercial_failure,
         auto_human_decision=False,
         auto_final_approval=False,
+        replace_existing=replace_existing,
     )
     runner = LocalWorkflowRunner(config)
     context = runner.run_until_human_gate()
@@ -139,6 +143,50 @@ def inspect_run(run_path: Path | str) -> ArtifactInspectionResult:
     return validate_run_artifacts(run_path)
 
 
+def demo_equipment_delay_case(
+    *,
+    case_path: Path | str = DEFAULT_CASE_PATH,
+    artifacts_root: Path | str = DEFAULT_ARTIFACTS_ROOT,
+    run_id: str = "deterministic-demo",
+    inject_commercial_failure: bool = False,
+    replace_existing: bool = False,
+) -> dict[str, Any]:
+    started = start_equipment_delay_case(
+        case_path=case_path,
+        artifacts_root=artifacts_root,
+        run_id=run_id,
+        inject_commercial_failure=inject_commercial_failure,
+        replace_existing=replace_existing,
+    )
+    run_path = started.run_path
+    submit_decision(
+        run_path,
+        request_id="HDR-ONSITE-001",
+        decision="equipment_not_onsite",
+        actor="demo-reviewer",
+    )
+    resume_workflow(run_path)
+    approved = approve_workflow(run_path, actor="demo-approver")
+    inspection = inspect_run(run_path)
+    if not inspection.passed:
+        raise RuntimeError(f"demo artifact inspection failed: {inspection.errors}")
+    recommendation = approved.context.final_recommendation
+    if recommendation is None:
+        raise RuntimeError("demo completed without final recommendation")
+    return {
+        "run_path": Path(run_path).as_posix(),
+        "projected_delay_days": recommendation.options_considered[0].avoided_delay_days,
+        "unmitigated_exposure_usd": recommendation.unmitigated_exposure_usd,
+        "mitigation_cost_usd": recommendation.mitigation_cost_usd,
+        "gross_avoided_exposure_usd": recommendation.gross_avoided_exposure_usd,
+        "contradiction_status": recommendation.contradictions[0].status if recommendation.contradictions else "none",
+        "human_decision_status": approved.context.human_decision_requests[0].status if approved.context.human_decision_requests else "none",
+        "final_approval_status": recommendation.approval_status,
+        "inspection_passed": inspection.passed,
+        "commercial_failure_injected": inject_commercial_failure,
+    }
+
+
 def validate_case_fixture(case_path: Path | str = DEFAULT_CASE_PATH) -> list[str]:
     return validate_fixture_bundle(case_path)
 
@@ -148,6 +196,7 @@ def replay_run(
     *,
     artifacts_root: Path | str | None = None,
     run_id: str | None = None,
+    replace_existing: bool = False,
 ) -> WorkflowRunResult:
     replay_path = Path(path)
     replay_input_path = replay_path / "replay-input.json" if replay_path.is_dir() else replay_path
@@ -160,6 +209,7 @@ def replay_run(
         artifacts_root=output_root,
         run_id=replay_run_id,
         inject_commercial_failure=bool(replay_input["inject_commercial_failure"]),
+        replace_existing=replace_existing,
     )
     if result.run_path is None:
         return result

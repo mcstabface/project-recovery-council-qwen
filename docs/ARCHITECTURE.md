@@ -13,6 +13,7 @@ fixtures. The boundary is intentionally narrow:
 - local orchestration layer and CLI
 - versioned schema export
 - persisted run-state and artifact contract validation
+- CI contract checks and canonical demo evidence generation
 
 No runtime code connects to external systems.
 
@@ -49,9 +50,11 @@ The orchestration layer is explicit and separate from expert stubs:
 - `persistence.py` converts between in-memory workflow context and versioned
   persisted state.
 - `artifacts.py` defines the run artifact manifest and validates run directories.
-- `schemas.py` exports public JSON Schemas and the schema catalog.
+- `schemas.py` exports public JSON Schemas, the schema catalog, and schema drift
+  checks against the committed v1 contracts.
 - `runner.py` and `__main__.py` expose local validate, start, status, decide,
-  resume, approve, inspect, run, replay, and schema export commands.
+  resume, approve, inspect, demo, run, replay, schema export, and schema drift
+  commands.
 
 Workflow stages are:
 
@@ -78,8 +81,13 @@ recommendations, approval state, audit sequence position, audit events, and
 failure information when present.
 
 The workflow does not automatically provide human decisions in the core
-lifecycle. The `run` command is a demo helper that explicitly opts into simulated
+lifecycle. The `demo` and legacy `run` commands explicitly opt into simulated
 human decision and final approval.
+
+Run directory creation is evidence-preserving by default. A requested run ID
+that already exists raises a workflow execution error unless the caller provides
+`--replace-existing`, which is intended for deterministic local regeneration and
+test fixtures.
 
 ## Expert Adapter Boundary
 
@@ -136,6 +144,11 @@ For the current case, `RuleBasedDirector` selects:
   and final recommendation content.
 - Artifact inspection fails incomplete runs that claim completion and completed
   runs that lack final approval or final recommendation.
+- Committed `schemas/v1/` files are frozen public contract artifacts. CI exports
+  schemas to a temporary directory and fails on byte-level drift.
+- Canonical demo artifacts under `session-artifacts/canonical-demo/` provide a
+  completed local evidence run for review without connecting to external
+  services.
 
 ## Future Integration Points
 

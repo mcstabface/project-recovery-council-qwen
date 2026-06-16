@@ -1,0 +1,64 @@
+[
+  {
+    "decided_at": "2026-06-29T16:00:00Z",
+    "decided_by": "demo-reviewer",
+    "decision_id": "HD-ONSITE-001",
+    "decision_request_id": "HDR-ONSITE-001",
+    "evidence": [
+      {
+        "excerpt": "The generator skid is onsite and released to installation.",
+        "locator": "section:Equipment Status",
+        "record_id": "PRG-ONSITE-001",
+        "source_file": "progress-report.md"
+      },
+      {
+        "excerpt": "The generator skid has not arrived at the site.",
+        "locator": "section:Supplier Message",
+        "record_id": "SUP-NOT-ARRIVED-001",
+        "source_file": "supplier-correspondence.md"
+      },
+      {
+        "excerpt": "actual_arrival_date is null",
+        "locator": "/records/0/actual_arrival_date",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "outcome": "confirmed",
+    "rationale": "Human decision confirms the generator skid is not onsite."
+  },
+  {
+    "decided_at": "2026-06-29T16:00:00Z",
+    "decided_by": "demo-approver",
+    "decision_id": "HD-FINAL-APPROVAL-001",
+    "decision_request_id": "HDR-FINAL-APPROVAL-001",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "section:Delay Exposure",
+        "record_id": "CTR-DELAY-001",
+        "source_file": "contract-excerpt.md"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "outcome": "approved",
+    "rationale": "Final approver authorizes the accelerated logistics recommendation."
+  }
+]

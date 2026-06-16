@@ -1,4 +1,5 @@
 import os
+import shutil
 import subprocess
 import sys
 from pathlib import Path
@@ -18,7 +19,7 @@ from project_recovery_council.runner import (
     submit_decision,
     workflow_status,
 )
-from project_recovery_council.schemas import SCHEMA_EXPORTS, export_schemas
+from project_recovery_council.schemas import SCHEMA_EXPORTS, check_schema_drift, compare_schema_directories, export_schemas
 from project_recovery_council.serialization import read_json
 from project_recovery_council.state import WorkflowStage
 from project_recovery_council.workflow import default_workflow_config
@@ -50,6 +51,31 @@ def test_schema_export_and_catalog_completeness(tmp_path: Path) -> None:
     for item in catalog_payload["schemas"]:
         assert (tmp_path / Path(item["file_path"]).name).is_file()
         assert item["compatibility_notes"]
+
+
+def test_schema_drift_passes_with_committed_schemas() -> None:
+    result = check_schema_drift(ROOT / "schemas" / "v1")
+
+    assert result.passed is True
+    assert result.messages == []
+
+
+def test_schema_drift_detects_modified_missing_and_unexpected_schema(tmp_path: Path) -> None:
+    committed = tmp_path / "committed"
+    exported = tmp_path / "exported"
+    shutil.copytree(ROOT / "schemas" / "v1", committed)
+    export_schemas(exported)
+
+    (committed / "recovery-case.schema.json").write_text("{}\n", encoding="utf-8")
+    (committed / "expert-request.schema.json").unlink()
+    (committed / "unexpected.schema.json").write_text("{}\n", encoding="utf-8")
+
+    result = compare_schema_directories(committed, exported)
+
+    assert result.passed is False
+    assert "recovery-case.schema.json" in result.changed_files
+    assert "expert-request.schema.json" in result.missing_files
+    assert "unexpected.schema.json" in result.unexpected_files
 
 
 def test_deterministic_adapter_success_and_failure_representation() -> None:
@@ -124,6 +150,30 @@ def test_persistent_pause_resume_lifecycle(tmp_path: Path) -> None:
     approved = approve_workflow(run_path, actor="demo-approver")
     assert approved.context.state == WorkflowStage.COMPLETED
     assert approved.context.final_recommendation.approval_status == "approved"
+
+
+def test_existing_run_directory_rejection_and_explicit_replacement(tmp_path: Path) -> None:
+    run_equipment_delay_case(
+        case_path=FIXTURE_PATH,
+        artifacts_root=tmp_path,
+        run_id="replace-demo",
+    )
+
+    with pytest.raises(Exception, match="already exists"):
+        run_equipment_delay_case(
+            case_path=FIXTURE_PATH,
+            artifacts_root=tmp_path,
+            run_id="replace-demo",
+        )
+
+    replaced = run_equipment_delay_case(
+        case_path=FIXTURE_PATH,
+        artifacts_root=tmp_path,
+        run_id="replace-demo",
+        replace_existing=True,
+    )
+
+    assert replaced.context.audit_events[0].metadata["replace_existing"] is True
 
 
 def test_premature_approval_and_duplicate_decision_are_rejected(tmp_path: Path) -> None:
@@ -212,6 +262,93 @@ def test_replay_acceptance_profile_and_equivalence(tmp_path: Path) -> None:
     assert "audit_events" in profile["order_sensitive_fields"]
 
 
+def test_demo_command_completion_and_failure_injection(tmp_path: Path) -> None:
+    ok = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "project_recovery_council",
+            "demo",
+            "--case-path",
+            str(FIXTURE_PATH),
+            "--artifacts-root",
+            str(tmp_path),
+            "--run-id",
+            "demo-ok",
+        ],
+        cwd=ROOT,
+        env=cli_env(),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    retry = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "project_recovery_council",
+            "demo",
+            "--case-path",
+            str(FIXTURE_PATH),
+            "--artifacts-root",
+            str(tmp_path),
+            "--run-id",
+            "demo-retry",
+            "--inject-commercial-failure",
+        ],
+        cwd=ROOT,
+        env=cli_env(),
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert ok.returncode == 0
+    assert "demo completed" in ok.stdout
+    assert "projected_delay_days: 13" in ok.stdout
+    assert validate_run_artifacts(tmp_path / "demo-ok").passed is True
+    assert retry.returncode == 0
+    findings = read_json(tmp_path / "demo-retry" / "expert-findings.json")
+    assert any(item["status"] == "failed" for item in findings)
+
+
+def test_canonical_evidence_run_validation() -> None:
+    canonical = ROOT / "session-artifacts" / "canonical-demo"
+
+    assert validate_run_artifacts(canonical).passed is True
+    recommendation = read_json(canonical / "final-recommendation.json")
+    assert recommendation["approval_status"] == "approved"
+    assert recommendation["gross_avoided_exposure_usd"] == 147000
+
+
+def test_installed_console_entry_point(tmp_path: Path) -> None:
+    venv = tmp_path / "venv"
+    subprocess.run(
+        [sys.executable, "-m", "venv", "--system-site-packages", str(venv)],
+        cwd=ROOT,
+        check=True,
+    )
+    python = venv / ("Scripts/python.exe" if os.name == "nt" else "bin/python")
+    command = venv / ("Scripts/project-recovery-council.exe" if os.name == "nt" else "bin/project-recovery-council")
+    subprocess.run(
+        [str(python), "-m", "pip", "install", "-e", ".", "--no-deps", "--no-build-isolation"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=True,
+    )
+    result = subprocess.run(
+        [str(command), "validate"],
+        cwd=ROOT,
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+
+    assert result.returncode == 0
+    assert "validation passed" in result.stdout
+
+
 def test_cli_persistent_lifecycle_success_and_failure_codes(tmp_path: Path) -> None:
     run_path = tmp_path / "cli-persist"
     start = subprocess.run(
@@ -256,4 +393,3 @@ def test_cli_persistent_lifecycle_success_and_failure_codes(tmp_path: Path) -> N
         check=False,
     )
     assert premature.returncode == 1
-

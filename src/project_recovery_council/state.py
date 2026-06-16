@@ -137,6 +137,7 @@ class WorkflowConfig:
     inject_commercial_failure: bool = False
     auto_human_decision: bool = False
     auto_final_approval: bool = False
+    replace_existing: bool = False
 
 
 @dataclass

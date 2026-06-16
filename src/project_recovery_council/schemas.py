@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+from dataclasses import dataclass
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Any
 
 from pydantic import TypeAdapter
@@ -48,6 +50,24 @@ SCHEMA_EXPORTS: list[dict[str, Any]] = [
 ]
 
 
+@dataclass(frozen=True)
+class SchemaDriftResult:
+    """Byte-level schema drift comparison result."""
+
+    passed: bool
+    changed_files: list[str]
+    missing_files: list[str]
+    unexpected_files: list[str]
+
+    @property
+    def messages(self) -> list[str]:
+        messages: list[str] = []
+        messages.extend(f"changed: {path}" for path in self.changed_files)
+        messages.extend(f"missing: {path}" for path in self.missing_files)
+        messages.extend(f"unexpected: {path}" for path in self.unexpected_files)
+        return messages
+
+
 def export_schemas(output_dir: Path | str = SCHEMA_ROOT) -> list[dict[str, Any]]:
     root = Path(output_dir)
     root.mkdir(parents=True, exist_ok=True)
@@ -64,7 +84,7 @@ def export_schemas(output_dir: Path | str = SCHEMA_ROOT) -> list[dict[str, Any]]
                 "schema_id": item["id"],
                 "title": item["title"],
                 "version": SCHEMA_VERSION,
-                "file_path": path.as_posix(),
+                "file_path": (SCHEMA_ROOT / item["file"]).as_posix(),
                 "intended_producer": item["producer"],
                 "intended_consumer": item["consumer"],
                 "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
@@ -74,6 +94,45 @@ def export_schemas(output_dir: Path | str = SCHEMA_ROOT) -> list[dict[str, Any]]
     return catalog
 
 
+def check_schema_drift(committed_dir: Path | str = SCHEMA_ROOT) -> SchemaDriftResult:
+    """Export schemas to a temporary directory and compare against committed v1 files."""
+
+    committed = Path(committed_dir)
+    with TemporaryDirectory() as tmp:
+        exported = Path(tmp) / SCHEMA_VERSION
+        export_schemas(exported)
+        return compare_schema_directories(committed, exported)
+
+
+def compare_schema_directories(committed_dir: Path | str, exported_dir: Path | str) -> SchemaDriftResult:
+    committed = Path(committed_dir)
+    exported = Path(exported_dir)
+    committed_files = _relative_files(committed)
+    exported_files = _relative_files(exported)
+    missing = sorted(str(path) for path in exported_files - committed_files)
+    unexpected = sorted(str(path) for path in committed_files - exported_files)
+    changed: list[str] = []
+    for relative in sorted(committed_files & exported_files):
+        if (committed / relative).read_bytes() != (exported / relative).read_bytes():
+            changed.append(str(relative))
+    return SchemaDriftResult(
+        passed=not changed and not missing and not unexpected,
+        changed_files=changed,
+        missing_files=missing,
+        unexpected_files=unexpected,
+    )
+
+
+def _relative_files(root: Path) -> set[Path]:
+    if not root.exists():
+        return set()
+    return {
+        path.relative_to(root)
+        for path in root.rglob("*")
+        if path.is_file()
+    }
+
+
 def main() -> int:
     export_schemas()
     return 0
@@ -81,4 +140,3 @@ def main() -> int:
 
 if __name__ == "__main__":
     raise SystemExit(main())
-

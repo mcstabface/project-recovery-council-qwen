@@ -1,0 +1,47 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test:
+    name: Python ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.12", "3.13"]
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install package
+        run: python -m pip install -e ".[dev]"
+
+      - name: Run tests
+        run: python -m pytest
+
+      - name: Export schemas to temporary directory
+        run: project-recovery-council export-schemas --output-dir "$RUNNER_TEMP/schemas/v1"
+
+      - name: Check schema drift
+        run: project-recovery-council check-schema-drift
+
+      - name: Validate fixture bundle
+        run: project-recovery-council validate
+
+      - name: Run canonical demo workflow
+        run: project-recovery-council demo --artifacts-root "$RUNNER_TEMP/prc-runs" --run-id ci-demo
+
+      - name: Inspect demo artifacts
+        run: project-recovery-council inspect "$RUNNER_TEMP/prc-runs/ci-demo"
+

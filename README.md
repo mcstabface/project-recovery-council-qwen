@@ -14,6 +14,8 @@ This run does not build the full application. It establishes:
 - deterministic local workflow runner and CLI
 - persistent pause/resume artifacts
 - versioned JSON Schemas under `schemas/v1/`
+- schema drift checking
+- canonical deterministic demo evidence
 - expected results for the demonstration case
 - tests and process artifacts
 
@@ -57,6 +59,22 @@ tests/                        Deterministic test suite
 session-artifacts/            Build checkpoint and run manifest
 ```
 
+## Install Locally
+
+```bash
+python -m pip install -e ".[dev]"
+```
+
+After installation, the console command is available:
+
+```bash
+project-recovery-council validate
+project-recovery-council demo
+project-recovery-council inspect session-artifacts/canonical-demo
+```
+
+`python -m project_recovery_council ...` remains supported.
+
 ## Local Workflow CLI
 
 From an installed environment:
@@ -69,10 +87,12 @@ python -m project_recovery_council decide session-artifacts/runs/equipment-delay
 python -m project_recovery_council resume session-artifacts/runs/equipment-delay-paused
 python -m project_recovery_council approve session-artifacts/runs/equipment-delay-paused --actor demo-approver
 python -m project_recovery_council inspect session-artifacts/runs/equipment-delay-paused
+python -m project_recovery_council demo
 python -m project_recovery_council run
 python -m project_recovery_council run --inject-commercial-failure
 python -m project_recovery_council replay session-artifacts/runs/equipment-delay-standard
 python -m project_recovery_council export-schemas
+python -m project_recovery_council check-schema-drift
 ```
 
 From this source tree without installing first:
@@ -85,10 +105,12 @@ PYTHONPATH=src python -m project_recovery_council decide session-artifacts/runs/
 PYTHONPATH=src python -m project_recovery_council resume session-artifacts/runs/equipment-delay-paused
 PYTHONPATH=src python -m project_recovery_council approve session-artifacts/runs/equipment-delay-paused --actor demo-approver
 PYTHONPATH=src python -m project_recovery_council inspect session-artifacts/runs/equipment-delay-paused
+PYTHONPATH=src python -m project_recovery_council demo
 PYTHONPATH=src python -m project_recovery_council run
 PYTHONPATH=src python -m project_recovery_council run --inject-commercial-failure
 PYTHONPATH=src python -m project_recovery_council replay session-artifacts/runs/equipment-delay-standard
 PYTHONPATH=src python -m project_recovery_council export-schemas
+PYTHONPATH=src python -m project_recovery_council check-schema-drift
 ```
 
 Workflow runs write inspectable artifacts under:
@@ -100,8 +122,8 @@ session-artifacts/runs/<run-id>/
 Each run includes `workflow-state.json`, `artifact-manifest.json`,
 `run-summary.json`, `audit-events.json`, `expert-findings.json`,
 `contradictions.json`, `human-decisions.json`, `human-decision-requests.json`,
-`draft-recommendation.json`, `final-recommendation.json`, and
-`replay-input.json`.
+`recovery-options.json`, `draft-recommendation.json`,
+`final-recommendation.json`, and `replay-input.json`.
 
 ## Local Execution Flow
 
@@ -136,6 +158,31 @@ PYTHONPATH=src python -m project_recovery_council inspect session-artifacts/runs
 Inspection checks required files, JSON parsing, Pydantic contract validation,
 SHA-256 checksums, ordered audit sequences, evidence references, pending gates,
 and completion claims.
+
+Committed v1 schemas are frozen public artifacts. Use
+`project-recovery-council check-schema-drift` before changing integration
+contracts. Intentional schema changes must follow
+`docs/SCHEMA_VERSIONING_POLICY.md`.
+
+## Demo Evidence
+
+The canonical completed evidence run is committed under:
+
+```text
+session-artifacts/canonical-demo/
+```
+
+Ad hoc runtime outputs under `session-artifacts/runs/` are useful for local
+inspection but should not normally be committed.
+
+The cross-platform demo script is:
+
+```bash
+python scripts/run_demo.py --replace-existing
+```
+
+Run creation fails if the target run directory already exists. Use
+`--replace-existing` only for local deterministic regeneration.
 
 ## Run Tests
 

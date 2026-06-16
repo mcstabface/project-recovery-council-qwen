@@ -16,6 +16,7 @@ from project_recovery_council.contracts import (
     FinalRecommendation,
     HumanDecision,
     HumanDecisionRequest,
+    RecoveryOption,
 )
 from project_recovery_council.fixtures import load_equipment_delay_case
 from project_recovery_council.serialization import read_json, sha256_file
@@ -102,6 +103,7 @@ LIST_ADAPTERS: dict[str, TypeAdapter[Any]] = {
     "project-recovery-council.contradictions.v1": TypeAdapter(list[Contradiction]),
     "project-recovery-council.human-decisions.v1": TypeAdapter(list[HumanDecision]),
     "project-recovery-council.human-decision-requests.v1": TypeAdapter(list[HumanDecisionRequest]),
+    "project-recovery-council.recovery-options.v1": TypeAdapter(list[RecoveryOption]),
 }
 
 MODEL_ADAPTERS: dict[str, type[ContractModel]] = {
@@ -231,4 +233,3 @@ def _validate_state_consistency(
             errors.append("incomplete run summary falsely claims completion")
 
     return errors
-

@@ -1,0 +1,47 @@
+[
+  {
+    "assumptions": [
+      "Accelerated logistics can recover the forecast milestone slip before secondary effects.",
+      "Commercial exposure remains 15000 USD per calendar day."
+    ],
+    "avoided_delay_days": 13,
+    "avoided_exposure_usd": 195000,
+    "cost_usd": 48000,
+    "description": "Approve the alternate logistics lane to recover the delivery delay.",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "section:Delay Exposure",
+        "record_id": "CTR-DELAY-001",
+        "source_file": "contract-excerpt.md"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "label": "accelerated logistics",
+    "option_id": "REC-ACCEL-LOGISTICS",
+    "required_approvals": [
+      "project director approval",
+      "commercial approval"
+    ],
+    "warnings": [
+      "Final authorization is blocked until onsite-status contradiction is resolved by a human."
+    ]
+  }
+]

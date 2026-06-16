@@ -4,6 +4,7 @@ from __future__ import annotations
 
 from dataclasses import dataclass
 from pathlib import Path
+from shutil import rmtree
 from typing import Any
 
 from project_recovery_council.adapters import DeterministicExpertAdapter, ExpertAdapter
@@ -66,6 +67,7 @@ def default_workflow_config(
     inject_commercial_failure: bool = False,
     auto_human_decision: bool = False,
     auto_final_approval: bool = False,
+    replace_existing: bool = False,
 ) -> WorkflowConfig:
     return WorkflowConfig(
         case_path=Path(case_path),
@@ -74,6 +76,7 @@ def default_workflow_config(
         inject_commercial_failure=inject_commercial_failure,
         auto_human_decision=auto_human_decision,
         auto_final_approval=auto_final_approval,
+        replace_existing=replace_existing,
     )
 
 
@@ -132,6 +135,7 @@ class LocalWorkflowRunner:
     def run_until_human_gate(self) -> WorkflowContext:
         if self.context is not None:
             raise WorkflowExecutionError("workflow has already started")
+        self._prepare_new_run_directory()
         self.context = self._initialize_context()
         try:
             self._validate_fixture(self.context)
@@ -269,6 +273,7 @@ class LocalWorkflowRunner:
         write_json(run_path / "contradictions.json", context.contradictions)
         write_json(run_path / "human-decisions.json", context.human_decisions)
         write_json(run_path / "human-decision-requests.json", context.human_decision_requests)
+        write_json(run_path / "recovery-options.json", state.recovery_options)
         write_json(run_path / "draft-recommendation.json", context.draft_recommendation)
         write_json(run_path / "final-recommendation.json", context.final_recommendation)
         write_json(run_path / "replay-input.json", replay_input)
@@ -285,9 +290,22 @@ class LocalWorkflowRunner:
             "workflow",
             "Recovery case created from synthetic fixture bundle.",
             evidence=[case_record.reference("record")],
-            metadata={"title": bundle.case.title},
+            metadata={
+                "title": bundle.case.title,
+                "replace_existing": self.config.replace_existing,
+            },
         )
         return context
+
+    def _prepare_new_run_directory(self) -> None:
+        run_path = self.config.artifacts_root / self.config.run_id
+        if not run_path.exists():
+            return
+        if not self.config.replace_existing:
+            raise WorkflowExecutionError(
+                f"run directory already exists: {run_path}. Use --replace-existing for local regeneration."
+            )
+        rmtree(run_path)
 
     def _validate_fixture(self, context: WorkflowContext) -> None:
         self._transition(context, WorkflowStage.VALIDATING)
@@ -743,6 +761,7 @@ class LocalWorkflowRunner:
             self._artifact_entry(run_path, "contradictions.json", "project-recovery-council.contradictions.v1", generated_at),
             self._artifact_entry(run_path, "human-decisions.json", "project-recovery-council.human-decisions.v1", generated_at),
             self._artifact_entry(run_path, "human-decision-requests.json", "project-recovery-council.human-decision-requests.v1", generated_at),
+            self._artifact_entry(run_path, "recovery-options.json", "project-recovery-council.recovery-options.v1", generated_at),
             self._artifact_entry(run_path, "draft-recommendation.json", "project-recovery-council.nullable-final-recommendation.v1", generated_at, required=False),
             self._artifact_entry(run_path, "final-recommendation.json", "project-recovery-council.nullable-final-recommendation.v1", generated_at, required=False),
             self._artifact_entry(run_path, "replay-input.json", "project-recovery-council.replay-input.v1", generated_at),

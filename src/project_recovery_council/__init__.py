@@ -20,6 +20,7 @@ from project_recovery_council.contracts import (
 from project_recovery_council.fixtures import CaseBundle, load_equipment_delay_case
 from project_recovery_council.runner import (
     approve_workflow,
+    demo_equipment_delay_case,
     inspect_run,
     replay_run,
     resume_workflow,
@@ -83,6 +84,7 @@ __all__ = [
     "load_equipment_delay_case",
     "approve_workflow",
     "default_workflow_config",
+    "demo_equipment_delay_case",
     "export_schemas",
     "inspect_run",
     "replay_run",
