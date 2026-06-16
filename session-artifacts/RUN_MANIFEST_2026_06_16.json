@@ -1,0 +1,84 @@
+{
+  "run_id": "project-recovery-council-foundation-2026-06-16",
+  "created_on": "2026-06-16",
+  "status": "complete",
+  "scope": "standalone deterministic foundation",
+  "created_files": [
+    ".gitignore",
+    "LICENSE",
+    "README.md",
+    "pyproject.toml",
+    "decisions/ADR-0001-project-scope-and-architecture.md",
+    "docs/ARCHITECTURE.md",
+    "docs/CASE_MODEL.md",
+    "docs/DEVELOPMENT_PLAN.md",
+    "docs/TARGET_BRIEF.md",
+    "sample-data/equipment-delay-case/case.json",
+    "sample-data/equipment-delay-case/contract-excerpt.md",
+    "sample-data/equipment-delay-case/cost-summary.json",
+    "sample-data/equipment-delay-case/expected-results.json",
+    "sample-data/equipment-delay-case/logistics-status.json",
+    "sample-data/equipment-delay-case/progress-report.md",
+    "sample-data/equipment-delay-case/risk-register.csv",
+    "sample-data/equipment-delay-case/schedule.json",
+    "sample-data/equipment-delay-case/supplier-correspondence.md",
+    "src/project_recovery_council/__init__.py",
+    "src/project_recovery_council/contracts.py",
+    "src/project_recovery_council/fixtures.py",
+    "src/project_recovery_council/interfaces.py",
+    "src/project_recovery_council/stubs.py",
+    "src/project_recovery_council/validation.py",
+    "tests/test_contracts_and_stubs.py",
+    "tests/test_fixture_loading.py",
+    "tests/test_validation.py",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16.json"
+  ],
+  "tests_run": [
+    {
+      "command": "python -m pytest",
+      "result": "passed",
+      "stdout_summary": "17 passed in 0.09s"
+    },
+    {
+      "command": "python -m pytest --collect-only -q",
+      "result": "passed",
+      "stdout_summary": "tests/test_contracts_and_stubs.py: 8; tests/test_fixture_loading.py: 3; tests/test_validation.py: 6"
+    }
+  ],
+  "architectural_decisions": [
+    {
+      "id": "ADR-0001",
+      "path": "decisions/ADR-0001-project-scope-and-architecture.md",
+      "decision": "Use a standalone deterministic Python package with Pydantic contracts, local fixtures, validators, ABC interfaces, and deterministic stubs. Exclude LLM SDKs, web frameworks, UiPath runtime code, and external connectors from this slice."
+    }
+  ],
+  "deterministic_expected_results": {
+    "case_id": "PRC-EQ-DELAY-001",
+    "delivery_shift_days": 21,
+    "calculated_milestone_delay_days": 13,
+    "unmitigated_exposure_usd": 195000,
+    "mitigation_cost_usd": 48000,
+    "gross_avoided_exposure_before_secondary_effects_usd": 147000,
+    "equipment_onsite_status": "unresolved_until_human_confirmation",
+    "contradiction_detected": true,
+    "human_escalation_required": true,
+    "unsupported_equipment_onsite_assertion_prohibited": true,
+    "preferred_option_id": "REC-ACCEL-LOGISTICS",
+    "preferred_option_label": "accelerated logistics",
+    "preferred_option_subject_to_approval": true
+  },
+  "known_limitations": [
+    "No workflow runner or CLI exists yet.",
+    "No production expert implementations exist yet.",
+    "No UiPath Maestro implementation exists yet.",
+    "No LLM provider integration exists yet.",
+    "No external system adapters exist yet.",
+    "Audit history is modeled but not yet emitted by a runner."
+  ],
+  "repository_review": {
+    "consistency_scan": "rg scan confirmed the intentional onsite contradiction and calculation values are consistent across fixtures, docs, source, and tests.",
+    "git_status": "project foundation files are untracked; no commit was created."
+  },
+  "next_recommended_step": "Build a deterministic workflow runner that executes the existing expert stubs and writes replayable findings, contradiction, recommendation, and audit artifacts."
+}

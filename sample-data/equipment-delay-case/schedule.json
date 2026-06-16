@@ -1,0 +1,25 @@
+{
+  "records": [
+    {
+      "record_id": "SCH-DELIVERY-001",
+      "title": "Generator skid delivery and installation schedule forecast",
+      "data_date": "2026-06-29",
+      "summary": "Forecast delivery moved 21 calendar days after baseline; installation had 8 days total float; milestone is forecast to slip 13 days without intervention.",
+      "equipment_id": "EQ-GEN-SKID-01",
+      "delivery_activity_id": "A-4100",
+      "installation_activity_id": "A-4200",
+      "successor_testing_activity_id": "A-4300",
+      "baseline_delivery_date": "2026-07-01",
+      "forecast_delivery_date": "2026-07-22",
+      "delivery_shift_days": 21,
+      "installation_total_float_days": 8,
+      "installation_duration_days": 5,
+      "contractual_milestone_id": "MS-COMMISSIONING-READY",
+      "contractual_milestone_baseline_date": "2026-08-15",
+      "contractual_milestone_forecast_without_intervention": "2026-08-28",
+      "forecast_milestone_slip_days": 13,
+      "successor_testing_constraint": "finish_to_start_after_installation_complete"
+    }
+  ]
+}
+

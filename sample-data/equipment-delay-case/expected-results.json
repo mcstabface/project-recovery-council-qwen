@@ -1,0 +1,16 @@
+{
+  "case_id": "PRC-EQ-DELAY-001",
+  "delivery_shift_days": 21,
+  "calculated_milestone_delay_days": 13,
+  "unmitigated_exposure_usd": 195000,
+  "mitigation_cost_usd": 48000,
+  "gross_avoided_exposure_before_secondary_effects_usd": 147000,
+  "equipment_onsite_status": "unresolved_until_human_confirmation",
+  "contradiction_detected": true,
+  "human_escalation_required": true,
+  "unsupported_equipment_onsite_assertion_prohibited": true,
+  "preferred_option_id": "REC-ACCEL-LOGISTICS",
+  "preferred_option_label": "accelerated logistics",
+  "preferred_option_subject_to_approval": true
+}
+

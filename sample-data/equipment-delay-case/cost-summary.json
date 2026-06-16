@@ -1,0 +1,18 @@
+{
+  "records": [
+    {
+      "record_id": "COST-SUMMARY-001",
+      "title": "Commercial exposure and accelerated logistics summary",
+      "pricing_date": "2026-06-29",
+      "summary": "Accelerated logistics option costs 48000 USD; delay exposure is 15000 USD per calendar day.",
+      "currency": "USD",
+      "accelerated_logistics_option_id": "REC-ACCEL-LOGISTICS",
+      "accelerated_logistics_cost_usd": 48000,
+      "delay_exposure_usd_per_day": 15000,
+      "unmitigated_delay_days": 13,
+      "unmitigated_exposure_usd": 195000,
+      "gross_avoided_exposure_before_secondary_effects_usd": 147000
+    }
+  ]
+}
+

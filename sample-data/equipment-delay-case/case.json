@@ -1,0 +1,15 @@
+{
+  "record_id": "CASE-INTAKE-001",
+  "case_id": "PRC-EQ-DELAY-001",
+  "title": "Synthetic generator skid delivery delay",
+  "status": "waiting_for_human",
+  "stage": "human_confirmation",
+  "opened_on": "2026-06-29",
+  "opened_at": "2026-06-29T16:00:00Z",
+  "summary": "Major generator skid delivery forecast moved later, creating forecast milestone exposure and a source conflict about onsite status.",
+  "contractual_milestone_id": "MS-COMMISSIONING-READY",
+  "equipment_id": "EQ-GEN-SKID-01",
+  "project_id": "SYNTH-PLANT-EXPANSION-01",
+  "data_boundary": "Synthetic demonstration data only. No customer, vendor, internal, or proprietary project records are represented."
+}
+

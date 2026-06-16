@@ -1,0 +1,17 @@
+{
+  "records": [
+    {
+      "record_id": "LOG-STATUS-001",
+      "title": "Carrier logistics status for generator skid",
+      "status_date": "2026-06-29",
+      "summary": "Carrier record shows the generator skid in transit and not arrived onsite.",
+      "equipment_id": "EQ-GEN-SKID-01",
+      "carrier_status": "in_transit_at_regional_terminal",
+      "actual_arrival_date": null,
+      "forecast_delivery_date": "2026-07-22",
+      "approved_recovery_option_id": "REC-ACCEL-LOGISTICS",
+      "approved_recovery_option_status": "available_subject_to_project_approval"
+    }
+  ]
+}
+
