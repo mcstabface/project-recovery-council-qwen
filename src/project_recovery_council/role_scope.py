@@ -55,6 +55,7 @@ SCHEDULE_ALLOWED_CLAIMS = [
     "delivery_movement_days",
     "installation_total_float_consumed_days",
     "installation_total_float_remaining_days",
+    "float_consumption_status",
     "milestone_baseline_date",
     "milestone_forecast_date_without_intervention",
     "installation_total_float_days",

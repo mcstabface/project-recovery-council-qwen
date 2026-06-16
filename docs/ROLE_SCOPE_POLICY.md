@@ -30,6 +30,7 @@ Allowed claim keys include:
 - `installation_total_float_days`
 - `installation_total_float_consumed_days`
 - `installation_total_float_remaining_days`
+- `float_consumption_status`
 - `milestone_baseline_date`
 - `milestone_forecast_date_without_intervention`
 - `forecast_milestone_slip_days`
@@ -38,10 +39,11 @@ Allowed claim keys include:
 
 These keys cover baseline and forecast dates, delivery movement, available
 installation float, float consumed, remaining float, projected milestone slip,
-and successor dependency effects.
+qualitative float consumption status, and successor dependency effects.
 
 Supported aliases, such as `baseline_delivery_date`,
 `forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
+`remaining_total_float_days`,
 `contractual_milestone_baseline_date`, and
 `contractual_milestone_forecast_without_intervention`, are normalized before
 role validation. They are not role-policy keys themselves.
@@ -126,6 +128,10 @@ The validator checks the schedule arithmetic against `SCH-DELIVERY-001`:
   `max(delivery_movement_days - installation_total_float_days, 0)`.
 - remaining float is never negative.
 - consumed float never exceeds available float.
+- `float_consumption_status` is one of `available`, `partially_consumed`, or
+  `fully_consumed`.
+- when consumed and remaining float are present, `float_consumption_status`
+  agrees with those numeric fields.
 - `milestone_forecast_date_without_intervention` equals
   `milestone_baseline_date + forecast_milestone_slip_days` when both dates are
   present.

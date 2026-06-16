@@ -106,6 +106,7 @@ def test_new_schedule_claim_keys_are_allowed() -> None:
         "installation_total_float_days",
         "installation_total_float_consumed_days",
         "installation_total_float_remaining_days",
+        "float_consumption_status",
         "milestone_baseline_date",
         "milestone_forecast_date_without_intervention",
         "forecast_milestone_slip_days",
@@ -113,6 +114,22 @@ def test_new_schedule_claim_keys_are_allowed() -> None:
         "successor_dependency_effect",
     ]:
         assert key in allowed
+
+
+def test_allowed_qualitative_float_consumption_status() -> None:
+    bundle = load_equipment_delay_case(FIXTURE_PATH)
+    response = SpecialistFindingResponse.model_validate(schedule_response(float_consumption_status="fully_consumed"))
+
+    result = validate_specialist_response(
+        role=AgentRole.SCHEDULE_EXPERT.value,
+        invocation_id="INV-FLOAT-STATUS-ALLOWED",
+        response=response,
+        selected_record_ids=selected_evidence_record_ids(bundle, AgentRole.SCHEDULE_EXPERT.value),
+        bundle=bundle,
+    )
+
+    assert result.valid is True
+    assert "float_consumption_status" in result.allowed_claims
 
 
 def test_prohibited_commercial_and_onsite_claims_remain_prohibited() -> None:
@@ -136,7 +153,7 @@ def test_prohibited_commercial_and_onsite_claims_remain_prohibited() -> None:
 def test_correct_21_8_13_schedule_arithmetic_passes() -> None:
     result = validate_schedule_semantics(
         invocation_id="INV-SCHEDULE-OK",
-        response_payload=schedule_response(),
+        response_payload=schedule_response(float_consumption_status="fully_consumed"),
         bundle=load_equipment_delay_case(FIXTURE_PATH),
     )
 
@@ -144,7 +161,41 @@ def test_correct_21_8_13_schedule_arithmetic_passes() -> None:
     assert result.expected_values["delivery_movement_days"] == 21
     assert result.expected_values["installation_total_float_consumed_days"] == 8
     assert result.expected_values["installation_total_float_remaining_days"] == 0
+    assert result.expected_values["float_consumption_status"] == "fully_consumed"
     assert result.expected_values["forecast_milestone_slip_days"] == 13
+
+
+def test_correct_fully_consumed_status_passes() -> None:
+    result = validate_schedule_semantics(
+        invocation_id="INV-FLOAT-STATUS-OK",
+        response_payload=schedule_response(float_consumption_status="fully_consumed"),
+        bundle=load_equipment_delay_case(FIXTURE_PATH),
+    )
+
+    assert result.valid is True
+    assert "float_consumption_status" in result.checked_fields
+
+
+def test_inconsistent_float_consumption_status_fails() -> None:
+    result = validate_schedule_semantics(
+        invocation_id="INV-FLOAT-STATUS-BAD",
+        response_payload=schedule_response(float_consumption_status="available"),
+        bundle=load_equipment_delay_case(FIXTURE_PATH),
+    )
+
+    assert result.valid is False
+    assert any("float_consumption_status expected fully_consumed" in item for item in result.semantic_violations)
+
+
+def test_invalid_float_consumption_status_fails() -> None:
+    result = validate_schedule_semantics(
+        invocation_id="INV-FLOAT-STATUS-INVALID",
+        response_payload=schedule_response(float_consumption_status="exhausted"),
+        bundle=load_equipment_delay_case(FIXTURE_PATH),
+    )
+
+    assert result.valid is False
+    assert any("float_consumption_status must be one of" in item for item in result.semantic_violations)
 
 
 def test_float_consumed_13_fails() -> None:

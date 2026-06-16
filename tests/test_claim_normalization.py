@@ -88,6 +88,7 @@ def alias_schedule_response(**overrides: Any) -> dict[str, Any]:
         "installation_total_float_days": 8,
         "installation_total_float_consumed_days": 8,
         "remaining_float_after_delivery_shift_days": 0,
+        "float_consumption_status": "fully_consumed",
         "contractual_milestone_baseline_date": "2026-08-15",
         "contractual_milestone_forecast_without_intervention": "2026-08-28",
         "forecast_milestone_slip_days": 13,
@@ -137,6 +138,14 @@ def test_each_schedule_alias_maps_to_canonical_key() -> None:
     assert aliases["baseline_delivery_date"] == "delivery_baseline_date"
     assert aliases["forecast_delivery_date"] == "delivery_forecast_date"
     assert aliases["remaining_float_after_delivery_shift_days"] == "installation_total_float_remaining_days"
+    payload_with_total_float = alias_schedule_response(
+        remaining_float_after_delivery_shift_days=0,
+        remaining_total_float_days=0,
+    )
+    total_float_result = normalize(payload_with_total_float)
+    total_float_aliases = {item.raw_key: item.canonical_key for item in total_float_result.applied_aliases}
+
+    assert total_float_aliases["remaining_total_float_days"] == "installation_total_float_remaining_days"
     assert aliases["contractual_milestone_baseline_date"] == "milestone_baseline_date"
     assert (
         aliases["contractual_milestone_forecast_without_intervention"]
@@ -210,7 +219,11 @@ def test_unknown_keys_remain_visible_and_role_prohibited() -> None:
 
 def test_role_validation_passes_latest_live_response_shape_after_normalization() -> None:
     bundle = load_equipment_delay_case(FIXTURE_PATH)
-    payload = alias_schedule_response()
+    payload = alias_schedule_response(
+        remaining_float_after_delivery_shift_days=0,
+        remaining_total_float_days=0,
+        float_consumption_status="fully_consumed",
+    )
     result = normalize(payload, invocation_id="INV-LIVE-SHAPE")
     normalized = normalize_response_payload(payload, result)
     role = validate_role_scope(
@@ -224,13 +237,18 @@ def test_role_validation_passes_latest_live_response_shape_after_normalization()
     assert result.valid is True
     assert role.valid is True
     assert "installation_total_float_remaining_days" in role.allowed_claims
+    assert "float_consumption_status" in role.allowed_claims
     assert "milestone_baseline_date" in role.allowed_claims
     assert "milestone_forecast_date_without_intervention" in role.allowed_claims
 
 
 def test_schedule_semantic_validation_passes_for_normalized_live_response_shape() -> None:
     bundle = load_equipment_delay_case(FIXTURE_PATH)
-    payload = alias_schedule_response()
+    payload = alias_schedule_response(
+        remaining_float_after_delivery_shift_days=0,
+        remaining_total_float_days=0,
+        float_consumption_status="fully_consumed",
+    )
     result = normalize(payload, invocation_id="INV-LIVE-SEMANTIC")
     normalized = normalize_response_payload(payload, result)
     semantic = validate_schedule_semantics(
@@ -241,6 +259,7 @@ def test_schedule_semantic_validation_passes_for_normalized_live_response_shape(
 
     assert semantic.valid is True
     assert semantic.observed_values["installation_total_float_remaining_days"] == 0
+    assert semantic.observed_values["float_consumption_status"] == "fully_consumed"
     assert semantic.observed_values["milestone_forecast_date_without_intervention"] == "2026-08-28"
 
 

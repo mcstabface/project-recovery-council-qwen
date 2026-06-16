@@ -11,6 +11,9 @@ from project_recovery_council.contracts import ContractModel
 from project_recovery_council.fixtures import CaseBundle
 
 
+ALLOWED_FLOAT_CONSUMPTION_STATUSES = {"available", "partially_consumed", "fully_consumed"}
+
+
 class ScheduleSemanticValidationResult(ContractModel):
     invocation_id: str = Field(min_length=1)
     valid: bool
@@ -46,6 +49,7 @@ def validate_schedule_semantics(
         "delivery_movement_days": delivery_movement,
         "installation_total_float_consumed_days": float_consumed,
         "installation_total_float_remaining_days": remaining_float,
+        "float_consumption_status": _float_status(remaining_float, float_consumed, available_float),
         "forecast_milestone_slip_days": milestone_slip,
         "milestone_forecast_date_without_intervention": milestone_forecast.isoformat(),
     }
@@ -56,6 +60,7 @@ def validate_schedule_semantics(
             "installation_total_float_days",
             "installation_total_float_consumed_days",
             "installation_total_float_remaining_days",
+            "float_consumption_status",
             "forecast_milestone_slip_days",
             "delivery_baseline_date",
             "delivery_forecast_date",
@@ -118,6 +123,21 @@ def validate_schedule_semantics(
             violations.append(
                 f"installation_total_float_remaining_days must never be negative, observed {observed_remaining}"
             )
+
+    observed_status = _string_or_none(_observed_claim(claims, "float_consumption_status"))
+    if observed_status is not None:
+        checked.append("float_consumption_status")
+        if observed_status not in ALLOWED_FLOAT_CONSUMPTION_STATUSES:
+            violations.append(
+                "float_consumption_status must be one of "
+                f"{sorted(ALLOWED_FLOAT_CONSUMPTION_STATUSES)}, observed {observed_status}"
+            )
+        if observed_remaining is not None and observed_consumed is not None:
+            expected_status = _float_status(observed_remaining, observed_consumed, available_float)
+            if expected_status is not None and observed_status != expected_status:
+                violations.append(
+                    f"float_consumption_status expected {expected_status}, observed {observed_status}"
+                )
 
     observed_slip = _int_or_none(
         _first_present(claims, ["forecast_milestone_slip_days", "projected_milestone_slip_days"])
@@ -223,6 +243,20 @@ def _int_or_none(value: Any) -> int | None:
             return int(value)
         except ValueError:
             return None
+    return None
+
+
+def _string_or_none(value: Any) -> str | None:
+    return value if isinstance(value, str) else None
+
+
+def _float_status(remaining_float: int, consumed_float: int, available_float: int) -> str | None:
+    if remaining_float == available_float and consumed_float == 0:
+        return "available"
+    if remaining_float > 0 and consumed_float > 0:
+        return "partially_consumed"
+    if remaining_float == 0:
+        return "fully_consumed"
     return None
 
 

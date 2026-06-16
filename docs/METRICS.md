@@ -96,6 +96,9 @@ evidence.
 - `remaining_float_correctness`: whether reported remaining float equals
   `max(available_total_float_days - delivery_movement_days, 0)` and is not
   negative.
+- `float_consumption_status`: when present, the status must be one of
+  `available`, `partially_consumed`, or `fully_consumed`, and must agree with
+  reported consumed and remaining float values.
 - `milestone_slip_correctness`: whether reported net milestone slip equals
   `max(delivery_movement_days - available_total_float_days, 0)`.
 - `milestone_date_arithmetic_correctness`: whether the reported forecast

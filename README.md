@@ -269,10 +269,10 @@ conflicts are reported instead of silently resolved.
 `ScheduleExpert` outputs also receive deterministic schedule-semantic
 validation. For the synthetic case, 21 days of delivery movement consumes the
 available 8 days of installation total float, leaves 0 days remaining float, and
-produces a 13-day net milestone slip. Future standalone live ScheduleExpert
-artifacts include `schedule-semantic-validation.json` and
-`schedule-semantic-metrics.json`; prior live artifacts are not retroactively
-modified.
+produces a 13-day net milestone slip with `float_consumption_status` of
+`fully_consumed`. Future standalone live ScheduleExpert artifacts include
+`schedule-semantic-validation.json` and `schedule-semantic-metrics.json`; prior
+live artifacts are not retroactively modified.
 
 Offline experiment outputs use:
 

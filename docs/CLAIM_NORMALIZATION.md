@@ -19,6 +19,7 @@ decisions are stored in `claim-normalization-results.json`.
 | `delivery_shift_days` | `delivery_movement_days` |
 | `float_consumption_days` | `installation_total_float_consumed_days` |
 | `remaining_float_days` | `installation_total_float_remaining_days` |
+| `remaining_total_float_days` | `installation_total_float_remaining_days` |
 | `remaining_float_after_delivery_shift_days` | `installation_total_float_remaining_days` |
 | `projected_milestone_slip_days` | `forecast_milestone_slip_days` |
 | `contractual_milestone_baseline_date` | `milestone_baseline_date` |
@@ -26,6 +27,8 @@ decisions are stored in `claim-normalization-results.json`.
 | `successor_dependency_effects` | `successor_dependency_effect` |
 
 Already canonical keys are retained unchanged.
+`float_consumption_status` is a canonical ScheduleExpert claim key, not an
+alias.
 
 ## Conflict Rules
 

@@ -90,4 +90,5 @@ Validation layers are intentionally distinct:
 - Role-scope validation checks whether a specialist stayed inside its
   authorized evidence and claim boundary.
 - Schedule-semantic validation checks whether `ScheduleExpert` arithmetic is
-  consistent with `SCH-DELIVERY-001`.
+  consistent with `SCH-DELIVERY-001`, including qualitative
+  `float_consumption_status` consistency when that claim is present.

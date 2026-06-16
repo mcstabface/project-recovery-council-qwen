@@ -95,11 +95,17 @@ domain semantic validation. Raw parsed output remains in
 written to `claim-normalization-metrics.json`.
 
 For `ScheduleExpert`, supported aliases include `baseline_delivery_date`,
-`forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
+`forecast_delivery_date`, `remaining_total_float_days`,
+`remaining_float_after_delivery_shift_days`,
 `contractual_milestone_baseline_date`, and
 `contractual_milestone_forecast_without_intervention`. Conflicting aliases do
 not get silently resolved; they invalidate normalization while preserving raw
 provider output.
+
+`float_consumption_status` is a canonical ScheduleExpert claim. It must be
+`available`, `partially_consumed`, or `fully_consumed`, and is checked against
+reported consumed and remaining float values when those numeric fields are
+available.
 
 ## Artifact Handling
 
