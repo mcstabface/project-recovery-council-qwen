@@ -27,8 +27,12 @@ class FinishStatus(StrEnum):
 
 class FailureKind(StrEnum):
     CONFIGURATION_ERROR = "configuration_error"
+    TRANSPORT_ERROR = "transport_error"
     PROVIDER_ERROR = "provider_error"
+    RATE_LIMIT = "rate_limit"
     TIMEOUT = "timeout"
+    PARSING_ERROR = "parsing_error"
+    SCHEMA_ERROR = "schema_error"
     VALIDATION_ERROR = "validation_error"
     MISSING_FIXTURE = "missing_fixture"
 

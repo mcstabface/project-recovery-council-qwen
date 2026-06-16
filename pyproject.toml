@@ -29,6 +29,9 @@ dev = [
 addopts = "-q"
 pythonpath = ["src"]
 testpaths = ["tests"]
+markers = [
+  "live: opt-in live provider integration tests skipped unless explicitly enabled"
+]
 
 [tool.hatch.build.targets.wheel]
 packages = ["src/project_recovery_council"]

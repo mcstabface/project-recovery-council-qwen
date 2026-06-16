@@ -85,6 +85,7 @@ prc-qwen evaluate-offline
 prc-qwen compare-offline
 prc-qwen validate-prompts
 prc-qwen inspect-experiment experiment-artifacts/offline-strong_modular_council
+prc-qwen live-smoke --model <model-id> --allow-network
 project-recovery-council validate
 project-recovery-council demo
 project-recovery-council inspect session-artifacts/canonical-demo
@@ -114,6 +115,7 @@ python -m project_recovery_council evaluate-offline --fixture strong_modular_cou
 python -m project_recovery_council compare-offline
 python -m project_recovery_council validate-prompts
 python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
+python -m project_recovery_council live-smoke --model <model-id> --allow-network
 ```
 
 From this source tree without installing first:
@@ -136,6 +138,7 @@ PYTHONPATH=src python -m project_recovery_council evaluate-offline --fixture str
 PYTHONPATH=src python -m project_recovery_council compare-offline
 PYTHONPATH=src python -m project_recovery_council validate-prompts
 PYTHONPATH=src python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
+PYTHONPATH=src python -m project_recovery_council live-smoke --model <model-id> --allow-network
 ```
 
 Workflow runs write inspectable artifacts under:
@@ -227,6 +230,23 @@ Live Qwen execution is disabled by default. `DisabledQwenModelClient` returns a
 typed configuration failure and records that no network call was attempted.
 `OfflineModelClient` replays deterministic simulated fixtures from
 `experiment-fixtures/offline-responses/v1/`.
+
+Opt-in live Qwen execution is available only through explicit live commands.
+Each live command requires `--allow-network`, a `--model <model-id>`, and
+`DASHSCOPE_API_KEY` or a configured alternate key environment variable. Provider
+charges may apply. Live artifacts are written under `experiment-artifacts/live/`
+and are ignored by Git by default.
+
+```bash
+export DASHSCOPE_API_KEY="<your-api-key>"
+PYTHONPATH=src python -m project_recovery_council live-smoke --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council live-agent --agent ScheduleExpert --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council live-variant --variant single_generalist --model <model-id> --allow-network
+```
+
+No live model identifier is hard-coded. Choose the model ID from the current
+Alibaba Cloud Model Studio console or official documentation for the endpoint
+you are using.
 
 Offline experiment outputs use:
 

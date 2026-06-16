@@ -16,6 +16,7 @@ RECOVERY_ANALYSIS_RESPONSE_SCHEMA = "project-recovery-council.qwen.recovery-anal
 DIRECTOR_ROUTING_RESPONSE_SCHEMA = "project-recovery-council.qwen.director-routing-response.v1"
 SPECIALIST_FINDING_RESPONSE_SCHEMA = "project-recovery-council.qwen.specialist-finding-response.v1"
 ARBITER_RESPONSE_SCHEMA = "project-recovery-council.qwen.arbiter-response.v1"
+LIVE_SMOKE_RESPONSE_SCHEMA = "project-recovery-council.qwen.live-smoke-response.v1"
 
 
 class ExperimentVariant(StrEnum):
@@ -146,6 +147,13 @@ class ArbiterResponse(ContractModel):
     unresolved_disagreements: list[Disagreement] = Field(default_factory=list)
     preserved_provenance_record_ids: list[str] = Field(default_factory=list)
     concise_rationale: str = Field(min_length=1)
+
+
+class LiveSmokeResponse(ContractModel):
+    schema_version: str = LIVE_SMOKE_RESPONSE_SCHEMA
+    status: Literal["ok"]
+    model_identifier: str = Field(min_length=1)
+    short_message: str = Field(min_length=1, max_length=200)
 
 
 class ExperimentStep(ContractModel):
@@ -310,4 +318,5 @@ SCHEMA_REGISTRY = {
     DIRECTOR_ROUTING_RESPONSE_SCHEMA: DirectorRoutingResponse,
     SPECIALIST_FINDING_RESPONSE_SCHEMA: SpecialistFindingResponse,
     ARBITER_RESPONSE_SCHEMA: ArbiterResponse,
+    LIVE_SMOKE_RESPONSE_SCHEMA: LiveSmokeResponse,
 }

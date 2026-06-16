@@ -53,6 +53,17 @@ MODEL_ADAPTERS: dict[str, type[ContractModel]] = {
     "project-recovery-council.qwen.experiment-artifact-manifest.v1": ExperimentArtifactManifest,
 }
 
+GENERIC_JSON_SCHEMA_IDS = {
+    "project-recovery-council.qwen.live-sanitized-provider-config.v1",
+    "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+    "project-recovery-council.qwen.live-raw-provider-responses.v1",
+    "project-recovery-council.qwen.live-parsed-structured-responses.v1",
+    "project-recovery-council.qwen.live-validation-results.v1",
+    "project-recovery-council.qwen.live-token-usage.v1",
+    "project-recovery-council.qwen.live-retry-history.v1",
+    "project-recovery-council.qwen.live-reproducibility.v1",
+}
+
 
 def write_experiment_artifacts(
     *,
@@ -148,6 +159,10 @@ def _validate_payload(schema_id: str, payload: Any) -> None:
         if not isinstance(payload, dict):
             raise ValueError("variant results must be a JSON object")
         return
+    if schema_id in GENERIC_JSON_SCHEMA_IDS:
+        if not isinstance(payload, (dict, list)):
+            raise ValueError("live artifact payload must be a JSON object or array")
+        return
     model = MODEL_ADAPTERS.get(schema_id)
     if model is None:
         raise ValueError(f"unknown schema id: {schema_id}")
@@ -161,6 +176,14 @@ def _schema_id_for(filename: str) -> str:
         "variant-results.json": "project-recovery-council.qwen.variant-results.v1",
         "evaluation-results.json": "project-recovery-council.qwen.evaluation-report.v1",
         "comparison-report.json": "project-recovery-council.qwen.experiment-comparison.v1",
+        "sanitized-provider-config.json": "project-recovery-council.qwen.live-sanitized-provider-config.v1",
+        "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+        "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
+        "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
+        "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",
+        "token-usage.json": "project-recovery-council.qwen.live-token-usage.v1",
+        "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
+        "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 
 

@@ -1,0 +1,112 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "live-qwen-provider",
+  "repository": "project-recovery-council-qwen",
+  "status": "complete",
+  "objectives": [
+    "Implement typed Qwen provider configuration",
+    "Add opt-in QwenModelClient behind ModelClient",
+    "Keep live provider disabled by default",
+    "Add deterministic prompt rendering",
+    "Add structured-output fallback handling",
+    "Add centralized secret redaction",
+    "Add live-specific artifact isolation and reproducibility metadata",
+    "Add live CLI commands with --allow-network preflight",
+    "Keep normal tests offline and credential-free"
+  ],
+  "created_files": [
+    "src/project_recovery_council/redaction.py",
+    "src/project_recovery_council/qwen_config.py",
+    "src/project_recovery_council/prompt_rendering.py",
+    "src/project_recovery_council/qwen_client.py",
+    "src/project_recovery_council/live_experiments.py",
+    "tests/test_qwen_live_client.py",
+    "tests/test_qwen_live_cli.py",
+    "tests/test_qwen_live_integration.py",
+    "docs/LIVE_QWEN_SETUP.md",
+    "docs/ARTIFACT_REDACTION.md",
+    "decisions/ADR-0006-opt-in-live-qwen-provider.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_LIVE_QWEN_PROVIDER.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_LIVE_QWEN_PROVIDER.json"
+  ],
+  "modified_files": [
+    ".gitignore",
+    "README.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_PROVIDER_PLAN.md",
+    "pyproject.toml",
+    "src/project_recovery_council/__main__.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/model_client.py"
+  ],
+  "architectural_decisions": [
+    {
+      "id": "ADR-0006",
+      "title": "Opt-In Live Qwen Provider",
+      "path": "decisions/ADR-0006-opt-in-live-qwen-provider.md"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_qwen_live_client.py tests/test_qwen_live_cli.py tests/test_qwen_live_integration.py",
+      "exit_code": 0,
+      "result": "13 passed, 1 skipped in 0.81s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "71 passed, 1 skipped in 7.70s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council live-smoke --model explicit-test-model",
+      "exit_code": 1,
+      "result": "failed before network because --allow-network was absent"
+    },
+    {
+      "command": "env -u DASHSCOPE_API_KEY PYTHONPATH=src python -m project_recovery_council live-smoke --model explicit-test-model --allow-network",
+      "exit_code": 1,
+      "result": "failed before network because DASHSCOPE_API_KEY was absent"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council compare-offline",
+      "exit_code": 0,
+      "result": "offline comparison generated without live calls"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "71 passed, 1 skipped in 7.95s"
+    }
+  ],
+  "test_results": {
+    "pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "71 passed, 1 skipped in 7.95s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_tests": "mock transport only; opt-in live marker skipped"
+  },
+  "known_limitations": [
+    "No real Qwen smoke test was executed",
+    "live-variant currently supports only single_generalist",
+    "Provider-enforced JSON Schema support is configurable but not the default claim",
+    "No provider pricing is encoded",
+    "No Alibaba Cloud deployment proof is included"
+  ],
+  "manual_smoke_command": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-smoke --model <model-id> --allow-network"
+}

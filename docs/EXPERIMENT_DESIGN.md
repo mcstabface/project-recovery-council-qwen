@@ -40,3 +40,18 @@ The manifest records SHA-256 checksums and schema identifiers for each artifact.
 `prc-qwen evaluate-offline` replays one simulated fixture and writes experiment
 artifacts. `prc-qwen compare-offline` compares simulated fixtures for local
 contract checks. Neither command requires credentials or network access.
+
+## Live Execution
+
+Live execution is limited to one explicit command at a time:
+
+- `live-smoke`: one small request validating authentication, reachability, model
+  availability, structured response parsing, local schema validation, token
+  accounting when returned, artifact redaction, and artifact inspection.
+- `live-agent`: one named agent against the synthetic case.
+- `live-variant`: one named experiment variant. The current implementation
+  supports `single_generalist`; it does not run the full matrix implicitly.
+
+Every live command requires `--allow-network`, a `--model <model-id>`, and a
+configured API key environment variable. Live artifacts are isolated under
+`experiment-artifacts/live/<experiment-id>/`.

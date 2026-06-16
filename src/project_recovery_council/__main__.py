@@ -20,12 +20,20 @@ from project_recovery_council.runner import (
 )
 from project_recovery_council.schemas import check_schema_drift, export_schemas
 from project_recovery_council.experiment_artifacts import validate_experiment_artifacts
+from project_recovery_council.experiment_contracts import ExperimentVariant
+from project_recovery_council.live_experiments import (
+    LIVE_ARTIFACT_ROOT,
+    run_live_agent,
+    run_live_smoke,
+    run_live_variant,
+)
 from project_recovery_council.offline_experiments import (
     DEFAULT_COMPARISON_FIXTURES,
     compare_offline_fixtures,
     write_offline_evaluation_artifacts,
 )
 from project_recovery_council.prompt_catalog import validate_prompt_catalog
+from project_recovery_council.qwen_config import StructuredOutputMode, qwen_config_from_env
 from project_recovery_council.workflow import DEFAULT_ARTIFACTS_ROOT, DEFAULT_CASE_PATH
 
 
@@ -101,6 +109,19 @@ def build_parser() -> argparse.ArgumentParser:
 
     inspect_experiment_parser = subparsers.add_parser("inspect-experiment", help="validate experiment artifact contract")
     inspect_experiment_parser.add_argument("path", type=Path)
+
+    live_smoke_parser = subparsers.add_parser("live-smoke", help="run one opt-in live Qwen smoke request")
+    _add_live_provider_args(live_smoke_parser)
+
+    live_agent_parser = subparsers.add_parser("live-agent", help="run one named live Qwen agent")
+    live_agent_parser.add_argument("--agent", required=True)
+    live_agent_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
+    _add_live_provider_args(live_agent_parser)
+
+    live_variant_parser = subparsers.add_parser("live-variant", help="run one live Qwen experiment variant")
+    live_variant_parser.add_argument("--variant", required=True, choices=[variant.value for variant in ExperimentVariant])
+    live_variant_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
+    _add_live_provider_args(live_variant_parser)
 
     return parser
 
@@ -280,12 +301,103 @@ def main(argv: list[str] | None = None) -> int:
                 print(f"- {error}")
             return 1
 
+        if args.command == "live-smoke":
+            config = _live_config_from_args(args)
+            _print_live_notice(config)
+            run_path = run_live_smoke(
+                config=config,
+                allow_network=args.allow_network,
+                artifacts_root=args.artifacts_root,
+                experiment_id=args.experiment_id,
+                replace_existing=args.replace_existing,
+            )
+            print(f"live smoke artifacts written: {run_path}")
+            return 0
+
+        if args.command == "live-agent":
+            config = _live_config_from_args(args)
+            _print_live_notice(config)
+            run_path = run_live_agent(
+                agent_role=args.agent,
+                config=config,
+                allow_network=args.allow_network,
+                case_path=args.case_path,
+                artifacts_root=args.artifacts_root,
+                experiment_id=args.experiment_id,
+                replace_existing=args.replace_existing,
+            )
+            print(f"live agent artifacts written: {run_path}")
+            return 0
+
+        if args.command == "live-variant":
+            config = _live_config_from_args(args)
+            _print_live_notice(config)
+            run_path = run_live_variant(
+                variant=args.variant,
+                config=config,
+                allow_network=args.allow_network,
+                case_path=args.case_path,
+                artifacts_root=args.artifacts_root,
+                experiment_id=args.experiment_id,
+                replace_existing=args.replace_existing,
+            )
+            print(f"live variant artifacts written: {run_path}")
+            return 0
+
     except Exception as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 
     parser.error(f"unsupported command: {args.command}")
     return 2
+
+
+def _add_live_provider_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--allow-network", action="store_true", help="required acknowledgement for live provider calls")
+    parser.add_argument("--model", required=True, help="Qwen model identifier for this live run")
+    parser.add_argument("--base-url", default=None)
+    parser.add_argument("--api-key-env-var", default=None)
+    parser.add_argument("--timeout-seconds", type=float, default=None)
+    parser.add_argument("--max-retries", type=int, default=None)
+    parser.add_argument("--retry-initial-seconds", type=float, default=None)
+    parser.add_argument("--retry-multiplier", type=float, default=None)
+    parser.add_argument("--retry-max-seconds", type=float, default=None)
+    parser.add_argument("--temperature", type=float, default=None)
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument(
+        "--structured-output-mode",
+        choices=[mode.value for mode in StructuredOutputMode],
+        default=None,
+    )
+    parser.add_argument("--provider-region-label", default=None)
+    parser.add_argument("--artifacts-root", type=Path, default=LIVE_ARTIFACT_ROOT)
+    parser.add_argument("--experiment-id", default=None)
+    parser.add_argument("--replace-existing", action="store_true")
+
+
+def _live_config_from_args(args: argparse.Namespace):
+    return qwen_config_from_env(
+        model_identifier=args.model,
+        api_key_env_var=args.api_key_env_var,
+        base_url=args.base_url,
+        request_timeout_seconds=args.timeout_seconds,
+        maximum_retries=args.max_retries,
+        retry_initial_seconds=args.retry_initial_seconds,
+        retry_multiplier=args.retry_multiplier,
+        retry_max_seconds=args.retry_max_seconds,
+        temperature=args.temperature,
+        seed=args.seed,
+        structured_output_mode=args.structured_output_mode,
+        provider_region_label=args.provider_region_label,
+    )
+
+
+def _print_live_notice(config) -> None:
+    print("Live Qwen execution requested.")
+    print(f"model: {config.model_identifier}")
+    print(f"endpoint: {config.base_url}")
+    print(f"region_label: {config.provider_region_label}")
+    print("Provider charges may apply. API keys and authorization headers will not be printed.")
 
 
 if __name__ == "__main__":
