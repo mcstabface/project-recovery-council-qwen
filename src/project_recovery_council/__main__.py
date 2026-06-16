@@ -25,7 +25,12 @@ from project_recovery_council.live_experiments import (
     LIVE_ARTIFACT_ROOT,
     run_live_agent,
     run_live_smoke,
-    run_live_variant,
+)
+from project_recovery_council.live_variant_runner import (
+    LiveRunControls,
+    compare_live_variant_runs,
+    live_variant_completed,
+    run_controlled_live_variant,
 )
 from project_recovery_council.offline_experiments import (
     DEFAULT_COMPARISON_FIXTURES,
@@ -119,9 +124,26 @@ def build_parser() -> argparse.ArgumentParser:
     _add_live_provider_args(live_agent_parser)
 
     live_variant_parser = subparsers.add_parser("live-variant", help="run one live Qwen experiment variant")
-    live_variant_parser.add_argument("--variant", required=True, choices=[variant.value for variant in ExperimentVariant])
+    live_variant_parser.add_argument(
+        "--variant",
+        required=True,
+        choices=[
+            ExperimentVariant.SINGLE_GENERALIST.value,
+            ExperimentVariant.FIXED_EXPERT_CHAIN.value,
+            ExperimentVariant.DYNAMIC_EXPERT_COUNCIL.value,
+        ],
+    )
     live_variant_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
     _add_live_provider_args(live_variant_parser)
+    _add_live_control_args(live_variant_parser)
+
+    compare_live_parser = subparsers.add_parser("compare-live", help="compare three completed live variant runs")
+    compare_live_parser.add_argument("--generalist", required=True, type=Path)
+    compare_live_parser.add_argument("--fixed-chain", required=True, type=Path)
+    compare_live_parser.add_argument("--dynamic-council", required=True, type=Path)
+    compare_live_parser.add_argument("--output-root", type=Path, default=Path("experiment-artifacts") / "live-comparisons")
+    compare_live_parser.add_argument("--comparison-id", default=None)
+    compare_live_parser.add_argument("--allow-incomplete", action="store_true")
 
     return parser
 
@@ -332,16 +354,37 @@ def main(argv: list[str] | None = None) -> int:
         if args.command == "live-variant":
             config = _live_config_from_args(args)
             _print_live_notice(config)
-            run_path = run_live_variant(
+            controls = LiveRunControls(
+                max_invocation_count=args.max_invocation_count,
+                max_total_input_tokens=args.max_total_input_tokens,
+                max_total_output_tokens=args.max_total_output_tokens,
+                max_elapsed_seconds=args.max_elapsed_seconds,
+                max_retries_per_invocation=args.max_retries_per_invocation,
+                stop_after_invocation=args.stop_after_invocation,
+            )
+            run_path = run_controlled_live_variant(
                 variant=args.variant,
                 config=config,
                 allow_network=args.allow_network,
+                controls=controls,
                 case_path=args.case_path,
                 artifacts_root=args.artifacts_root,
                 experiment_id=args.experiment_id,
                 replace_existing=args.replace_existing,
             )
             print(f"live variant artifacts written: {run_path}")
+            return 0 if live_variant_completed(run_path) else 1
+
+        if args.command == "compare-live":
+            run_path = compare_live_variant_runs(
+                generalist_path=args.generalist,
+                fixed_chain_path=args.fixed_chain,
+                dynamic_council_path=args.dynamic_council,
+                output_root=args.output_root,
+                comparison_id=args.comparison_id,
+                allow_incomplete=args.allow_incomplete,
+            )
+            print(f"live comparison artifacts written: {run_path}")
             return 0
 
     except Exception as exc:
@@ -373,6 +416,15 @@ def _add_live_provider_args(parser: argparse.ArgumentParser) -> None:
     parser.add_argument("--artifacts-root", type=Path, default=LIVE_ARTIFACT_ROOT)
     parser.add_argument("--experiment-id", default=None)
     parser.add_argument("--replace-existing", action="store_true")
+
+
+def _add_live_control_args(parser: argparse.ArgumentParser) -> None:
+    parser.add_argument("--max-invocation-count", type=int, default=8)
+    parser.add_argument("--max-total-input-tokens", type=int, default=100000)
+    parser.add_argument("--max-total-output-tokens", type=int, default=50000)
+    parser.add_argument("--max-elapsed-seconds", type=float, default=300.0)
+    parser.add_argument("--max-retries-per-invocation", type=int, default=2)
+    parser.add_argument("--stop-after-invocation", type=int, default=None)
 
 
 def _live_config_from_args(args: argparse.Namespace):

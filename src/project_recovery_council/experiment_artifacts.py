@@ -56,11 +56,13 @@ MODEL_ADAPTERS: dict[str, type[ContractModel]] = {
 GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-sanitized-provider-config.v1",
     "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+    "project-recovery-council.qwen.live-execution-plan.v1",
     "project-recovery-council.qwen.live-selected-evidence-records.v1",
     "project-recovery-council.qwen.live-role-validation-results.v1",
     "project-recovery-council.qwen.live-claim-normalization-results.v1",
     "project-recovery-council.qwen.live-normalized-structured-responses.v1",
     "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+    "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
     "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
     "project-recovery-council.qwen.live-raw-provider-responses.v1",
     "project-recovery-council.qwen.live-parsed-structured-responses.v1",
@@ -69,6 +71,11 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-retry-history.v1",
     "project-recovery-council.qwen.live-role-compliance-metrics.v1",
     "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
+    "project-recovery-council.qwen.live-routing-decisions.v1",
+    "project-recovery-council.qwen.live-disagreement-records.v1",
+    "project-recovery-council.qwen.live-final-variant-result.v1",
+    "project-recovery-council.qwen.live-evaluation-results.v1",
+    "project-recovery-council.qwen.live-comparison-report.v1",
     "project-recovery-council.qwen.live-reproducibility.v1",
 }
 
@@ -183,6 +190,7 @@ def _validate_payload(schema_id: str, payload: Any) -> None:
 def _schema_id_for(filename: str) -> str:
     return {
         "experiment-config.json": "project-recovery-council.qwen.experiment-config.v1",
+        "execution-plan.json": "project-recovery-council.qwen.live-execution-plan.v1",
         "invocation-records.json": "project-recovery-council.qwen.agent-invocations.v1",
         "variant-results.json": "project-recovery-council.qwen.variant-results.v1",
         "evaluation-results.json": "project-recovery-council.qwen.evaluation-report.v1",
@@ -196,6 +204,9 @@ def _schema_id_for(filename: str) -> str:
             "project-recovery-council.qwen.live-normalized-structured-responses.v1"
         ),
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+        "domain-semantic-validation-results.json": (
+            "project-recovery-council.qwen.live-domain-semantic-validation-results.v1"
+        ),
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
@@ -204,6 +215,10 @@ def _schema_id_for(filename: str) -> str:
         "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
         "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
         "claim-normalization-metrics.json": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
+        "routing-decisions.json": "project-recovery-council.qwen.live-routing-decisions.v1",
+        "disagreement-records.json": "project-recovery-council.qwen.live-disagreement-records.v1",
+        "final-variant-result.json": "project-recovery-council.qwen.live-final-variant-result.v1",
+        "live-comparison-report.json": "project-recovery-council.qwen.live-comparison-report.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 
@@ -216,8 +231,8 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
         invocation.get("invocation_id")
         for invocation in invocations
         if isinstance(invocation, dict)
-        and invocation.get("invocation_purpose") == "standalone_live_agent"
-        and invocation.get("agent_role") not in {"GeneralistAgent", "LiveSmoke"}
+        and invocation.get("agent_role")
+        in {"ScheduleExpert", "CommercialExpert", "EvidenceAuditor", "RiskExpert"}
     ]
     if not specialist_invocation_ids:
         return []
@@ -240,7 +255,6 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
         invocation.get("invocation_id")
         for invocation in invocations
         if isinstance(invocation, dict)
-        and invocation.get("invocation_purpose") == "standalone_live_agent"
         and invocation.get("agent_role") == "ScheduleExpert"
     ]
     if schedule_invocation_ids and (not isinstance(schedule_results, list) or not schedule_results):

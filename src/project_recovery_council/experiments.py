@@ -76,7 +76,6 @@ def build_experiment_plan(
             AgentRole.EVIDENCE_AUDITOR,
             AgentRole.RISK_EXPERT,
             AgentRole.RECOVERY_PLANNER,
-            AgentRole.ARBITER,
         ]
         steps = []
         previous_step = ""

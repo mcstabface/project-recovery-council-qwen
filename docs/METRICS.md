@@ -105,3 +105,23 @@ evidence.
   milestone date equals the baseline milestone date plus the reported net slip.
 - `schedule_semantic_compliance_rate`: the share of ScheduleExpert semantic
   validations that pass all checked schedule rules.
+
+## Live Comparison Metrics
+
+`compare-live` reports one row per completed live AI variant:
+
+- `single_generalist`
+- `fixed_expert_chain`
+- `dynamic_expert_council`
+
+Each row includes model configuration, case ID, completion status, total
+invocation count, required-fact accuracy, schedule correctness, commercial
+correctness, citation precision and recall, contradiction detection,
+unsupported claim count, correct human escalation, preferred recovery option,
+schema-valid response rate, role-scope compliance, semantic-validation
+compliance, provider-reported token totals, aggregate latency, retry count, and
+any stopped-by-limit status.
+
+The comparison is descriptive. One live run per variant is not statistically
+significant, and the deterministic oracle remains the expected-result source
+rather than an AI competitor.

@@ -73,8 +73,37 @@ PYTHONPATH=src python -m project_recovery_council live-variant \
   --allow-network
 ```
 
+```bash
+PYTHONPATH=src python -m project_recovery_council live-variant \
+  --variant fixed_expert_chain \
+  --model <model-id> \
+  --allow-network
+```
+
+```bash
+PYTHONPATH=src python -m project_recovery_council live-variant \
+  --variant dynamic_expert_council \
+  --model <model-id> \
+  --allow-network
+```
+
 `live-variant` runs only the named variant and never runs the full matrix
-implicitly.
+implicitly. It applies invocation, token, elapsed-time, retry, and optional
+`--stop-after-invocation` limits. If a limit stops the run, completed artifacts
+are preserved, the final result is marked incomplete, and the CLI returns a
+nonzero exit code.
+
+After all three runs are complete and inspected, compare them without network
+access:
+
+```bash
+PYTHONPATH=src python -m project_recovery_council compare-live \
+  --generalist experiment-artifacts/live/<single-generalist-run> \
+  --fixed-chain experiment-artifacts/live/<fixed-chain-run> \
+  --dynamic-council experiment-artifacts/live/<dynamic-council-run>
+```
+
+The manual order is documented in `docs/LIVE_COMPARISON_RUNBOOK.md`.
 
 ## Specialist Scope
 
@@ -121,6 +150,11 @@ Before committing, verify no live artifacts are staged:
 git status --short
 git diff --cached --name-only | grep '^experiment-artifacts/live/' || true
 ```
+
+Live comparison artifacts are written under
+`experiment-artifacts/live-comparisons/` and are also local generated outputs.
+Review `git status --short` before committing to ensure no unintended live
+artifacts are staged.
 
 ## Cost Caution
 

@@ -1,0 +1,113 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "controlled-live-variant-comparison",
+  "repository": "project-recovery-council-qwen",
+  "git_commit": "b80b3ef",
+  "dirty_working_tree": true,
+  "status": "complete",
+  "objectives": [
+    "Implement controlled live execution plans for single_generalist, fixed_expert_chain, and dynamic_expert_council",
+    "Preserve fair shared model, endpoint, case, evidence, and evaluation baselines",
+    "Add strict invocation, token, elapsed-time, retry, stop-after, and overwrite safeguards",
+    "Run specialist outputs through schema validation, claim normalization, role validation, and domain semantic validation where implemented",
+    "Produce comparable live artifacts and a no-network combined comparison report",
+    "Keep all live execution explicit and opt-in"
+  ],
+  "created_files": [
+    "decisions/ADR-0011-controlled-live-variant-comparison.md",
+    "docs/LIVE_COMPARISON_RUNBOOK.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_LIVE_VARIANT_COMPARISON.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_LIVE_VARIANT_COMPARISON.json",
+    "src/project_recovery_council/live_variant_runner.py",
+    "tests/test_live_variant_runner.py"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_PROVIDER_PLAN.md",
+    "docs/LIVE_QWEN_SETUP.md",
+    "docs/METRICS.md",
+    "src/project_recovery_council/__main__.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiments.py",
+    "src/project_recovery_council/live_experiments.py",
+    "tests/test_qwen_live_cli.py",
+    "tests/test_qwen_prompts_and_plans.py"
+  ],
+  "live_execution_plans": {
+    "single_generalist": [
+      "GeneralistAgent"
+    ],
+    "fixed_expert_chain": [
+      "ScheduleExpert",
+      "CommercialExpert",
+      "EvidenceAuditor",
+      "RiskExpert",
+      "RecoveryPlanner"
+    ],
+    "dynamic_expert_council": [
+      "DirectorAgent",
+      "Director-selected specialists",
+      "EvidenceAuditor",
+      "ArbiterAgent",
+      "RecoveryPlanner"
+    ]
+  },
+  "safeguards": {
+    "allow_network_required": true,
+    "model_required": true,
+    "max_invocation_count_default": 8,
+    "max_total_input_tokens_default": 100000,
+    "max_total_output_tokens_default": 50000,
+    "max_elapsed_seconds_default": 300.0,
+    "max_retries_per_invocation_default": 2,
+    "stop_after_invocation_supported": true,
+    "overwrite_requires_explicit_flag": true
+  },
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_live_variant_runner.py tests/test_qwen_live_cli.py tests/test_qwen_prompts_and_plans.py tests/test_schedule_semantics.py",
+      "exit_code": 0,
+      "result": "38 passed in 2.57s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "129 passed, 1 skipped in 8.92s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    }
+  ],
+  "test_results": {
+    "focused_pytest": {
+      "command": "python -m pytest tests/test_live_variant_runner.py tests/test_qwen_live_cli.py tests/test_qwen_prompts_and_plans.py tests/test_schedule_semantics.py",
+      "exit_code": 0,
+      "summary": "38 passed in 2.57s"
+    },
+    "full_pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "129 passed, 1 skipped in 8.92s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_command_executed": false
+  },
+  "known_limitations": [
+    "Only ScheduleExpert has a specialized semantic validator",
+    "The comparison report is descriptive and not statistically significant from one run per variant",
+    "Provider pricing is omitted unless supplied explicitly",
+    "Automatic live matrix execution is intentionally unsupported"
+  ],
+  "recommended_first_live_command": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-variant --variant single_generalist --model qwen-plus --allow-network"
+}

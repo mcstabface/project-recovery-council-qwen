@@ -88,6 +88,8 @@ prc-qwen compare-offline
 prc-qwen validate-prompts
 prc-qwen inspect-experiment experiment-artifacts/offline-strong_modular_council
 prc-qwen live-smoke --model <model-id> --allow-network
+prc-qwen live-variant --variant single_generalist --model <model-id> --allow-network
+prc-qwen compare-live --generalist <path> --fixed-chain <path> --dynamic-council <path>
 project-recovery-council validate
 project-recovery-council demo
 project-recovery-council inspect session-artifacts/canonical-demo
@@ -118,6 +120,7 @@ python -m project_recovery_council compare-offline
 python -m project_recovery_council validate-prompts
 python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
 python -m project_recovery_council live-smoke --model <model-id> --allow-network
+python -m project_recovery_council live-variant --variant single_generalist --model <model-id> --allow-network
 ```
 
 From this source tree without installing first:
@@ -141,6 +144,7 @@ PYTHONPATH=src python -m project_recovery_council compare-offline
 PYTHONPATH=src python -m project_recovery_council validate-prompts
 PYTHONPATH=src python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
 PYTHONPATH=src python -m project_recovery_council live-smoke --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council live-variant --variant single_generalist --model <model-id> --allow-network
 ```
 
 Workflow runs write inspectable artifacts under:
@@ -244,11 +248,21 @@ export DASHSCOPE_API_KEY="<your-api-key>"
 PYTHONPATH=src python -m project_recovery_council live-smoke --model <model-id> --allow-network
 PYTHONPATH=src python -m project_recovery_council live-agent --agent ScheduleExpert --model <model-id> --allow-network
 PYTHONPATH=src python -m project_recovery_council live-variant --variant single_generalist --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council live-variant --variant fixed_expert_chain --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council live-variant --variant dynamic_expert_council --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council compare-live --generalist <path> --fixed-chain <path> --dynamic-council <path>
 ```
 
 No live model identifier is hard-coded. Choose the model ID from the current
 Alibaba Cloud Model Studio console or official documentation for the endpoint
 you are using.
+
+`live-variant` runs exactly one requested AI variant and never launches the
+full comparison matrix automatically. It enforces `--allow-network`, explicit
+model selection, no-overwrite artifact behavior, conservative call/token/time
+limits, and a nonzero exit code when a limit stops the run before completion.
+The manual comparison order is documented in
+`docs/LIVE_COMPARISON_RUNBOOK.md`.
 
 Specialist live invocations now use explicit evidence-access policy code before
 prompt rendering. For example, `ScheduleExpert` receives schedule records plus
@@ -270,9 +284,19 @@ conflicts are reported instead of silently resolved.
 validation. For the synthetic case, 21 days of delivery movement consumes the
 available 8 days of installation total float, leaves 0 days remaining float, and
 produces a 13-day net milestone slip with `float_consumption_status` of
-`fully_consumed`. Future standalone live ScheduleExpert artifacts include
+`fully_consumed`. Future live ScheduleExpert artifacts include
 `schedule-semantic-validation.json` and `schedule-semantic-metrics.json`; prior
 live artifacts are not retroactively modified.
+
+Controlled live variant artifacts are written under
+`experiment-artifacts/live/<experiment-id>/` and include execution plans,
+selected evidence record IDs, prompt hashes, invocation records, parsed and raw
+redacted responses, validation results, token usage, retry history, routing
+decisions for dynamic council runs, final variant results, evaluation results,
+reproducibility metadata, and a checksum manifest. Completed live runs can be
+compared offline with `compare-live`; the comparison writes machine-readable
+JSON and concise Markdown and refuses incomplete or invalid runs unless a
+diagnostic override is supplied.
 
 Offline experiment outputs use:
 

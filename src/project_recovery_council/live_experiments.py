@@ -250,69 +250,17 @@ def run_live_variant(
     replace_existing: bool = False,
     client: QwenModelClient | None = None,
 ) -> Path:
-    selected_variant = ExperimentVariant(variant)
-    if selected_variant != ExperimentVariant.SINGLE_GENERALIST:
-        raise ValueError("live-variant currently supports only single_generalist")
-    assert_live_ready(config, allow_network=allow_network)
-    bundle = load_equipment_delay_case(case_path)
-    selected_id = experiment_id or _timestamped_id("live-variant-single_generalist")
-    _assert_live_artifact_path_writable(artifacts_root, selected_id, replace_existing=replace_existing)
-    schema_id = RECOVERY_ANALYSIS_RESPONSE_SCHEMA
-    prompt = render_agent_prompt(
-        bundle=bundle,
-        agent_role=AgentRole.GENERALIST.value,
-        expected_response_schema=schema_id,
-        correlation_id=selected_id,
-        experiment_variant=selected_variant,
-        invocation_purpose=InvocationPurpose.SINGLE_GENERALIST,
-    )
-    selected_record_ids = selected_evidence_record_ids(bundle, AgentRole.GENERALIST.value)
-    request = ModelRequest(
-        model_identifier=config.model_identifier,
-        system_instructions="You are the Project Recovery Council single generalist. Return one JSON object only.",
-        user_payload=prompt,
-        expected_response_schema=schema_id,
-        generation_parameters={"temperature": config.temperature, "seed": config.seed},
-        correlation_id=selected_id,
-        metadata={
-            "command": "live-variant",
-            "variant": selected_variant.value,
-            "invocation_purpose": selected_variant.value,
-            "selected_evidence_record_ids": selected_record_ids,
-            "prompt_version": PROMPT_VERSION,
-        },
-    )
-    selected_client = client or QwenModelClient(config, schema_registry=SCHEMA_REGISTRY)
-    result = selected_client.generate(request)
-    invocation = AgentInvocation(
-        invocation_id=f"INV-{selected_id}",
-        variant=selected_variant,
-        invocation_purpose=selected_variant.value,
-        agent_role=AgentRole.GENERALIST.value,
-        prompt_id=f"{AgentRole.GENERALIST.value}.{PROMPT_VERSION}",
-        request=request,
-        result=result,
-    )
-    report = _evaluation_for_result(result, bundle=bundle, fixture_id=selected_id)
-    return write_live_artifacts(
-        experiment_id=selected_id,
-        case_id=bundle.case.case_id,
+    from project_recovery_council.live_variant_runner import run_controlled_live_variant
+
+    return run_controlled_live_variant(
+        variant=variant,
         config=config,
-        prompt_records=[_prompt_record(AgentRole.GENERALIST.value, prompt, schema_id)],
-        selected_evidence_records=[
-            {
-                "invocation_id": invocation.invocation_id,
-                "agent_role": AgentRole.GENERALIST.value,
-                "record_ids": selected_record_ids,
-            }
-        ],
-        role_validation_results=[],
-        schedule_semantic_validation_results=[],
-        invocations=[invocation],
-        results=[result],
-        evaluation_report=report,
+        allow_network=allow_network,
+        case_path=case_path,
         artifacts_root=artifacts_root,
+        experiment_id=experiment_id,
         replace_existing=replace_existing,
+        client=client,
     )
 
 

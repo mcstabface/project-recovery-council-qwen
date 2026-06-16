@@ -25,12 +25,16 @@ and token usage fields:
 - secrets handling and redaction in logs and artifacts
 - experiment reproducibility, including prompt version, model identifier,
   generation parameters, fixture or provider metadata, and evidence bundle hash
+- controlled one-variant live execution for `single_generalist`,
+  `fixed_expert_chain`, and `dynamic_expert_council`
+- offline `compare-live` reporting across three completed live variant
+  directories
 
 ## Deferred
 
 - Alibaba Cloud deployment proof
 - provider-specific cost estimation
-- live matrix execution
+- automatic live matrix execution
 - default model selection
 
 `DisabledQwenModelClient` remains available as the safe non-networking

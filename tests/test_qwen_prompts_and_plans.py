@@ -35,7 +35,6 @@ def test_all_four_experiment_plans_are_explicit() -> None:
         AgentRole.EVIDENCE_AUDITOR.value,
         AgentRole.RISK_EXPERT.value,
         AgentRole.RECOVERY_PLANNER.value,
-        AgentRole.ARBITER.value,
     ]
     dynamic = build_experiment_plan(ExperimentVariant.DYNAMIC_EXPERT_COUNCIL)
     assert dynamic.steps[0].agent_role == AgentRole.DIRECTOR.value
