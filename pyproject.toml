@@ -16,6 +16,9 @@ dependencies = [
   "pydantic>=2,<3"
 ]
 
+[project.scripts]
+project-recovery-council = "project_recovery_council.__main__:main"
+
 [project.optional-dependencies]
 dev = [
   "pytest>=8"
@@ -25,4 +28,3 @@ dev = [
 addopts = "-q"
 pythonpath = ["src"]
 testpaths = ["tests"]
-

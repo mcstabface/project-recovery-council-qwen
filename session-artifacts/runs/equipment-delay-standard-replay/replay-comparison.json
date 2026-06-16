@@ -1,0 +1,12 @@
+{
+  "differences": [],
+  "equivalent": true,
+  "ignored_fields": [
+    "artifact_path",
+    "decided_at",
+    "event_id",
+    "occurred_at",
+    "run_id",
+    "run_path"
+  ]
+}

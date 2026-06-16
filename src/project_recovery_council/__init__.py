@@ -18,6 +18,8 @@ from project_recovery_council.contracts import (
     RecoveryOption,
 )
 from project_recovery_council.fixtures import CaseBundle, load_equipment_delay_case
+from project_recovery_council.runner import replay_run, run_equipment_delay_case, validate_case_fixture
+from project_recovery_council.state import WorkflowStage, WorkflowTransitionError
 from project_recovery_council.validation import (
     assert_expected_results,
     build_actual_expected_results,
@@ -30,6 +32,11 @@ from project_recovery_council.validation import (
     is_equipment_onsite_claim_supported,
     validate_date_and_duration_consistency,
     validate_evidence_references,
+)
+from project_recovery_council.workflow import (
+    LocalWorkflowRunner,
+    WorkflowExecutionError,
+    default_workflow_config,
 )
 
 __all__ = [
@@ -49,6 +56,10 @@ __all__ = [
     "HumanDecisionRequest",
     "RecoveryCase",
     "RecoveryOption",
+    "LocalWorkflowRunner",
+    "WorkflowExecutionError",
+    "WorkflowStage",
+    "WorkflowTransitionError",
     "assert_expected_results",
     "build_actual_expected_results",
     "calculate_delivery_shift_days",
@@ -59,7 +70,10 @@ __all__ = [
     "evaluate_human_gate_required",
     "is_equipment_onsite_claim_supported",
     "load_equipment_delay_case",
+    "default_workflow_config",
+    "replay_run",
+    "run_equipment_delay_case",
+    "validate_case_fixture",
     "validate_date_and_duration_consistency",
     "validate_evidence_references",
 ]
-

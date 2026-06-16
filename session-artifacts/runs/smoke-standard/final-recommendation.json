@@ -1,0 +1,211 @@
+{
+  "approval_status": "approved",
+  "assumptions": [
+    "Accelerated logistics can recover the forecast milestone slip before secondary effects.",
+    "Commercial exposure remains 15000 USD per calendar day."
+  ],
+  "case_id": "PRC-EQ-DELAY-001",
+  "confidence": {
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "section:Delay Exposure",
+        "record_id": "CTR-DELAY-001",
+        "source_file": "contract-excerpt.md"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "level": "high",
+    "rationale": "Schedule, commercial, logistics, contract, and human-confirmation records support the recommendation.",
+    "score": 0.96
+  },
+  "contradictions": [
+    {
+      "conflicting_evidence": [
+        {
+          "excerpt": "The generator skid is onsite and released to installation.",
+          "locator": "section:Equipment Status",
+          "record_id": "PRG-ONSITE-001",
+          "source_file": "progress-report.md"
+        },
+        {
+          "excerpt": "The generator skid has not arrived at the site.",
+          "locator": "section:Supplier Message",
+          "record_id": "SUP-NOT-ARRIVED-001",
+          "source_file": "supplier-correspondence.md"
+        },
+        {
+          "excerpt": "actual_arrival_date is null",
+          "locator": "/records/0/actual_arrival_date",
+          "record_id": "LOG-STATUS-001",
+          "source_file": "logistics-status.json"
+        }
+      ],
+      "contradiction_id": "CONTRA-ONSITE-001",
+      "issue": "equipment_onsite_status",
+      "requires_human_confirmation": false,
+      "status": "resolved",
+      "summary": "Progress reporting says the equipment is onsite, but supplier correspondence and the logistics record show it has not arrived. Human decision confirms the equipment is not onsite."
+    }
+  ],
+  "evidence": [
+    {
+      "excerpt": null,
+      "locator": "/records/0",
+      "record_id": "SCH-DELIVERY-001",
+      "source_file": "schedule.json"
+    },
+    {
+      "excerpt": null,
+      "locator": "/records/0",
+      "record_id": "COST-SUMMARY-001",
+      "source_file": "cost-summary.json"
+    },
+    {
+      "excerpt": null,
+      "locator": "section:Delay Exposure",
+      "record_id": "CTR-DELAY-001",
+      "source_file": "contract-excerpt.md"
+    },
+    {
+      "excerpt": null,
+      "locator": "/records/0",
+      "record_id": "LOG-STATUS-001",
+      "source_file": "logistics-status.json"
+    }
+  ],
+  "gross_avoided_exposure_usd": 147000,
+  "human_decision_request": {
+    "blocking": true,
+    "case_id": "PRC-EQ-DELAY-001",
+    "contradictions": [
+      {
+        "conflicting_evidence": [
+          {
+            "excerpt": "The generator skid is onsite and released to installation.",
+            "locator": "section:Equipment Status",
+            "record_id": "PRG-ONSITE-001",
+            "source_file": "progress-report.md"
+          },
+          {
+            "excerpt": "The generator skid has not arrived at the site.",
+            "locator": "section:Supplier Message",
+            "record_id": "SUP-NOT-ARRIVED-001",
+            "source_file": "supplier-correspondence.md"
+          },
+          {
+            "excerpt": "actual_arrival_date is null",
+            "locator": "/records/0/actual_arrival_date",
+            "record_id": "LOG-STATUS-001",
+            "source_file": "logistics-status.json"
+          }
+        ],
+        "contradiction_id": "CONTRA-ONSITE-001",
+        "issue": "equipment_onsite_status",
+        "requires_human_confirmation": true,
+        "status": "unresolved",
+        "summary": "Progress reporting says the equipment is onsite, but supplier correspondence and the logistics record show it has not arrived."
+      }
+    ],
+    "decision_request_id": "HDR-ONSITE-001",
+    "evidence": [
+      {
+        "excerpt": "The generator skid is onsite and released to installation.",
+        "locator": "section:Equipment Status",
+        "record_id": "PRG-ONSITE-001",
+        "source_file": "progress-report.md"
+      },
+      {
+        "excerpt": "The generator skid has not arrived at the site.",
+        "locator": "section:Supplier Message",
+        "record_id": "SUP-NOT-ARRIVED-001",
+        "source_file": "supplier-correspondence.md"
+      },
+      {
+        "excerpt": "actual_arrival_date is null",
+        "locator": "/records/0/actual_arrival_date",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "question": "Confirm whether the generator skid has physically arrived onsite.",
+    "reason": "Onsite status is contradicted by cited source records.",
+    "requested_by": "EvidenceAuditor",
+    "status": "answered"
+  },
+  "human_decision_required": false,
+  "mitigation_cost_usd": 48000,
+  "options_considered": [
+    {
+      "assumptions": [
+        "Accelerated logistics can recover the forecast milestone slip before secondary effects.",
+        "Commercial exposure remains 15000 USD per calendar day."
+      ],
+      "avoided_delay_days": 13,
+      "avoided_exposure_usd": 195000,
+      "cost_usd": 48000,
+      "description": "Approve the alternate logistics lane to recover the delivery delay.",
+      "evidence": [
+        {
+          "excerpt": null,
+          "locator": "/records/0",
+          "record_id": "SCH-DELIVERY-001",
+          "source_file": "schedule.json"
+        },
+        {
+          "excerpt": null,
+          "locator": "/records/0",
+          "record_id": "COST-SUMMARY-001",
+          "source_file": "cost-summary.json"
+        },
+        {
+          "excerpt": null,
+          "locator": "section:Delay Exposure",
+          "record_id": "CTR-DELAY-001",
+          "source_file": "contract-excerpt.md"
+        },
+        {
+          "excerpt": null,
+          "locator": "/records/0",
+          "record_id": "LOG-STATUS-001",
+          "source_file": "logistics-status.json"
+        }
+      ],
+      "label": "accelerated logistics",
+      "option_id": "REC-ACCEL-LOGISTICS",
+      "required_approvals": [
+        "project director approval",
+        "commercial approval"
+      ],
+      "warnings": [
+        "Final authorization is blocked until onsite-status contradiction is resolved by a human."
+      ]
+    }
+  ],
+  "preferred_option_id": "REC-ACCEL-LOGISTICS",
+  "recommendation_id": "FREC-EQ-001",
+  "status": "authorized",
+  "summary": "Accelerated logistics is authorized: the 48000 USD mitigation is lower than the 195000 USD unmitigated exposure, and the equipment is confirmed not onsite by simulated human decision.",
+  "unmitigated_exposure_usd": 195000,
+  "warnings": [
+    "Authorization assumes accelerated logistics can still recover the 13-day projected milestone slip.",
+    "Execution remains subject to implementing the approved logistics option before secondary effects emerge."
+  ]
+}

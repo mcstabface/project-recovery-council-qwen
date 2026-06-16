@@ -62,6 +62,8 @@ The `FinalRecommendation` contract rejects an authorized recommendation when
 
 `AuditEvent` stores concise, append-only history:
 
+- sequence number
+- event type
 - actor
 - action
 - timestamp
@@ -71,3 +73,29 @@ The `FinalRecommendation` contract rejects an authorized recommendation when
 
 Audit events are not private reasoning logs.
 
+## Workflow State
+
+Workflow state is represented outside the case contract in the local execution
+context. Allowed stages are:
+
+- `initialized`
+- `validating`
+- `triaging`
+- `expert_analysis`
+- `contradiction_review`
+- `awaiting_human_decision`
+- `recovery_planning`
+- `awaiting_final_approval`
+- `completed`
+- `failed`
+
+Transitions are validated before state changes. This keeps case lifecycle
+semantics explicit without embedding orchestration-specific mutable state inside
+expert findings.
+
+## Recommendation Approval
+
+`FinalRecommendation` now carries optional confidence and an `approval_status`.
+The local workflow creates a draft recommendation after human confirmation and
+then records deterministic final approval before creating the authorized final
+recommendation.

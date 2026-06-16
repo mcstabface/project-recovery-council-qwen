@@ -1,0 +1,11 @@
+{
+  "auto_human_decision": true,
+  "case_path": "sample-data/equipment-delay-case",
+  "inject_commercial_failure": false,
+  "run_id": "equipment-delay-standard-replay",
+  "schema_version": "project-recovery-council.replay-input.v1",
+  "simulated_human_decision": {
+    "decision_id": "HD-ONSITE-001",
+    "onsite_status": "not_onsite"
+  }
+}

@@ -45,7 +45,20 @@ class DeterministicScheduleExpert(ScheduleExpert):
 
 
 class DeterministicCommercialExpert(CommercialExpert):
+    def __init__(self, fail_first_attempt: bool = False) -> None:
+        self.fail_first_attempt = fail_first_attempt
+
     def evaluate(self, request: ExpertRequest, bundle: CaseBundle) -> ExpertFinding:
+        if self.fail_first_attempt and request.attempt == 1:
+            return ExpertFinding(
+                finding_id="FIND-COMMERCIAL-FAILED-001",
+                request_id=request.request_id,
+                expert_role="CommercialExpert",
+                status=ExpertStatus.FAILED,
+                failure_reason="Injected deterministic first-attempt commercial expert failure.",
+                retry_count=0,
+            )
+
         cost = bundle.evidence_by_id["COST-SUMMARY-001"]
         delay_days = int(cost.fields["unmitigated_delay_days"])
         exposure = calculate_unmitigated_exposure_usd(
@@ -57,8 +70,9 @@ class DeterministicCommercialExpert(CommercialExpert):
             int(cost.fields["accelerated_logistics_cost_usd"]),
         )
         evidence = [cost.reference("/records/0")]
+        suffix = "001" if request.attempt == 1 else f"{request.attempt:03d}"
         return ExpertFinding(
-            finding_id="FIND-COMMERCIAL-001",
+            finding_id=f"FIND-COMMERCIAL-{suffix}",
             request_id=request.request_id,
             expert_role="CommercialExpert",
             status=ExpertStatus.COMPLETED,
@@ -66,6 +80,7 @@ class DeterministicCommercialExpert(CommercialExpert):
             confidence=completed_confidence("The calculation uses fixed fixture rates and costs.", evidence),
             evidence=evidence,
             assumptions=["Delay exposure is linear by calendar day."],
+            retry_count=request.attempt - 1,
         )
 
 
@@ -142,4 +157,3 @@ class DeterministicDirector(Director):
                 bundle,
             ),
         ]
-

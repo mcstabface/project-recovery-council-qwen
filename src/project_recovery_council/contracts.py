@@ -203,6 +203,8 @@ class FinalRecommendation(ContractModel):
     mitigation_cost_usd: int = Field(ge=0)
     gross_avoided_exposure_usd: int
     human_decision_required: bool
+    confidence: ConfidenceAssessment | None = None
+    approval_status: Literal["not_requested", "pending", "approved", "rejected"] = "not_requested"
     assumptions: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     evidence: list[EvidenceReference] = Field(default_factory=list)
@@ -228,8 +230,10 @@ class AuditEvent(ContractModel):
     """Append-only event for preserving case and orchestration history."""
 
     event_id: str = Field(min_length=1)
+    sequence: int = Field(default=0, ge=0)
     case_id: str = Field(min_length=1)
     occurred_at: datetime
+    event_type: str = Field(default="legacy", min_length=1)
     actor: str = Field(min_length=1)
     action: str = Field(min_length=1)
     summary: str = Field(min_length=1)
@@ -250,4 +254,3 @@ class RecoveryCase(ContractModel):
     contradictions: list[Contradiction] = Field(default_factory=list)
     human_decision_requests: list[HumanDecisionRequest] = Field(default_factory=list)
     audit_history: list[AuditEvent] = Field(default_factory=list)
-
