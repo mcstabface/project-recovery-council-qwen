@@ -81,6 +81,10 @@ class EvaluationMetricId(StrEnum):
     MILESTONE_SLIP_CORRECTNESS = "milestone_slip_correctness"
     MILESTONE_DATE_ARITHMETIC_CORRECTNESS = "milestone_date_arithmetic_correctness"
     SCHEDULE_SEMANTIC_COMPLIANCE_RATE = "schedule_semantic_compliance_rate"
+    CLAIM_NORMALIZATION_SUCCESS_RATE = "claim_normalization_success_rate"
+    ALIAS_APPLICATION_COUNT = "alias_application_count"
+    UNKNOWN_CLAIM_KEY_COUNT = "unknown_claim_key_count"
+    CLAIM_ALIAS_CONFLICT_COUNT = "claim_alias_conflict_count"
 
 
 class Disagreement(ContractModel):

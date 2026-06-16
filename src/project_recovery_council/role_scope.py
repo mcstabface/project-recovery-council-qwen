@@ -8,6 +8,7 @@ from typing import Any
 
 from pydantic import Field
 
+from project_recovery_council.claim_normalization import normalize_claim_keys, normalize_response_payload
 from project_recovery_council.contracts import ContractModel, EvidenceRecord
 from project_recovery_council.experiment_contracts import AgentRole, SpecialistFindingResponse
 from project_recovery_council.fixtures import CaseBundle
@@ -51,22 +52,15 @@ SCHEDULE_ALLOWED_CLAIMS = [
     "milestone_id",
     "delivery_baseline_date",
     "delivery_forecast_date",
-    "baseline_delivery_date",
-    "forecast_delivery_date",
     "delivery_movement_days",
-    "delivery_shift_days",
     "installation_total_float_consumed_days",
     "installation_total_float_remaining_days",
     "milestone_baseline_date",
     "milestone_forecast_date_without_intervention",
-    "float_consumption_days",
     "installation_total_float_days",
-    "remaining_float_days",
-    "projected_milestone_slip_days",
     "forecast_milestone_slip_days",
     "successor_testing_activity_id",
     "successor_dependency_effect",
-    "successor_dependency_effects",
     "successor_testing_constraint",
 ]
 
@@ -307,10 +301,16 @@ def validate_specialist_response(
     selected_record_ids: list[str],
     bundle: CaseBundle,
 ) -> RoleValidationResult:
+    payload = response.model_dump(mode="json")
+    normalization = normalize_claim_keys(
+        invocation_id=invocation_id,
+        role=role,
+        response_payload=payload,
+    )
     return validate_role_scope(
         role=role,
         invocation_id=invocation_id,
-        response_payload=response.model_dump(mode="json"),
+        response_payload=normalize_response_payload(payload, normalization),
         selected_record_ids=selected_record_ids,
         bundle=bundle,
     )

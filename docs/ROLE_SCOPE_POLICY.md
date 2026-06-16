@@ -33,14 +33,18 @@ Allowed claim keys include:
 - `milestone_baseline_date`
 - `milestone_forecast_date_without_intervention`
 - `forecast_milestone_slip_days`
-- `projected_milestone_slip_days`
 - `successor_testing_activity_id`
 - `successor_dependency_effect`
-- `successor_dependency_effects`
 
 These keys cover baseline and forecast dates, delivery movement, available
 installation float, float consumed, remaining float, projected milestone slip,
 and successor dependency effects.
+
+Supported aliases, such as `baseline_delivery_date`,
+`forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
+`contractual_milestone_baseline_date`, and
+`contractual_milestone_forecast_without_intervention`, are normalized before
+role validation. They are not role-policy keys themselves.
 
 Prohibited claims include equipment onsite conclusions, supplier/logistics
 arrival conclusions, commercial exposure, mitigation cost, preferred recovery
@@ -84,6 +88,13 @@ experiment design.
 
 ## Validation
 
+Specialist validation order is:
+
+- JSON schema validation
+- deterministic claim-key normalization
+- role-scope validation on normalized claims
+- domain semantic validation on normalized claims
+
 Role validation records:
 
 - allowed claims
@@ -95,6 +106,7 @@ Role validation records:
 - concise findings
 
 JSON schema validity does not imply role-scope validity.
+Claim normalization validity does not imply role-scope validity.
 
 ## Schedule Semantic Validation
 

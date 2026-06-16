@@ -58,6 +58,8 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
     "project-recovery-council.qwen.live-selected-evidence-records.v1",
     "project-recovery-council.qwen.live-role-validation-results.v1",
+    "project-recovery-council.qwen.live-claim-normalization-results.v1",
+    "project-recovery-council.qwen.live-normalized-structured-responses.v1",
     "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
     "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
     "project-recovery-council.qwen.live-raw-provider-responses.v1",
@@ -66,6 +68,7 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-token-usage.v1",
     "project-recovery-council.qwen.live-retry-history.v1",
     "project-recovery-council.qwen.live-role-compliance-metrics.v1",
+    "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
     "project-recovery-council.qwen.live-reproducibility.v1",
 }
 
@@ -188,6 +191,10 @@ def _schema_id_for(filename: str) -> str:
         "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
         "selected-evidence-records.json": "project-recovery-council.qwen.live-selected-evidence-records.v1",
         "role-validation-results.json": "project-recovery-council.qwen.live-role-validation-results.v1",
+        "claim-normalization-results.json": "project-recovery-council.qwen.live-claim-normalization-results.v1",
+        "normalized-structured-responses.json": (
+            "project-recovery-council.qwen.live-normalized-structured-responses.v1"
+        ),
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
@@ -196,6 +203,7 @@ def _schema_id_for(filename: str) -> str:
         "token-usage.json": "project-recovery-council.qwen.live-token-usage.v1",
         "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
         "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
+        "claim-normalization-metrics.json": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 
@@ -216,11 +224,18 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
     errors: list[str] = []
     selected = loaded_payloads.get("selected-evidence-records.json")
     role_results = loaded_payloads.get("role-validation-results.json")
+    normalization_results = loaded_payloads.get("claim-normalization-results.json")
+    normalized_responses = loaded_payloads.get("normalized-structured-responses.json")
+    parsed_responses = loaded_payloads.get("parsed-structured-responses.json")
     schedule_results = loaded_payloads.get("schedule-semantic-validation.json")
     if not isinstance(selected, list) or not selected:
         errors.append("standalone specialist live artifacts require selected-evidence-records.json")
     if not isinstance(role_results, list) or not role_results:
         errors.append("standalone specialist live artifacts require role-validation-results.json")
+    if not isinstance(normalization_results, list) or not normalization_results:
+        errors.append("standalone specialist live artifacts require claim-normalization-results.json")
+    if not isinstance(normalized_responses, list) or not normalized_responses:
+        errors.append("standalone specialist live artifacts require normalized-structured-responses.json")
     schedule_invocation_ids = [
         invocation.get("invocation_id")
         for invocation in invocations
@@ -240,6 +255,16 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
         for item in role_results or []
         if isinstance(item, dict)
     }
+    normalization_result_ids = {
+        item.get("invocation_id")
+        for item in normalization_results or []
+        if isinstance(item, dict)
+    }
+    normalized_response_ids = {
+        item.get("invocation_id")
+        for item in normalized_responses or []
+        if isinstance(item, dict)
+    }
     schedule_result_ids = {
         item.get("invocation_id")
         for item in schedule_results or []
@@ -250,9 +275,82 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
             errors.append(f"missing selected evidence record entry for {invocation_id}")
         if invocation_id not in role_result_ids:
             errors.append(f"missing role validation result for {invocation_id}")
+        if invocation_id not in normalization_result_ids:
+            errors.append(f"missing claim normalization result for {invocation_id}")
+        if invocation_id not in normalized_response_ids:
+            errors.append(f"missing normalized structured response for {invocation_id}")
     for invocation_id in schedule_invocation_ids:
         if invocation_id not in schedule_result_ids:
             errors.append(f"missing schedule semantic validation result for {invocation_id}")
+    errors.extend(
+        _validate_claim_normalization_artifacts(
+            specialist_invocation_ids=specialist_invocation_ids,
+            parsed_responses=parsed_responses,
+            normalization_results=normalization_results,
+            normalized_responses=normalized_responses,
+        )
+    )
+    return errors
+
+
+def _validate_claim_normalization_artifacts(
+    *,
+    specialist_invocation_ids: list[str],
+    parsed_responses: Any,
+    normalization_results: Any,
+    normalized_responses: Any,
+) -> list[str]:
+    if not all(isinstance(payload, list) for payload in [parsed_responses, normalization_results, normalized_responses]):
+        return []
+    errors: list[str] = []
+    parsed_by_id = {
+        item.get("invocation_id"): item.get("parsed_response")
+        for item in parsed_responses
+        if isinstance(item, dict)
+    }
+    normalization_by_id = {
+        item.get("invocation_id"): item
+        for item in normalization_results
+        if isinstance(item, dict)
+    }
+    normalized_by_id = {
+        item.get("invocation_id"): item.get("normalized_response")
+        for item in normalized_responses
+        if isinstance(item, dict)
+    }
+    for invocation_id in specialist_invocation_ids:
+        parsed = parsed_by_id.get(invocation_id)
+        normalization = normalization_by_id.get(invocation_id)
+        normalized = normalized_by_id.get(invocation_id)
+        if not isinstance(parsed, dict) or not isinstance(normalization, dict) or not isinstance(normalized, dict):
+            continue
+        parsed_claims = parsed.get("claims", {})
+        raw_claims = normalization.get("raw_claims", {})
+        normalized_claims = normalization.get("normalized_claims", {})
+        normalized_response_claims = normalized.get("claims", {})
+        if parsed_claims != raw_claims:
+            errors.append(f"claim normalization raw_claims do not match parsed response for {invocation_id}")
+        if normalized_response_claims != normalized_claims:
+            errors.append(f"normalized response claims do not match normalization result for {invocation_id}")
+        conflicts = normalization.get("conflicts", [])
+        if conflicts and normalization.get("valid") is True:
+            errors.append(f"claim normalization conflicts must invalidate normalization for {invocation_id}")
+        conflicted_keys = {
+            conflict.get("canonical_key")
+            for conflict in conflicts
+            if isinstance(conflict, dict)
+        }
+        for alias in normalization.get("applied_aliases", []):
+            if not isinstance(alias, dict):
+                continue
+            raw_key = alias.get("raw_key")
+            canonical_key = alias.get("canonical_key")
+            if raw_key not in raw_claims:
+                errors.append(f"applied alias {raw_key} is missing from raw_claims for {invocation_id}")
+            if canonical_key not in normalized_claims and canonical_key not in conflicted_keys:
+                errors.append(
+                    f"applied alias {raw_key} does not trace to normalized claim {canonical_key} for {invocation_id}"
+                )
     return errors
 
 

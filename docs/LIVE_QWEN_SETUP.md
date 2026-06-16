@@ -87,6 +87,20 @@ If it produces onsite-status, supplier/logistics, commercial, recovery-option,
 authorization, or human-decision content, that output is preserved but marked as
 role-scope invalid in `role-validation-results.json`.
 
+Specialist claim keys are normalized after schema validation and before role or
+domain semantic validation. Raw parsed output remains in
+`parsed-structured-responses.json`; normalized output is written to
+`normalized-structured-responses.json`. The normalization trace is written to
+`claim-normalization-results.json`, and aggregate normalization metrics are
+written to `claim-normalization-metrics.json`.
+
+For `ScheduleExpert`, supported aliases include `baseline_delivery_date`,
+`forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
+`contractual_milestone_baseline_date`, and
+`contractual_milestone_forecast_without_intervention`. Conflicting aliases do
+not get silently resolved; they invalidate normalization while preserving raw
+provider output.
+
 ## Artifact Handling
 
 Live artifacts are ignored by Git:

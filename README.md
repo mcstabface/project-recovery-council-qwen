@@ -23,7 +23,8 @@ This edition establishes:
 - offline simulated response fixtures
 - prompt contracts for generalist, director, specialists, arbiter, and planner
 - typed experiment variants and deterministic evaluation metrics
-- role-scoped evidence filtering and specialist semantic validation
+- role-scoped evidence filtering, deterministic claim normalization, and
+  specialist semantic validation
 - tests and process artifacts
 
 ## Boundaries
@@ -256,6 +257,14 @@ cost, contract, unrelated risk, or recovery-option evidence. Live artifacts
 record `selected-evidence-records.json` and `role-validation-results.json` for
 standalone specialist invocations. A response may be JSON-schema valid while
 still failing semantic role-scope validation.
+
+Specialist claim keys are normalized deterministically after schema validation
+and before role or domain semantic validation. Raw parsed provider output
+remains in `parsed-structured-responses.json`; normalized output and trace
+artifacts are written separately as `normalized-structured-responses.json`,
+`claim-normalization-results.json`, and `claim-normalization-metrics.json`.
+Supported aliases are explicit and documented in `docs/CLAIM_NORMALIZATION.md`;
+conflicts are reported instead of silently resolved.
 
 `ScheduleExpert` outputs also receive deterministic schedule-semantic
 validation. For the synthetic case, 21 days of delivery movement consumes the

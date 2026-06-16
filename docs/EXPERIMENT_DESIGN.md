@@ -62,9 +62,18 @@ from experiment variants such as `single_generalist`,
 `fixed_expert_chain`, and `dynamic_expert_council`.
 
 Specialist prompts are rendered from role-filtered evidence selected by policy
-code. Role-scope validation runs after schema validation and records whether
-claims, warnings, citations, and selected evidence stayed within the declared
-role boundary.
+code. After schema validation, specialist claim keys are normalized with an
+explicit versioned alias map. Role-scope validation then runs on normalized
+claims and records whether claims, warnings, citations, and selected evidence
+stayed within the declared role boundary.
+
+Future specialist live artifacts include:
+
+- `claim-normalization-results.json`
+- `normalized-structured-responses.json`
+- `claim-normalization-metrics.json`
+
+Raw parsed provider output remains in `parsed-structured-responses.json`.
 
 Standalone live `ScheduleExpert` invocations also run deterministic
 schedule-semantic validation. Future artifacts for those invocations include
@@ -76,6 +85,8 @@ response.
 Validation layers are intentionally distinct:
 
 - JSON schema validation checks response shape.
+- Claim-key normalization maps supported aliases to canonical claim keys and
+  reports unknown keys or alias conflicts.
 - Role-scope validation checks whether a specialist stayed inside its
   authorized evidence and claim boundary.
 - Schedule-semantic validation checks whether `ScheduleExpert` arithmetic is

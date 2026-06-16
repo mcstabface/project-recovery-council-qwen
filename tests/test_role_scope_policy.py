@@ -76,12 +76,12 @@ def valid_schedule_response() -> dict[str, Any]:
         "status": "completed",
         "claims": {
             "delivery_movement_days": 21,
-            "projected_milestone_slip_days": 13,
-            "successor_dependency_effects": "Successor testing follows installation completion.",
+            "forecast_milestone_slip_days": 13,
+            "successor_dependency_effect": "Successor testing follows installation completion.",
         },
         "citations": {
             "delivery_movement_days": ["SCH-DELIVERY-001"],
-            "projected_milestone_slip_days": ["SCH-DELIVERY-001"],
+            "forecast_milestone_slip_days": ["SCH-DELIVERY-001"],
         },
         "unsupported_claims": [],
         "warnings": ["Schedule conclusions depend on supplied schedule data."],

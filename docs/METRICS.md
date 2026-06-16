@@ -43,6 +43,10 @@ Required deterministic checks:
 - milestone slip correctness
 - milestone date arithmetic correctness
 - schedule semantic compliance rate
+- claim normalization success rate
+- alias application count
+- unknown claim key count
+- claim alias conflict count
 
 Provider pricing is never invented. Offline fixtures leave provider token,
 latency, and cost values null unless a fixture or provider explicitly supplies
@@ -63,6 +67,20 @@ overexposed evidence.
 
 The scope metrics are intended to show whether modular experts remain narrower
 and more governable than a generalist.
+
+## Claim Normalization Metrics
+
+Claim normalization metrics apply between schema validation and role-scope
+validation. They are reported separately from role and semantic correctness.
+
+- `claim_normalization_success_rate`: the share of normalization results with
+  no alias conflicts.
+- `alias_application_count`: the number of explicit supported aliases mapped to
+  canonical claim keys.
+- `unknown_claim_key_count`: the number of claim keys that were neither
+  canonical nor supported aliases.
+- `claim_alias_conflict_count`: the number of canonical claim keys that had
+  conflicting raw values from a canonical key or aliases.
 
 ## Schedule Semantic Metrics
 

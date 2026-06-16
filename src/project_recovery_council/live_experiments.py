@@ -10,6 +10,12 @@ from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
+from project_recovery_council.claim_normalization import (
+    ClaimNormalizationResult,
+    claim_normalization_metrics,
+    normalize_claim_keys,
+    normalize_response_payload,
+)
 from project_recovery_council.evaluation import evaluate_model_result
 from project_recovery_council.experiment_artifacts import (
     ExperimentArtifactEntry,
@@ -184,17 +190,23 @@ def run_live_agent(
         request=request,
         result=result,
     )
+    normalization = normalize_claim_keys(
+        invocation_id=invocation.invocation_id,
+        role=agent_role,
+        response_payload=result.parsed_response,
+    )
+    normalized_payload = normalize_response_payload(result.parsed_response, normalization)
     role_validation = validate_role_scope(
         role=agent_role,
         invocation_id=invocation.invocation_id,
-        response_payload=result.parsed_response,
+        response_payload=normalized_payload,
         selected_record_ids=selected_record_ids,
         bundle=bundle,
     )
     schedule_validation = (
         validate_schedule_semantics(
             invocation_id=invocation.invocation_id,
-            response_payload=result.parsed_response,
+            response_payload=normalized_payload,
             bundle=bundle,
         )
         if agent_role == AgentRole.SCHEDULE_EXPERT.value
@@ -211,6 +223,14 @@ def run_live_agent(
         ],
         role_validation_results=[role_validation],
         schedule_semantic_validation_results=[schedule_validation] if schedule_validation else [],
+        claim_normalization_results=[normalization],
+        normalized_structured_responses=[
+            {
+                "invocation_id": invocation.invocation_id,
+                "normalization_valid": normalization.valid,
+                "normalized_response": normalized_payload,
+            }
+        ],
         invocations=[invocation],
         results=[result],
         evaluation_report=report,
@@ -305,6 +325,8 @@ def write_live_artifacts(
     selected_evidence_records: list[dict[str, Any]] | None = None,
     role_validation_results: list[RoleValidationResult] | None = None,
     schedule_semantic_validation_results: list[ScheduleSemanticValidationResult] | None = None,
+    claim_normalization_results: list[ClaimNormalizationResult] | None = None,
+    normalized_structured_responses: list[dict[str, Any]] | None = None,
     invocations: list[AgentInvocation],
     results: list[ModelResult],
     evaluation_report: EvaluationReport | None,
@@ -368,6 +390,8 @@ def write_live_artifacts(
     ]
     role_results = role_validation_results or []
     schedule_results = schedule_semantic_validation_results or []
+    normalization_results = claim_normalization_results or []
+    normalized_responses = normalized_structured_responses or []
     experiment_config = ExperimentConfig(
         experiment_id=experiment_id,
         case_id=case_id,
@@ -384,6 +408,8 @@ def write_live_artifacts(
         ("rendered-prompt-hashes", "rendered-prompt-hashes.json", prompt_records),
         ("selected-evidence-records", "selected-evidence-records.json", selected_evidence_records or []),
         ("role-validation-results", "role-validation-results.json", role_results),
+        ("claim-normalization-results", "claim-normalization-results.json", normalization_results),
+        ("normalized-structured-responses", "normalized-structured-responses.json", normalized_responses),
         ("schedule-semantic-validation", "schedule-semantic-validation.json", schedule_results),
         ("invocation-records", "invocation-records.json", invocations),
         ("raw-provider-responses", "raw-provider-responses.json", raw_provider_responses),
@@ -392,6 +418,11 @@ def write_live_artifacts(
         ("token-usage", "token-usage.json", usage),
         ("retry-history", "retry-history.json", retry_history),
         ("role-compliance-metrics", "role-compliance-metrics.json", role_compliance_metrics(role_results)),
+        (
+            "claim-normalization-metrics",
+            "claim-normalization-metrics.json",
+            claim_normalization_metrics(normalization_results),
+        ),
         ("schedule-semantic-metrics", "schedule-semantic-metrics.json", schedule_semantic_metrics(schedule_results)),
         ("reproducibility", "reproducibility.json", reproducibility),
     ]
@@ -553,6 +584,8 @@ def _live_schema_id_for(filename: str) -> str:
         "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
         "selected-evidence-records.json": "project-recovery-council.qwen.live-selected-evidence-records.v1",
         "role-validation-results.json": "project-recovery-council.qwen.live-role-validation-results.v1",
+        "claim-normalization-results.json": "project-recovery-council.qwen.live-claim-normalization-results.v1",
+        "normalized-structured-responses.json": "project-recovery-council.qwen.live-normalized-structured-responses.v1",
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
@@ -561,6 +594,7 @@ def _live_schema_id_for(filename: str) -> str:
         "token-usage.json": "project-recovery-council.qwen.live-token-usage.v1",
         "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
         "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
+        "claim-normalization-metrics.json": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 

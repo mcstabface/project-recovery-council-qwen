@@ -211,6 +211,29 @@ def evaluation_metric_catalog() -> list[EvaluationMetric]:
             name="Schedule semantic compliance rate",
             description="Share of schedule semantic validations with no deterministic arithmetic violations.",
         ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.CLAIM_NORMALIZATION_SUCCESS_RATE,
+            name="Claim normalization success rate",
+            description="Share of claim normalization results with no alias conflicts.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.ALIAS_APPLICATION_COUNT,
+            name="Alias application count",
+            description="Count of explicit claim-key aliases normalized to canonical keys.",
+            higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.UNKNOWN_CLAIM_KEY_COUNT,
+            name="Unknown claim key count",
+            description="Count of claim keys not recognized as canonical keys or supported aliases.",
+            higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.CLAIM_ALIAS_CONFLICT_COUNT,
+            name="Claim alias conflict count",
+            description="Count of canonical claim keys with conflicting raw alias values.",
+            higher_is_better=False,
+        ),
     ]
 
 

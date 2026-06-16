@@ -1,0 +1,104 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "claim-key-normalization",
+  "repository": "project-recovery-council-qwen",
+  "git_commit": "34b7b94",
+  "dirty_working_tree": true,
+  "status": "complete",
+  "objectives": [
+    "Define canonical claim keys per agent role",
+    "Map supported ScheduleExpert aliases to canonical keys",
+    "Preserve raw claims and normalized claims separately",
+    "Detect conflicting aliases without silently selecting a value",
+    "Run role and schedule semantic validation against canonicalized claims",
+    "Record normalization decisions in live artifacts",
+    "Avoid live network calls"
+  ],
+  "created_files": [
+    "src/project_recovery_council/claim_normalization.py",
+    "tests/test_claim_normalization.py",
+    "docs/CLAIM_NORMALIZATION.md",
+    "decisions/ADR-0009-versioned-claim-key-normalization.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_CLAIM_NORMALIZATION.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_CLAIM_NORMALIZATION.json"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_QWEN_SETUP.md",
+    "docs/METRICS.md",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/live_experiments.py",
+    "src/project_recovery_council/role_scope.py",
+    "tests/test_role_scope_policy.py"
+  ],
+  "canonical_claim_mappings": {
+    "ScheduleExpert": {
+      "baseline_delivery_date": "delivery_baseline_date",
+      "forecast_delivery_date": "delivery_forecast_date",
+      "delivery_shift_days": "delivery_movement_days",
+      "float_consumption_days": "installation_total_float_consumed_days",
+      "remaining_float_days": "installation_total_float_remaining_days",
+      "remaining_float_after_delivery_shift_days": "installation_total_float_remaining_days",
+      "projected_milestone_slip_days": "forecast_milestone_slip_days",
+      "contractual_milestone_baseline_date": "milestone_baseline_date",
+      "contractual_milestone_forecast_without_intervention": "milestone_forecast_date_without_intervention",
+      "successor_dependency_effects": "successor_dependency_effect"
+    }
+  },
+  "live_artifact_additions": [
+    "claim-normalization-results.json",
+    "normalized-structured-responses.json",
+    "claim-normalization-metrics.json"
+  ],
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_claim_normalization.py tests/test_schedule_semantics.py tests/test_role_scope_policy.py",
+      "exit_code": 0,
+      "result": "36 passed in 0.26s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "107 passed, 1 skipped in 6.98s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    }
+  ],
+  "test_results": {
+    "focused_pytest": {
+      "command": "python -m pytest tests/test_claim_normalization.py tests/test_schedule_semantics.py tests/test_role_scope_policy.py",
+      "exit_code": 0,
+      "summary": "36 passed in 0.26s"
+    },
+    "full_pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "107 passed, 1 skipped in 6.98s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_command_executed": false,
+    "live_path_tests_used_mock_transport": true
+  },
+  "known_limitations": [
+    "Normalization uses explicit alias tables only; unsupported aliases remain unknown",
+    "Only claim keys are normalized",
+    "Prior live artifacts are not modified or retroactively certified",
+    "Live variant comparison remains deferred"
+  ],
+  "recommended_next_live_invocation": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-agent --agent ScheduleExpert --model qwen-plus --allow-network"
+}
