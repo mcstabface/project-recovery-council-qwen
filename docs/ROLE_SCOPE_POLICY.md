@@ -21,9 +21,26 @@ Must not receive:
 - recovery-option commercial data
 - unrelated risk records
 
-Allowed claims include baseline and forecast dates, delivery movement, float
-consumption, remaining float, projected milestone slip, and successor dependency
-effects.
+Allowed claim keys include:
+
+- `milestone_id`
+- `delivery_baseline_date`
+- `delivery_forecast_date`
+- `delivery_movement_days`
+- `installation_total_float_days`
+- `installation_total_float_consumed_days`
+- `installation_total_float_remaining_days`
+- `milestone_baseline_date`
+- `milestone_forecast_date_without_intervention`
+- `forecast_milestone_slip_days`
+- `projected_milestone_slip_days`
+- `successor_testing_activity_id`
+- `successor_dependency_effect`
+- `successor_dependency_effects`
+
+These keys cover baseline and forecast dates, delivery movement, available
+installation float, float consumed, remaining float, projected milestone slip,
+and successor dependency effects.
 
 Prohibited claims include equipment onsite conclusions, supplier/logistics
 arrival conclusions, commercial exposure, mitigation cost, preferred recovery
@@ -78,3 +95,29 @@ Role validation records:
 - concise findings
 
 JSON schema validity does not imply role-scope validity.
+
+## Schedule Semantic Validation
+
+`ScheduleExpert` findings also receive deterministic schedule-semantic
+validation in `src/project_recovery_council/schedule_semantics.py`. This is
+separate from JSON schema validation and role-scope validation.
+
+The validator checks the schedule arithmetic against `SCH-DELIVERY-001`:
+
+- `delivery_movement_days` equals the difference between forecast and baseline
+  delivery dates when both are present.
+- `installation_total_float_consumed_days` equals
+  `min(delivery_movement_days, installation_total_float_days)`.
+- `installation_total_float_remaining_days` equals
+  `max(installation_total_float_days - delivery_movement_days, 0)`.
+- `forecast_milestone_slip_days` equals
+  `max(delivery_movement_days - installation_total_float_days, 0)`.
+- remaining float is never negative.
+- consumed float never exceeds available float.
+- `milestone_forecast_date_without_intervention` equals
+  `milestone_baseline_date + forecast_milestone_slip_days` when both dates are
+  present.
+
+For the synthetic case, the correct interpretation is 21 days of delivery
+movement, 8 days of available installation total float, 8 days of float
+consumed, 0 days of remaining float, and 13 days of net milestone slip.

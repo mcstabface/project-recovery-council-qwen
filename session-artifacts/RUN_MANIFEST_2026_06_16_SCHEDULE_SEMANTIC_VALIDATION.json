@@ -1,0 +1,94 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "schedule-semantic-validation",
+  "repository": "project-recovery-council-qwen",
+  "git_commit": "48f1397",
+  "dirty_working_tree": true,
+  "status": "complete",
+  "objectives": [
+    "Correct ScheduleExpert role policy for legitimate schedule claim keys",
+    "Add deterministic ScheduleExpert schedule-semantic validation",
+    "Distinguish schema validity, role-scope validity, and schedule-semantic validity",
+    "Add schedule semantic correctness metrics",
+    "Require schedule semantic validation and metrics artifacts for future standalone live ScheduleExpert runs",
+    "Avoid live network calls"
+  ],
+  "created_files": [
+    "src/project_recovery_council/schedule_semantics.py",
+    "tests/test_schedule_semantics.py",
+    "decisions/ADR-0008-schedule-semantic-validation.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_SCHEDULE_SEMANTIC_VALIDATION.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_SCHEDULE_SEMANTIC_VALIDATION.json"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/METRICS.md",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/live_experiments.py",
+    "src/project_recovery_council/role_scope.py"
+  ],
+  "architectural_decisions": [
+    {
+      "id": "ADR-0008",
+      "title": "Schedule Semantic Validation",
+      "path": "decisions/ADR-0008-schedule-semantic-validation.md"
+    }
+  ],
+  "schedule_reference": {
+    "source_record_id": "SCH-DELIVERY-001",
+    "delivery_movement_days": 21,
+    "installation_total_float_days": 8,
+    "installation_total_float_consumed_days": 8,
+    "installation_total_float_remaining_days": 0,
+    "forecast_milestone_slip_days": 13
+  },
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_schedule_semantics.py tests/test_role_scope_policy.py",
+      "exit_code": 0,
+      "result": "24 passed in 0.30s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "95 passed, 1 skipped in 7.56s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    }
+  ],
+  "test_results": {
+    "focused_pytest": {
+      "command": "python -m pytest tests/test_schedule_semantics.py tests/test_role_scope_policy.py",
+      "exit_code": 0,
+      "summary": "24 passed in 0.30s"
+    },
+    "full_pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "95 passed, 1 skipped in 7.56s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_command_executed": false
+  },
+  "known_limitations": [
+    "Prior live artifacts are not modified or retroactively certified",
+    "Schedule semantic validation currently targets the deterministic synthetic equipment-delay schedule record",
+    "Live variant comparison remains deferred"
+  ],
+  "recommended_next_live_invocation": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-agent --agent ScheduleExpert --model qwen-plus --allow-network"
+}

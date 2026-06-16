@@ -58,6 +58,8 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
     "project-recovery-council.qwen.live-selected-evidence-records.v1",
     "project-recovery-council.qwen.live-role-validation-results.v1",
+    "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+    "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
     "project-recovery-council.qwen.live-raw-provider-responses.v1",
     "project-recovery-council.qwen.live-parsed-structured-responses.v1",
     "project-recovery-council.qwen.live-validation-results.v1",
@@ -186,6 +188,8 @@ def _schema_id_for(filename: str) -> str:
         "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
         "selected-evidence-records.json": "project-recovery-council.qwen.live-selected-evidence-records.v1",
         "role-validation-results.json": "project-recovery-council.qwen.live-role-validation-results.v1",
+        "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+        "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
         "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",
@@ -212,10 +216,20 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
     errors: list[str] = []
     selected = loaded_payloads.get("selected-evidence-records.json")
     role_results = loaded_payloads.get("role-validation-results.json")
+    schedule_results = loaded_payloads.get("schedule-semantic-validation.json")
     if not isinstance(selected, list) or not selected:
         errors.append("standalone specialist live artifacts require selected-evidence-records.json")
     if not isinstance(role_results, list) or not role_results:
         errors.append("standalone specialist live artifacts require role-validation-results.json")
+    schedule_invocation_ids = [
+        invocation.get("invocation_id")
+        for invocation in invocations
+        if isinstance(invocation, dict)
+        and invocation.get("invocation_purpose") == "standalone_live_agent"
+        and invocation.get("agent_role") == "ScheduleExpert"
+    ]
+    if schedule_invocation_ids and (not isinstance(schedule_results, list) or not schedule_results):
+        errors.append("standalone ScheduleExpert live artifacts require schedule-semantic-validation.json")
     selected_ids = {
         item.get("invocation_id")
         for item in selected or []
@@ -226,11 +240,19 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
         for item in role_results or []
         if isinstance(item, dict)
     }
+    schedule_result_ids = {
+        item.get("invocation_id")
+        for item in schedule_results or []
+        if isinstance(item, dict)
+    }
     for invocation_id in specialist_invocation_ids:
         if invocation_id not in selected_ids:
             errors.append(f"missing selected evidence record entry for {invocation_id}")
         if invocation_id not in role_result_ids:
             errors.append(f"missing role validation result for {invocation_id}")
+    for invocation_id in schedule_invocation_ids:
+        if invocation_id not in schedule_result_ids:
+            errors.append(f"missing schedule semantic validation result for {invocation_id}")
     return errors
 
 

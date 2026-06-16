@@ -48,15 +48,24 @@ class RoleValidationResult(ContractModel):
 
 
 SCHEDULE_ALLOWED_CLAIMS = [
+    "milestone_id",
+    "delivery_baseline_date",
+    "delivery_forecast_date",
     "baseline_delivery_date",
     "forecast_delivery_date",
     "delivery_movement_days",
     "delivery_shift_days",
+    "installation_total_float_consumed_days",
+    "installation_total_float_remaining_days",
+    "milestone_baseline_date",
+    "milestone_forecast_date_without_intervention",
     "float_consumption_days",
     "installation_total_float_days",
     "remaining_float_days",
     "projected_milestone_slip_days",
     "forecast_milestone_slip_days",
+    "successor_testing_activity_id",
+    "successor_dependency_effect",
     "successor_dependency_effects",
     "successor_testing_constraint",
 ]

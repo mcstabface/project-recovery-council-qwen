@@ -19,10 +19,11 @@ This edition establishes:
 - canonical deterministic demo evidence
 - expected results for the demonstration case
 - provider-neutral model-client contracts
-- disabled-by-default Qwen adapter placeholder
+- disabled-by-default offline and live Qwen adapters
 - offline simulated response fixtures
 - prompt contracts for generalist, director, specialists, arbiter, and planner
 - typed experiment variants and deterministic evaluation metrics
+- role-scoped evidence filtering and specialist semantic validation
 - tests and process artifacts
 
 ## Boundaries
@@ -30,7 +31,7 @@ This edition establishes:
 - Synthetic data only.
 - No external system connections.
 - No UiPath runtime implementation.
-- No live Qwen API implementation in this run.
+- No live Qwen calls unless explicitly requested with `--allow-network`.
 - No provider credentials required.
 - No network calls in tests.
 - Offline fixtures are simulated outputs, not empirical model results.
@@ -255,6 +256,14 @@ cost, contract, unrelated risk, or recovery-option evidence. Live artifacts
 record `selected-evidence-records.json` and `role-validation-results.json` for
 standalone specialist invocations. A response may be JSON-schema valid while
 still failing semantic role-scope validation.
+
+`ScheduleExpert` outputs also receive deterministic schedule-semantic
+validation. For the synthetic case, 21 days of delivery movement consumes the
+available 8 days of installation total float, leaves 0 days remaining float, and
+produces a 13-day net milestone slip. Future standalone live ScheduleExpert
+artifacts include `schedule-semantic-validation.json` and
+`schedule-semantic-metrics.json`; prior live artifacts are not retroactively
+modified.
 
 Offline experiment outputs use:
 

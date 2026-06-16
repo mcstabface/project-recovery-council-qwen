@@ -24,6 +24,10 @@ from project_recovery_council.experiment_contracts import (
 from project_recovery_council.fixtures import CaseBundle
 from project_recovery_council.model_client import FinishStatus, ModelResult
 from project_recovery_council.role_scope import RoleValidationResult, role_compliance_metrics
+from project_recovery_council.schedule_semantics import (
+    ScheduleSemanticValidationResult,
+    schedule_semantic_metrics,
+)
 
 
 CLAIM_REQUIREMENTS: dict[str, tuple[str, list[str]]] = {
@@ -176,6 +180,36 @@ def evaluation_metric_catalog() -> list[EvaluationMetric]:
             name="Evidence overexposure count",
             description="Count of selected evidence records outside role policy.",
             higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.DELIVERY_MOVEMENT_CORRECTNESS,
+            name="Delivery movement correctness",
+            description="Whether delivery movement matches forecast minus baseline delivery dates.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.FLOAT_CONSUMED_CORRECTNESS,
+            name="Float consumed correctness",
+            description="Whether consumed float equals min(delivery movement, available float).",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.REMAINING_FLOAT_CORRECTNESS,
+            name="Remaining float correctness",
+            description="Whether remaining float equals max(available float minus delivery movement, zero).",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.MILESTONE_SLIP_CORRECTNESS,
+            name="Milestone slip correctness",
+            description="Whether milestone slip equals max(delivery movement minus available float, zero).",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.MILESTONE_DATE_ARITHMETIC_CORRECTNESS,
+            name="Milestone date arithmetic correctness",
+            description="Whether milestone forecast date equals baseline date plus milestone slip.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.SCHEDULE_SEMANTIC_COMPLIANCE_RATE,
+            name="Schedule semantic compliance rate",
+            description="Share of schedule semantic validations with no deterministic arithmetic violations.",
         ),
     ]
 
@@ -566,5 +600,41 @@ def role_scope_metric_results(results: list[RoleValidationResult]) -> list[Metri
             metric_id=EvaluationMetricId.EVIDENCE_OVEREXPOSURE_COUNT,
             score=metrics["evidence_overexposure_count"],
             passed=metrics["evidence_overexposure_count"] == 0.0,
+        ),
+    ]
+
+
+def schedule_semantic_metric_results(results: list[ScheduleSemanticValidationResult]) -> list[MetricResult]:
+    metrics = schedule_semantic_metrics(results)
+    return [
+        MetricResult(
+            metric_id=EvaluationMetricId.DELIVERY_MOVEMENT_CORRECTNESS,
+            score=metrics["delivery_movement_correctness"],
+            passed=metrics["delivery_movement_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.FLOAT_CONSUMED_CORRECTNESS,
+            score=metrics["float_consumed_correctness"],
+            passed=metrics["float_consumed_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.REMAINING_FLOAT_CORRECTNESS,
+            score=metrics["remaining_float_correctness"],
+            passed=metrics["remaining_float_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.MILESTONE_SLIP_CORRECTNESS,
+            score=metrics["milestone_slip_correctness"],
+            passed=metrics["milestone_slip_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.MILESTONE_DATE_ARITHMETIC_CORRECTNESS,
+            score=metrics["milestone_date_arithmetic_correctness"],
+            passed=metrics["milestone_date_arithmetic_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.SCHEDULE_SEMANTIC_COMPLIANCE_RATE,
+            score=metrics["schedule_semantic_compliance_rate"],
+            passed=metrics["schedule_semantic_compliance_rate"] == 1.0,
         ),
     ]

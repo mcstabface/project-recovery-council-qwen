@@ -46,6 +46,11 @@ from project_recovery_council.role_scope import (
     selected_evidence_record_ids,
     validate_role_scope,
 )
+from project_recovery_council.schedule_semantics import (
+    ScheduleSemanticValidationResult,
+    schedule_semantic_metrics,
+    validate_schedule_semantics,
+)
 from project_recovery_council.serialization import sha256_file, write_json
 from project_recovery_council.workflow import DEFAULT_CASE_PATH
 
@@ -116,6 +121,7 @@ def run_live_smoke(
                 "schema_sha256": stable_sha256_model_schema(SCHEMA_REGISTRY[LIVE_SMOKE_RESPONSE_SCHEMA]),
             }
         ],
+        schedule_semantic_validation_results=[],
         invocations=[invocation],
         results=[result],
         evaluation_report=None,
@@ -185,6 +191,15 @@ def run_live_agent(
         selected_record_ids=selected_record_ids,
         bundle=bundle,
     )
+    schedule_validation = (
+        validate_schedule_semantics(
+            invocation_id=invocation.invocation_id,
+            response_payload=result.parsed_response,
+            bundle=bundle,
+        )
+        if agent_role == AgentRole.SCHEDULE_EXPERT.value
+        else None
+    )
     report = _evaluation_for_result(result, bundle=bundle, fixture_id=selected_id)
     return write_live_artifacts(
         experiment_id=selected_id,
@@ -195,6 +210,7 @@ def run_live_agent(
             {"invocation_id": invocation.invocation_id, "agent_role": agent_role, "record_ids": selected_record_ids}
         ],
         role_validation_results=[role_validation],
+        schedule_semantic_validation_results=[schedule_validation] if schedule_validation else [],
         invocations=[invocation],
         results=[result],
         evaluation_report=report,
@@ -271,6 +287,7 @@ def run_live_variant(
             }
         ],
         role_validation_results=[],
+        schedule_semantic_validation_results=[],
         invocations=[invocation],
         results=[result],
         evaluation_report=report,
@@ -287,6 +304,7 @@ def write_live_artifacts(
     prompt_records: list[dict[str, Any]],
     selected_evidence_records: list[dict[str, Any]] | None = None,
     role_validation_results: list[RoleValidationResult] | None = None,
+    schedule_semantic_validation_results: list[ScheduleSemanticValidationResult] | None = None,
     invocations: list[AgentInvocation],
     results: list[ModelResult],
     evaluation_report: EvaluationReport | None,
@@ -349,6 +367,7 @@ def write_live_artifacts(
         for invocation, result in zip(invocations, results)
     ]
     role_results = role_validation_results or []
+    schedule_results = schedule_semantic_validation_results or []
     experiment_config = ExperimentConfig(
         experiment_id=experiment_id,
         case_id=case_id,
@@ -365,6 +384,7 @@ def write_live_artifacts(
         ("rendered-prompt-hashes", "rendered-prompt-hashes.json", prompt_records),
         ("selected-evidence-records", "selected-evidence-records.json", selected_evidence_records or []),
         ("role-validation-results", "role-validation-results.json", role_results),
+        ("schedule-semantic-validation", "schedule-semantic-validation.json", schedule_results),
         ("invocation-records", "invocation-records.json", invocations),
         ("raw-provider-responses", "raw-provider-responses.json", raw_provider_responses),
         ("parsed-structured-responses", "parsed-structured-responses.json", parsed),
@@ -372,6 +392,7 @@ def write_live_artifacts(
         ("token-usage", "token-usage.json", usage),
         ("retry-history", "retry-history.json", retry_history),
         ("role-compliance-metrics", "role-compliance-metrics.json", role_compliance_metrics(role_results)),
+        ("schedule-semantic-metrics", "schedule-semantic-metrics.json", schedule_semantic_metrics(schedule_results)),
         ("reproducibility", "reproducibility.json", reproducibility),
     ]
     if evaluation_report is not None:
@@ -532,6 +553,8 @@ def _live_schema_id_for(filename: str) -> str:
         "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
         "selected-evidence-records.json": "project-recovery-council.qwen.live-selected-evidence-records.v1",
         "role-validation-results.json": "project-recovery-council.qwen.live-role-validation-results.v1",
+        "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+        "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
         "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",

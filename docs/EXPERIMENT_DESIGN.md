@@ -65,3 +65,18 @@ Specialist prompts are rendered from role-filtered evidence selected by policy
 code. Role-scope validation runs after schema validation and records whether
 claims, warnings, citations, and selected evidence stayed within the declared
 role boundary.
+
+Standalone live `ScheduleExpert` invocations also run deterministic
+schedule-semantic validation. Future artifacts for those invocations include
+`schedule-semantic-validation.json` and `schedule-semantic-metrics.json`
+alongside selected evidence and role validation results. The validation artifact
+records expected and observed schedule values without modifying the provider
+response.
+
+Validation layers are intentionally distinct:
+
+- JSON schema validation checks response shape.
+- Role-scope validation checks whether a specialist stayed inside its
+  authorized evidence and claim boundary.
+- Schedule-semantic validation checks whether `ScheduleExpert` arithmetic is
+  consistent with `SCH-DELIVERY-001`.

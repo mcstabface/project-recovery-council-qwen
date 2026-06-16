@@ -75,6 +75,12 @@ class EvaluationMetricId(StrEnum):
     PROHIBITED_WARNING_COUNT = "prohibited_warning_count"
     PROHIBITED_CITATION_COUNT = "prohibited_citation_count"
     EVIDENCE_OVEREXPOSURE_COUNT = "evidence_overexposure_count"
+    DELIVERY_MOVEMENT_CORRECTNESS = "delivery_movement_correctness"
+    FLOAT_CONSUMED_CORRECTNESS = "float_consumed_correctness"
+    REMAINING_FLOAT_CORRECTNESS = "remaining_float_correctness"
+    MILESTONE_SLIP_CORRECTNESS = "milestone_slip_correctness"
+    MILESTONE_DATE_ARITHMETIC_CORRECTNESS = "milestone_date_arithmetic_correctness"
+    SCHEDULE_SEMANTIC_COMPLIANCE_RATE = "schedule_semantic_compliance_rate"
 
 
 class Disagreement(ContractModel):
