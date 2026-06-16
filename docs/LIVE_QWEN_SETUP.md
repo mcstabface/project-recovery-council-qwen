@@ -76,6 +76,17 @@ PYTHONPATH=src python -m project_recovery_council live-variant \
 `live-variant` runs only the named variant and never runs the full matrix
 implicitly.
 
+## Specialist Scope
+
+Standalone specialist commands are recorded with
+`invocation_purpose=standalone_live_agent`. They are not labeled as
+`single_generalist`.
+
+`ScheduleExpert` receives only schedule evidence and minimal case identity.
+If it produces onsite-status, supplier/logistics, commercial, recovery-option,
+authorization, or human-decision content, that output is preserved but marked as
+role-scope invalid in `role-validation-results.json`.
+
 ## Artifact Handling
 
 Live artifacts are ignored by Git:

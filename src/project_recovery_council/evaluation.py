@@ -23,6 +23,7 @@ from project_recovery_council.experiment_contracts import (
 )
 from project_recovery_council.fixtures import CaseBundle
 from project_recovery_council.model_client import FinishStatus, ModelResult
+from project_recovery_council.role_scope import RoleValidationResult, role_compliance_metrics
 
 
 CLAIM_REQUIREMENTS: dict[str, tuple[str, list[str]]] = {
@@ -145,6 +146,35 @@ def evaluation_metric_catalog() -> list[EvaluationMetric]:
             metric_id=EvaluationMetricId.ESTIMATED_PROVIDER_COST,
             name="Estimated provider cost",
             description="Estimated cost only when explicit provider pricing is supplied.",
+            higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.SCOPE_COMPLIANCE_RATE,
+            name="Scope compliance rate",
+            description="Share of role validation results with no scope violations.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.PROHIBITED_CLAIM_COUNT,
+            name="Prohibited claim count",
+            description="Count of role-prohibited claims.",
+            higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.PROHIBITED_WARNING_COUNT,
+            name="Prohibited warning count",
+            description="Count of role-prohibited warnings.",
+            higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.PROHIBITED_CITATION_COUNT,
+            name="Prohibited citation count",
+            description="Count of citations that violate role policy.",
+            higher_is_better=False,
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.EVIDENCE_OVEREXPOSURE_COUNT,
+            name="Evidence overexposure count",
+            description="Count of selected evidence records outside role policy.",
             higher_is_better=False,
         ),
     ]
@@ -507,3 +537,34 @@ def _sum_optional_float(values: list[float | None]) -> float | None:
 
 def _float_or_none(value: int | None) -> float | None:
     return float(value) if value is not None else None
+
+
+def role_scope_metric_results(results: list[RoleValidationResult]) -> list[MetricResult]:
+    metrics = role_compliance_metrics(results)
+    return [
+        MetricResult(
+            metric_id=EvaluationMetricId.SCOPE_COMPLIANCE_RATE,
+            score=metrics["scope_compliance_rate"],
+            passed=metrics["scope_compliance_rate"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.PROHIBITED_CLAIM_COUNT,
+            score=metrics["prohibited_claim_count"],
+            passed=metrics["prohibited_claim_count"] == 0.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.PROHIBITED_WARNING_COUNT,
+            score=metrics["prohibited_warning_count"],
+            passed=metrics["prohibited_warning_count"] == 0.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.PROHIBITED_CITATION_COUNT,
+            score=metrics["prohibited_citation_count"],
+            passed=metrics["prohibited_citation_count"] == 0.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.EVIDENCE_OVEREXPOSURE_COUNT,
+            score=metrics["evidence_overexposure_count"],
+            passed=metrics["evidence_overexposure_count"] == 0.0,
+        ),
+    ]

@@ -55,3 +55,13 @@ Live execution is limited to one explicit command at a time:
 Every live command requires `--allow-network`, a `--model <model-id>`, and a
 configured API key environment variable. Live artifacts are isolated under
 `experiment-artifacts/live/<experiment-id>/`.
+
+Standalone live agents use `invocation_purpose=standalone_live_agent` in
+request metadata, invocation records, and experiment config. This is distinct
+from experiment variants such as `single_generalist`,
+`fixed_expert_chain`, and `dynamic_expert_council`.
+
+Specialist prompts are rendered from role-filtered evidence selected by policy
+code. Role-scope validation runs after schema validation and records whether
+claims, warnings, citations, and selected evidence stayed within the declared
+role boundary.

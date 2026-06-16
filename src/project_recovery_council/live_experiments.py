@@ -39,6 +39,13 @@ from project_recovery_council.prompt_rendering import (
 from project_recovery_council.qwen_client import QwenModelClient
 from project_recovery_council.qwen_config import QwenProviderConfig
 from project_recovery_council.redaction import redact_value
+from project_recovery_council.role_scope import (
+    InvocationPurpose,
+    RoleValidationResult,
+    role_compliance_metrics,
+    selected_evidence_record_ids,
+    validate_role_scope,
+)
 from project_recovery_council.serialization import sha256_file, write_json
 from project_recovery_council.workflow import DEFAULT_CASE_PATH
 
@@ -91,6 +98,7 @@ def run_live_smoke(
     invocation = AgentInvocation(
         invocation_id=f"INV-{selected_id}",
         variant=ExperimentVariant.SINGLE_GENERALIST,
+        invocation_purpose=InvocationPurpose.LIVE_SMOKE.value,
         agent_role="LiveSmoke",
         prompt_id="LiveSmoke.v1",
         request=request,
@@ -139,8 +147,10 @@ def run_live_agent(
         agent_role=agent_role,
         expected_response_schema=schema_id,
         correlation_id=selected_id,
-        experiment_variant=ExperimentVariant.SINGLE_GENERALIST,
+        experiment_variant=ExperimentVariant.DYNAMIC_EXPERT_COUNCIL,
+        invocation_purpose=InvocationPurpose.STANDALONE_LIVE_AGENT,
     )
+    selected_record_ids = selected_evidence_record_ids(bundle, agent_role)
     request = ModelRequest(
         model_identifier=config.model_identifier,
         system_instructions="You are a Project Recovery Council live agent. Return one JSON object only.",
@@ -148,17 +158,32 @@ def run_live_agent(
         expected_response_schema=schema_id,
         generation_parameters={"temperature": config.temperature, "seed": config.seed},
         correlation_id=selected_id,
-        metadata={"command": "live-agent", "agent_role": agent_role, "prompt_version": PROMPT_VERSION},
+        metadata={
+            "command": "live-agent",
+            "agent_role": agent_role,
+            "prompt_version": PROMPT_VERSION,
+            "invocation_purpose": InvocationPurpose.STANDALONE_LIVE_AGENT.value,
+            "experiment_variant": None,
+            "selected_evidence_record_ids": selected_record_ids,
+        },
     )
     selected_client = client or QwenModelClient(config, schema_registry=SCHEMA_REGISTRY)
     result = selected_client.generate(request)
     invocation = AgentInvocation(
         invocation_id=f"INV-{selected_id}",
-        variant=ExperimentVariant.SINGLE_GENERALIST,
+        variant=ExperimentVariant.DYNAMIC_EXPERT_COUNCIL,
+        invocation_purpose=InvocationPurpose.STANDALONE_LIVE_AGENT.value,
         agent_role=agent_role,
         prompt_id=f"{agent_role}.{PROMPT_VERSION}",
         request=request,
         result=result,
+    )
+    role_validation = validate_role_scope(
+        role=agent_role,
+        invocation_id=invocation.invocation_id,
+        response_payload=result.parsed_response,
+        selected_record_ids=selected_record_ids,
+        bundle=bundle,
     )
     report = _evaluation_for_result(result, bundle=bundle, fixture_id=selected_id)
     return write_live_artifacts(
@@ -166,6 +191,10 @@ def run_live_agent(
         case_id=bundle.case.case_id,
         config=config,
         prompt_records=[_prompt_record(agent_role, prompt, schema_id)],
+        selected_evidence_records=[
+            {"invocation_id": invocation.invocation_id, "agent_role": agent_role, "record_ids": selected_record_ids}
+        ],
+        role_validation_results=[role_validation],
         invocations=[invocation],
         results=[result],
         evaluation_report=report,
@@ -199,7 +228,9 @@ def run_live_variant(
         expected_response_schema=schema_id,
         correlation_id=selected_id,
         experiment_variant=selected_variant,
+        invocation_purpose=InvocationPurpose.SINGLE_GENERALIST,
     )
+    selected_record_ids = selected_evidence_record_ids(bundle, AgentRole.GENERALIST.value)
     request = ModelRequest(
         model_identifier=config.model_identifier,
         system_instructions="You are the Project Recovery Council single generalist. Return one JSON object only.",
@@ -207,13 +238,20 @@ def run_live_variant(
         expected_response_schema=schema_id,
         generation_parameters={"temperature": config.temperature, "seed": config.seed},
         correlation_id=selected_id,
-        metadata={"command": "live-variant", "variant": selected_variant.value, "prompt_version": PROMPT_VERSION},
+        metadata={
+            "command": "live-variant",
+            "variant": selected_variant.value,
+            "invocation_purpose": selected_variant.value,
+            "selected_evidence_record_ids": selected_record_ids,
+            "prompt_version": PROMPT_VERSION,
+        },
     )
     selected_client = client or QwenModelClient(config, schema_registry=SCHEMA_REGISTRY)
     result = selected_client.generate(request)
     invocation = AgentInvocation(
         invocation_id=f"INV-{selected_id}",
         variant=selected_variant,
+        invocation_purpose=selected_variant.value,
         agent_role=AgentRole.GENERALIST.value,
         prompt_id=f"{AgentRole.GENERALIST.value}.{PROMPT_VERSION}",
         request=request,
@@ -225,6 +263,14 @@ def run_live_variant(
         case_id=bundle.case.case_id,
         config=config,
         prompt_records=[_prompt_record(AgentRole.GENERALIST.value, prompt, schema_id)],
+        selected_evidence_records=[
+            {
+                "invocation_id": invocation.invocation_id,
+                "agent_role": AgentRole.GENERALIST.value,
+                "record_ids": selected_record_ids,
+            }
+        ],
+        role_validation_results=[],
         invocations=[invocation],
         results=[result],
         evaluation_report=report,
@@ -239,6 +285,8 @@ def write_live_artifacts(
     case_id: str,
     config: QwenProviderConfig,
     prompt_records: list[dict[str, Any]],
+    selected_evidence_records: list[dict[str, Any]] | None = None,
+    role_validation_results: list[RoleValidationResult] | None = None,
     invocations: list[AgentInvocation],
     results: list[ModelResult],
     evaluation_report: EvaluationReport | None,
@@ -300,11 +348,13 @@ def write_live_artifacts(
         }
         for invocation, result in zip(invocations, results)
     ]
+    role_results = role_validation_results or []
     experiment_config = ExperimentConfig(
         experiment_id=experiment_id,
         case_id=case_id,
         fixture_id="live-provider",
         variant=invocations[0].variant if invocations else ExperimentVariant.SINGLE_GENERALIST,
+        invocation_purpose=invocations[0].invocation_purpose if invocations else None,
         execution_plan=build_experiment_plan(invocations[0].variant if invocations else ExperimentVariant.SINGLE_GENERALIST),
         live_provider_enabled=True,
         simulated_outputs=False,
@@ -313,12 +363,15 @@ def write_live_artifacts(
         ("sanitized-provider-config", "sanitized-provider-config.json", config.sanitized()),
         ("experiment-config", "experiment-config.json", experiment_config),
         ("rendered-prompt-hashes", "rendered-prompt-hashes.json", prompt_records),
+        ("selected-evidence-records", "selected-evidence-records.json", selected_evidence_records or []),
+        ("role-validation-results", "role-validation-results.json", role_results),
         ("invocation-records", "invocation-records.json", invocations),
         ("raw-provider-responses", "raw-provider-responses.json", raw_provider_responses),
         ("parsed-structured-responses", "parsed-structured-responses.json", parsed),
         ("validation-results", "validation-results.json", validation),
         ("token-usage", "token-usage.json", usage),
         ("retry-history", "retry-history.json", retry_history),
+        ("role-compliance-metrics", "role-compliance-metrics.json", role_compliance_metrics(role_results)),
         ("reproducibility", "reproducibility.json", reproducibility),
     ]
     if evaluation_report is not None:
@@ -477,11 +530,14 @@ def _live_schema_id_for(filename: str) -> str:
     return {
         "sanitized-provider-config.json": "project-recovery-council.qwen.live-sanitized-provider-config.v1",
         "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+        "selected-evidence-records.json": "project-recovery-council.qwen.live-selected-evidence-records.v1",
+        "role-validation-results.json": "project-recovery-council.qwen.live-role-validation-results.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
         "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",
         "token-usage.json": "project-recovery-council.qwen.live-token-usage.v1",
         "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
+        "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 

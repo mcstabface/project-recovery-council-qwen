@@ -56,11 +56,14 @@ MODEL_ADAPTERS: dict[str, type[ContractModel]] = {
 GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-sanitized-provider-config.v1",
     "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+    "project-recovery-council.qwen.live-selected-evidence-records.v1",
+    "project-recovery-council.qwen.live-role-validation-results.v1",
     "project-recovery-council.qwen.live-raw-provider-responses.v1",
     "project-recovery-council.qwen.live-parsed-structured-responses.v1",
     "project-recovery-council.qwen.live-validation-results.v1",
     "project-recovery-council.qwen.live-token-usage.v1",
     "project-recovery-council.qwen.live-retry-history.v1",
+    "project-recovery-council.qwen.live-role-compliance-metrics.v1",
     "project-recovery-council.qwen.live-reproducibility.v1",
 }
 
@@ -130,6 +133,7 @@ def validate_experiment_artifacts(path: Path | str) -> ArtifactInspectionResult:
         )
 
     errors: list[str] = []
+    loaded_payloads: dict[str, Any] = {}
     for entry in manifest.artifacts:
         artifact_path = root / entry.relative_path
         if entry.required and not artifact_path.exists():
@@ -144,10 +148,12 @@ def validate_experiment_artifacts(path: Path | str) -> ArtifactInspectionResult:
         except json.JSONDecodeError as exc:
             errors.append(f"invalid JSON in {entry.relative_path}: {exc}")
             continue
+        loaded_payloads[entry.relative_path] = payload
         try:
             _validate_payload(entry.schema_id, payload)
         except (ValidationError, ValueError) as exc:
             errors.append(f"schema validation failed for {entry.relative_path}: {exc}")
+    errors.extend(_validate_live_specialist_artifacts(loaded_payloads))
     return ArtifactInspectionResult(run_path=root.as_posix(), passed=not errors, errors=errors)
 
 
@@ -178,13 +184,54 @@ def _schema_id_for(filename: str) -> str:
         "comparison-report.json": "project-recovery-council.qwen.experiment-comparison.v1",
         "sanitized-provider-config.json": "project-recovery-council.qwen.live-sanitized-provider-config.v1",
         "rendered-prompt-hashes.json": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+        "selected-evidence-records.json": "project-recovery-council.qwen.live-selected-evidence-records.v1",
+        "role-validation-results.json": "project-recovery-council.qwen.live-role-validation-results.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
         "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",
         "token-usage.json": "project-recovery-council.qwen.live-token-usage.v1",
         "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
+        "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
+
+
+def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list[str]:
+    invocations = loaded_payloads.get("invocation-records.json")
+    if not isinstance(invocations, list):
+        return []
+    specialist_invocation_ids = [
+        invocation.get("invocation_id")
+        for invocation in invocations
+        if isinstance(invocation, dict)
+        and invocation.get("invocation_purpose") == "standalone_live_agent"
+        and invocation.get("agent_role") not in {"GeneralistAgent", "LiveSmoke"}
+    ]
+    if not specialist_invocation_ids:
+        return []
+    errors: list[str] = []
+    selected = loaded_payloads.get("selected-evidence-records.json")
+    role_results = loaded_payloads.get("role-validation-results.json")
+    if not isinstance(selected, list) or not selected:
+        errors.append("standalone specialist live artifacts require selected-evidence-records.json")
+    if not isinstance(role_results, list) or not role_results:
+        errors.append("standalone specialist live artifacts require role-validation-results.json")
+    selected_ids = {
+        item.get("invocation_id")
+        for item in selected or []
+        if isinstance(item, dict)
+    }
+    role_result_ids = {
+        item.get("invocation_id")
+        for item in role_results or []
+        if isinstance(item, dict)
+    }
+    for invocation_id in specialist_invocation_ids:
+        if invocation_id not in selected_ids:
+            errors.append(f"missing selected evidence record entry for {invocation_id}")
+        if invocation_id not in role_result_ids:
+            errors.append(f"missing role validation result for {invocation_id}")
+    return errors
 
 
 def _now() -> str:

@@ -29,6 +29,15 @@ The Director prompt requires concise routing rationale and selection of only
 relevant experts. The Arbiter prompt requires preservation of unresolved
 disagreement and evidence provenance.
 
+Prompt wording is not the access-control mechanism. Evidence is filtered before
+rendering by `role_scope.py`. The rendered invocation packet includes case ID,
+correlation ID, invocation purpose, agent role, selected evidence record IDs,
+expected schema, and only the evidence records allowed for that role.
+
+`ScheduleExpert` receives schedule records and minimal case identity only. It is
+not given commercial, supplier, logistics, onsite progress, unrelated risk, or
+recovery-option evidence.
+
 Run prompt validation with:
 
 ```bash

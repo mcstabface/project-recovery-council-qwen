@@ -248,6 +248,14 @@ No live model identifier is hard-coded. Choose the model ID from the current
 Alibaba Cloud Model Studio console or official documentation for the endpoint
 you are using.
 
+Specialist live invocations now use explicit evidence-access policy code before
+prompt rendering. For example, `ScheduleExpert` receives schedule records plus
+minimal case identity only; it does not receive supplier, logistics, progress,
+cost, contract, unrelated risk, or recovery-option evidence. Live artifacts
+record `selected-evidence-records.json` and `role-validation-results.json` for
+standalone specialist invocations. A response may be JSON-schema valid while
+still failing semantic role-scope validation.
+
 Offline experiment outputs use:
 
 ```text

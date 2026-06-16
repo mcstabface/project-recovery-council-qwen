@@ -11,6 +11,7 @@ from pydantic import BaseModel
 from project_recovery_council.experiment_contracts import ExperimentVariant, SCHEMA_REGISTRY
 from project_recovery_council.fixtures import CaseBundle
 from project_recovery_council.prompt_catalog import PROMPT_VERSION, load_prompt_catalog
+from project_recovery_council.role_scope import InvocationPurpose, select_evidence_for_role
 from project_recovery_council.serialization import to_jsonable
 
 
@@ -21,7 +22,9 @@ def render_agent_prompt(
     expected_response_schema: str,
     correlation_id: str,
     experiment_variant: ExperimentVariant | str,
+    invocation_purpose: InvocationPurpose | str | None = None,
     prompt_version: str = PROMPT_VERSION,
+    scoped_evidence: bool = True,
 ) -> str:
     catalog = load_prompt_catalog(prompt_version)
     if agent_role not in catalog:
@@ -30,12 +33,19 @@ def render_agent_prompt(
     schema_payload: dict[str, Any] = {}
     if schema_model is not None:
         schema_payload = schema_model.model_json_schema()
+    selected_records = (
+        select_evidence_for_role(bundle, agent_role)
+        if scoped_evidence
+        else list(bundle.case.evidence_records)
+    )
     payload = {
         "correlation_id": correlation_id,
         "case_id": bundle.case.case_id,
         "experiment_variant": ExperimentVariant(experiment_variant).value,
+        "invocation_purpose": str(invocation_purpose or ExperimentVariant(experiment_variant).value),
         "invocation_role": agent_role,
         "prompt_version": prompt_version,
+        "selected_evidence_record_ids": [record.record_id for record in selected_records],
         "expected_response_schema": expected_response_schema,
         "concise_output_requirements": [
             "Return one JSON object only.",
@@ -53,7 +63,7 @@ def render_agent_prompt(
                 "summary": record.summary,
                 "fields": record.fields,
             }
-            for record in bundle.case.evidence_records
+            for record in selected_records
         ],
         "expected_output_json_schema": schema_payload,
     }

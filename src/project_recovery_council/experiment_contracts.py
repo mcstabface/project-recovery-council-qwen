@@ -70,6 +70,11 @@ class EvaluationMetricId(StrEnum):
     LATENCY = "latency"
     RETRY_COUNT = "retry_count"
     ESTIMATED_PROVIDER_COST = "estimated_provider_cost"
+    SCOPE_COMPLIANCE_RATE = "scope_compliance_rate"
+    PROHIBITED_CLAIM_COUNT = "prohibited_claim_count"
+    PROHIBITED_WARNING_COUNT = "prohibited_warning_count"
+    PROHIBITED_CITATION_COUNT = "prohibited_citation_count"
+    EVIDENCE_OVEREXPOSURE_COUNT = "evidence_overexposure_count"
 
 
 class Disagreement(ContractModel):
@@ -186,6 +191,7 @@ class ExecutionPlan(ContractModel):
 class AgentInvocation(ContractModel):
     invocation_id: str = Field(min_length=1)
     variant: ExperimentVariant
+    invocation_purpose: str | None = None
     agent_role: str = Field(min_length=1)
     prompt_id: str = Field(min_length=1)
     request: ModelRequest
@@ -308,6 +314,7 @@ class ExperimentConfig(ContractModel):
     case_id: str = Field(min_length=1)
     fixture_id: str = Field(min_length=1)
     variant: ExperimentVariant
+    invocation_purpose: str | None = None
     execution_plan: ExecutionPlan
     live_provider_enabled: bool = False
     simulated_outputs: bool = True

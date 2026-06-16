@@ -1,0 +1,96 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-16T00:00:00Z",
+  "run_label": "role-scope-hardening",
+  "repository": "project-recovery-council-qwen",
+  "status": "complete",
+  "objectives": [
+    "Filter evidence supplied to each agent by declared role scope",
+    "Separate invocation purpose from experiment variant",
+    "Detect role-scope violations independently of schema validation",
+    "Add semantic validation for specialist claims and warnings",
+    "Preserve existing live-client and artifact behavior",
+    "Avoid live network calls"
+  ],
+  "created_files": [
+    "src/project_recovery_council/role_scope.py",
+    "tests/test_role_scope_policy.py",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "decisions/ADR-0007-agent-evidence-scope-and-semantic-validation.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_ROLE_SCOPE_HARDENING.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_ROLE_SCOPE_HARDENING.json"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_QWEN_SETUP.md",
+    "docs/METRICS.md",
+    "docs/PROMPT_ARCHITECTURE.md",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/live_experiments.py",
+    "src/project_recovery_council/prompt_rendering.py"
+  ],
+  "architectural_decisions": [
+    {
+      "id": "ADR-0007",
+      "title": "Agent Evidence Scope and Semantic Validation",
+      "path": "decisions/ADR-0007-agent-evidence-scope-and-semantic-validation.md"
+    }
+  ],
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_role_scope_policy.py",
+      "exit_code": 0,
+      "result": "12 passed in 0.20s"
+    },
+    {
+      "command": "python -m pytest tests/test_role_scope_policy.py tests/test_qwen_live_client.py tests/test_qwen_live_cli.py tests/test_qwen_live_integration.py",
+      "exit_code": 0,
+      "result": "25 passed, 1 skipped in 0.64s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "83 passed, 1 skipped in 5.82s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council compare-offline",
+      "exit_code": 0,
+      "result": "offline comparison generated without live calls"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council live-agent --agent ScheduleExpert --model qwen-plus",
+      "exit_code": 1,
+      "result": "failed before network because --allow-network was absent"
+    }
+  ],
+  "test_results": {
+    "pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "83 passed, 1 skipped in 5.82s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_preflight_only": true
+  },
+  "known_limitations": [
+    "Prior live artifacts are not retroactively modified",
+    "live-variant currently supports only single_generalist",
+    "Role phrase detection may need refinement as more real outputs are observed"
+  ],
+  "recommended_next_live_invocation": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-agent --agent ScheduleExpert --model qwen-plus --allow-network"
+}
