@@ -1,0 +1,1048 @@
+{
+  "$defs": {
+    "AuditEvent": {
+      "additionalProperties": false,
+      "description": "Append-only event for preserving case and orchestration history.",
+      "properties": {
+        "action": {
+          "minLength": 1,
+          "title": "Action",
+          "type": "string"
+        },
+        "actor": {
+          "minLength": 1,
+          "title": "Actor",
+          "type": "string"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "default": "legacy",
+          "minLength": 1,
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "sequence": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "case_id",
+        "occurred_at",
+        "actor",
+        "action",
+        "summary"
+      ],
+      "title": "AuditEvent",
+      "type": "object"
+    },
+    "CaseStage": {
+      "enum": [
+        "intake",
+        "evidence_review",
+        "expert_analysis",
+        "human_confirmation",
+        "recovery_planning",
+        "final_recommendation"
+      ],
+      "title": "CaseStage",
+      "type": "string"
+    },
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "description": "Explicit confidence summary for a conclusion.",
+      "properties": {
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "level": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
+        "score",
+        "rationale"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "Contradiction": {
+      "additionalProperties": false,
+      "description": "Contradictory evidence requiring resolution before final authorization.",
+      "properties": {
+        "conflicting_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "minItems": 2,
+          "title": "Conflicting Evidence",
+          "type": "array"
+        },
+        "contradiction_id": {
+          "minLength": 1,
+          "title": "Contradiction Id",
+          "type": "string"
+        },
+        "issue": {
+          "minLength": 1,
+          "title": "Issue",
+          "type": "string"
+        },
+        "requires_human_confirmation": {
+          "default": true,
+          "title": "Requires Human Confirmation",
+          "type": "boolean"
+        },
+        "status": {
+          "default": "unresolved",
+          "enum": [
+            "unresolved",
+            "resolved",
+            "dismissed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contradiction_id",
+        "issue",
+        "conflicting_evidence",
+        "summary"
+      ],
+      "title": "Contradiction",
+      "type": "object"
+    },
+    "EvidenceReference": {
+      "additionalProperties": false,
+      "description": "Source-level pointer used by findings, decisions, and recommendations.",
+      "properties": {
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "title": "Source File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_file",
+        "locator"
+      ],
+      "title": "EvidenceReference",
+      "type": "object"
+    },
+    "ExpertAttemptRecord": {
+      "additionalProperties": false,
+      "description": "Persisted record of one expert execution attempt.",
+      "properties": {
+        "attempt": {
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "correlation_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Correlation Id"
+        },
+        "expert_role": {
+          "title": "Expert Role",
+          "type": "string"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        },
+        "finding_id": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Finding Id"
+        },
+        "request_id": {
+          "title": "Request Id",
+          "type": "string"
+        },
+        "status": {
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "expert_role",
+        "request_id",
+        "attempt",
+        "status"
+      ],
+      "title": "ExpertAttemptRecord",
+      "type": "object"
+    },
+    "ExpertFinding": {
+      "additionalProperties": false,
+      "description": "Specialist conclusion or explicit non-conclusion.",
+      "properties": {
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "conclusion": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Conclusion"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceAssessment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "expert_role": {
+          "minLength": 1,
+          "title": "Expert Role",
+          "type": "string"
+        },
+        "failure_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Failure Reason"
+        },
+        "finding_id": {
+          "minLength": 1,
+          "title": "Finding Id",
+          "type": "string"
+        },
+        "incomplete_reason": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Incomplete Reason"
+        },
+        "request_id": {
+          "minLength": 1,
+          "title": "Request Id",
+          "type": "string"
+        },
+        "retry_count": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Retry Count",
+          "type": "integer"
+        },
+        "status": {
+          "$ref": "#/$defs/ExpertStatus"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "finding_id",
+        "request_id",
+        "expert_role",
+        "status"
+      ],
+      "title": "ExpertFinding",
+      "type": "object"
+    },
+    "ExpertRequest": {
+      "additionalProperties": false,
+      "description": "Narrow work packet sent from the Director to a specialist.",
+      "properties": {
+        "attempt": {
+          "default": 1,
+          "minimum": 1,
+          "title": "Attempt",
+          "type": "integer"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "evidence_scope": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence Scope",
+          "type": "array"
+        },
+        "expert_role": {
+          "minLength": 1,
+          "title": "Expert Role",
+          "type": "string"
+        },
+        "max_attempts": {
+          "default": 2,
+          "minimum": 1,
+          "title": "Max Attempts",
+          "type": "integer"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "request_id": {
+          "minLength": 1,
+          "title": "Request Id",
+          "type": "string"
+        },
+        "stage": {
+          "$ref": "#/$defs/CaseStage"
+        }
+      },
+      "required": [
+        "request_id",
+        "case_id",
+        "expert_role",
+        "stage",
+        "question"
+      ],
+      "title": "ExpertRequest",
+      "type": "object"
+    },
+    "ExpertSelection": {
+      "additionalProperties": false,
+      "description": "Director-selected expert with concise routing rationale.",
+      "properties": {
+        "expert_role": {
+          "enum": [
+            "ScheduleExpert",
+            "CommercialExpert",
+            "EvidenceAuditor",
+            "RiskExpert",
+            "RecoveryPlanner"
+          ],
+          "title": "Expert Role",
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "expert_analysis",
+            "contradiction_review",
+            "recovery_planning"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "rationale": {
+          "title": "Rationale",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "expert_role",
+        "phase",
+        "rationale"
+      ],
+      "title": "ExpertSelection",
+      "type": "object"
+    },
+    "ExpertStatus": {
+      "enum": [
+        "pending",
+        "completed",
+        "incomplete",
+        "abstained",
+        "failed"
+      ],
+      "title": "ExpertStatus",
+      "type": "string"
+    },
+    "FinalRecommendation": {
+      "additionalProperties": false,
+      "description": "Draft or authorized recovery recommendation.",
+      "properties": {
+        "approval_status": {
+          "default": "not_requested",
+          "enum": [
+            "not_requested",
+            "pending",
+            "approved",
+            "rejected"
+          ],
+          "title": "Approval Status",
+          "type": "string"
+        },
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "confidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ConfidenceAssessment"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "contradictions": {
+          "items": {
+            "$ref": "#/$defs/Contradiction"
+          },
+          "title": "Contradictions",
+          "type": "array"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "gross_avoided_exposure_usd": {
+          "title": "Gross Avoided Exposure Usd",
+          "type": "integer"
+        },
+        "human_decision_request": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/HumanDecisionRequest"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "human_decision_required": {
+          "title": "Human Decision Required",
+          "type": "boolean"
+        },
+        "mitigation_cost_usd": {
+          "minimum": 0,
+          "title": "Mitigation Cost Usd",
+          "type": "integer"
+        },
+        "options_considered": {
+          "items": {
+            "$ref": "#/$defs/RecoveryOption"
+          },
+          "minItems": 1,
+          "title": "Options Considered",
+          "type": "array"
+        },
+        "preferred_option_id": {
+          "minLength": 1,
+          "title": "Preferred Option Id",
+          "type": "string"
+        },
+        "recommendation_id": {
+          "minLength": 1,
+          "title": "Recommendation Id",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "draft",
+            "blocked_pending_human_confirmation",
+            "authorized",
+            "rejected"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "unmitigated_exposure_usd": {
+          "minimum": 0,
+          "title": "Unmitigated Exposure Usd",
+          "type": "integer"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "recommendation_id",
+        "case_id",
+        "status",
+        "summary",
+        "preferred_option_id",
+        "options_considered",
+        "unmitigated_exposure_usd",
+        "mitigation_cost_usd",
+        "gross_avoided_exposure_usd",
+        "human_decision_required"
+      ],
+      "title": "FinalRecommendation",
+      "type": "object"
+    },
+    "HumanDecision": {
+      "additionalProperties": false,
+      "description": "Human answer or approval recorded in the case history.",
+      "properties": {
+        "decided_at": {
+          "format": "date-time",
+          "title": "Decided At",
+          "type": "string"
+        },
+        "decided_by": {
+          "minLength": 1,
+          "title": "Decided By",
+          "type": "string"
+        },
+        "decision_id": {
+          "minLength": 1,
+          "title": "Decision Id",
+          "type": "string"
+        },
+        "decision_request_id": {
+          "minLength": 1,
+          "title": "Decision Request Id",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "outcome": {
+          "enum": [
+            "approved",
+            "rejected",
+            "confirmed",
+            "unable_to_confirm"
+          ],
+          "title": "Outcome",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_id",
+        "decision_request_id",
+        "outcome",
+        "rationale",
+        "decided_by",
+        "decided_at"
+      ],
+      "title": "HumanDecision",
+      "type": "object"
+    },
+    "HumanDecisionRequest": {
+      "additionalProperties": false,
+      "description": "Blocking request for human confirmation or approval.",
+      "properties": {
+        "blocking": {
+          "default": true,
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "contradictions": {
+          "items": {
+            "$ref": "#/$defs/Contradiction"
+          },
+          "title": "Contradictions",
+          "type": "array"
+        },
+        "decision_request_id": {
+          "minLength": 1,
+          "title": "Decision Request Id",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "requested_by": {
+          "minLength": 1,
+          "title": "Requested By",
+          "type": "string"
+        },
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "answered",
+            "cancelled"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_request_id",
+        "case_id",
+        "reason",
+        "question",
+        "requested_by"
+      ],
+      "title": "HumanDecisionRequest",
+      "type": "object"
+    },
+    "RecoveryOption": {
+      "additionalProperties": false,
+      "description": "Candidate recovery action with cited economics.",
+      "properties": {
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "avoided_delay_days": {
+          "minimum": 0,
+          "title": "Avoided Delay Days",
+          "type": "integer"
+        },
+        "avoided_exposure_usd": {
+          "minimum": 0,
+          "title": "Avoided Exposure Usd",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "minimum": 0,
+          "title": "Cost Usd",
+          "type": "integer"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "option_id": {
+          "minLength": 1,
+          "title": "Option Id",
+          "type": "string"
+        },
+        "required_approvals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Approvals",
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "option_id",
+        "label",
+        "description",
+        "cost_usd",
+        "avoided_delay_days",
+        "avoided_exposure_usd"
+      ],
+      "title": "RecoveryOption",
+      "type": "object"
+    },
+    "WorkflowFailureInfo": {
+      "additionalProperties": false,
+      "description": "Persisted failure information for a failed workflow.",
+      "properties": {
+        "error_type": {
+          "title": "Error Type",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "stage": {
+          "$ref": "#/$defs/WorkflowStage"
+        }
+      },
+      "required": [
+        "stage",
+        "error_type",
+        "message"
+      ],
+      "title": "WorkflowFailureInfo",
+      "type": "object"
+    },
+    "WorkflowStage": {
+      "enum": [
+        "initialized",
+        "validating",
+        "triaging",
+        "expert_analysis",
+        "contradiction_review",
+        "awaiting_human_decision",
+        "recovery_planning",
+        "awaiting_final_approval",
+        "completed",
+        "failed"
+      ],
+      "title": "WorkflowStage",
+      "type": "string"
+    }
+  },
+  "$id": "project-recovery-council.persisted-workflow-state.v1",
+  "additionalProperties": false,
+  "description": "Versioned persisted state sufficient to resume a workflow in a new process.",
+  "properties": {
+    "answered_human_requests": {
+      "items": {
+        "$ref": "#/$defs/HumanDecisionRequest"
+      },
+      "title": "Answered Human Requests",
+      "type": "array"
+    },
+    "approval_state": {
+      "default": "not_requested",
+      "enum": [
+        "not_requested",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "title": "Approval State",
+      "type": "string"
+    },
+    "artifacts_root": {
+      "title": "Artifacts Root",
+      "type": "string"
+    },
+    "audit_events": {
+      "items": {
+        "$ref": "#/$defs/AuditEvent"
+      },
+      "title": "Audit Events",
+      "type": "array"
+    },
+    "audit_sequence_position": {
+      "default": 0,
+      "title": "Audit Sequence Position",
+      "type": "integer"
+    },
+    "case_id": {
+      "title": "Case Id",
+      "type": "string"
+    },
+    "case_path": {
+      "title": "Case Path",
+      "type": "string"
+    },
+    "completed_stages": {
+      "items": {
+        "$ref": "#/$defs/WorkflowStage"
+      },
+      "title": "Completed Stages",
+      "type": "array"
+    },
+    "contradictions": {
+      "items": {
+        "$ref": "#/$defs/Contradiction"
+      },
+      "title": "Contradictions",
+      "type": "array"
+    },
+    "current_workflow_stage": {
+      "$ref": "#/$defs/WorkflowStage"
+    },
+    "draft_recommendation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FinalRecommendation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "expert_attempts": {
+      "items": {
+        "$ref": "#/$defs/ExpertAttemptRecord"
+      },
+      "title": "Expert Attempts",
+      "type": "array"
+    },
+    "expert_findings": {
+      "items": {
+        "$ref": "#/$defs/ExpertFinding"
+      },
+      "title": "Expert Findings",
+      "type": "array"
+    },
+    "expert_requests": {
+      "items": {
+        "$ref": "#/$defs/ExpertRequest"
+      },
+      "title": "Expert Requests",
+      "type": "array"
+    },
+    "failure_information": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/WorkflowFailureInfo"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "final_recommendation": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/FinalRecommendation"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "inject_commercial_failure": {
+      "default": false,
+      "title": "Inject Commercial Failure",
+      "type": "boolean"
+    },
+    "pending_human_requests": {
+      "items": {
+        "$ref": "#/$defs/HumanDecisionRequest"
+      },
+      "title": "Pending Human Requests",
+      "type": "array"
+    },
+    "received_human_decisions": {
+      "items": {
+        "$ref": "#/$defs/HumanDecision"
+      },
+      "title": "Received Human Decisions",
+      "type": "array"
+    },
+    "recovery_options": {
+      "items": {
+        "$ref": "#/$defs/RecoveryOption"
+      },
+      "title": "Recovery Options",
+      "type": "array"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "project-recovery-council.persisted-workflow-state.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "selected_experts": {
+      "items": {
+        "$ref": "#/$defs/ExpertSelection"
+      },
+      "title": "Selected Experts",
+      "type": "array"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_id",
+    "case_path",
+    "artifacts_root",
+    "current_workflow_stage"
+  ],
+  "title": "PersistedWorkflowState",
+  "type": "object",
+  "x-schema-version": "v1"
+}

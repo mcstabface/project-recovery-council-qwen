@@ -1,0 +1,96 @@
+{
+  "$defs": {
+    "EvidenceReference": {
+      "additionalProperties": false,
+      "description": "Source-level pointer used by findings, decisions, and recommendations.",
+      "properties": {
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "title": "Source File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_file",
+        "locator"
+      ],
+      "title": "EvidenceReference",
+      "type": "object"
+    }
+  },
+  "$id": "project-recovery-council.contradiction.v1",
+  "additionalProperties": false,
+  "description": "Contradictory evidence requiring resolution before final authorization.",
+  "properties": {
+    "conflicting_evidence": {
+      "items": {
+        "$ref": "#/$defs/EvidenceReference"
+      },
+      "minItems": 2,
+      "title": "Conflicting Evidence",
+      "type": "array"
+    },
+    "contradiction_id": {
+      "minLength": 1,
+      "title": "Contradiction Id",
+      "type": "string"
+    },
+    "issue": {
+      "minLength": 1,
+      "title": "Issue",
+      "type": "string"
+    },
+    "requires_human_confirmation": {
+      "default": true,
+      "title": "Requires Human Confirmation",
+      "type": "boolean"
+    },
+    "status": {
+      "default": "unresolved",
+      "enum": [
+        "unresolved",
+        "resolved",
+        "dismissed"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "contradiction_id",
+    "issue",
+    "conflicting_evidence",
+    "summary"
+  ],
+  "title": "Contradiction",
+  "type": "object",
+  "x-schema-version": "v1"
+}

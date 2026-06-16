@@ -18,7 +18,18 @@ from project_recovery_council.contracts import (
     RecoveryOption,
 )
 from project_recovery_council.fixtures import CaseBundle, load_equipment_delay_case
-from project_recovery_council.runner import replay_run, run_equipment_delay_case, validate_case_fixture
+from project_recovery_council.runner import (
+    approve_workflow,
+    inspect_run,
+    replay_run,
+    resume_workflow,
+    run_equipment_delay_case,
+    start_equipment_delay_case,
+    submit_decision,
+    validate_case_fixture,
+    workflow_status,
+)
+from project_recovery_council.schemas import export_schemas
 from project_recovery_council.state import WorkflowStage, WorkflowTransitionError
 from project_recovery_council.validation import (
     assert_expected_results,
@@ -70,10 +81,17 @@ __all__ = [
     "evaluate_human_gate_required",
     "is_equipment_onsite_claim_supported",
     "load_equipment_delay_case",
+    "approve_workflow",
     "default_workflow_config",
+    "export_schemas",
+    "inspect_run",
     "replay_run",
+    "resume_workflow",
     "run_equipment_delay_case",
+    "start_equipment_delay_case",
+    "submit_decision",
     "validate_case_fixture",
     "validate_date_and_duration_consistency",
     "validate_evidence_references",
+    "workflow_status",
 ]

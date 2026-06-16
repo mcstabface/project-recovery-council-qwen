@@ -1,0 +1,60 @@
+{
+  "$id": "project-recovery-council.evidence-record.v1",
+  "additionalProperties": false,
+  "description": "Compact representation of one cited source record.",
+  "properties": {
+    "fields": {
+      "additionalProperties": true,
+      "title": "Fields",
+      "type": "object"
+    },
+    "record_date": {
+      "anyOf": [
+        {
+          "format": "date",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Record Date"
+    },
+    "record_id": {
+      "minLength": 1,
+      "title": "Record Id",
+      "type": "string"
+    },
+    "record_type": {
+      "minLength": 1,
+      "title": "Record Type",
+      "type": "string"
+    },
+    "source_file": {
+      "minLength": 1,
+      "title": "Source File",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_id",
+    "source_file",
+    "record_type",
+    "title",
+    "summary"
+  ],
+  "title": "EvidenceRecord",
+  "type": "object",
+  "x-schema-version": "v1"
+}

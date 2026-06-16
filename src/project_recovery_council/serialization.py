@@ -3,8 +3,10 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import asdict, is_dataclass
 from enum import Enum
+from hashlib import sha256
 from pathlib import Path
 from typing import Any
 
@@ -34,14 +36,22 @@ def to_jsonable(value: Any) -> Any:
 
 def write_json(path: Path, payload: Any) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(to_jsonable(payload), indent=2, sort_keys=True) + "\n",
-        encoding="utf-8",
-    )
+    encoded = json.dumps(to_jsonable(payload), indent=2, sort_keys=True) + "\n"
+    tmp_path = path.with_name(f".{path.name}.tmp")
+    tmp_path.write_text(encoded, encoding="utf-8")
+    os.replace(tmp_path, path)
 
 
 def read_json(path: Path) -> Any:
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def sha256_file(path: Path) -> str:
+    digest = sha256()
+    with path.open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
 
 
 def strip_volatile(value: Any) -> Any:
@@ -57,17 +67,17 @@ def strip_volatile(value: Any) -> Any:
 
 
 def logical_signature_from_run(run_path: Path) -> dict[str, Any]:
-    summary = read_json(run_path / "run-summary.json")
+    state = read_json(run_path / "workflow-state.json")
     return strip_volatile(
         {
-            "state": summary["state"],
-            "selected_experts": summary["selected_experts"],
-            "inject_commercial_failure": summary["inject_commercial_failure"],
-            "audit_events": read_json(run_path / "audit-events.json"),
-            "expert_findings": read_json(run_path / "expert-findings.json"),
-            "contradictions": read_json(run_path / "contradictions.json"),
-            "human_decisions": read_json(run_path / "human-decisions.json"),
-            "final_recommendation": read_json(run_path / "final-recommendation.json"),
+            "terminal_status": state["current_workflow_stage"],
+            "selected_experts": state["selected_experts"],
+            "expert_findings": state["expert_findings"],
+            "contradictions": state["contradictions"],
+            "decision_requests": state["pending_human_requests"] + state["answered_human_requests"],
+            "human_decisions": state["received_human_decisions"],
+            "recovery_options": state["recovery_options"],
+            "final_recommendation": state["final_recommendation"],
         }
     )
 
@@ -81,4 +91,3 @@ def compare_run_artifacts(original_run_path: Path, replay_run_path: Path) -> dic
         "ignored_fields": sorted(VOLATILE_KEYS),
         "differences": [] if equivalent else ["logical signatures differ"],
     }
-

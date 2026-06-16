@@ -1,0 +1,15 @@
+{
+  "auto_human_decision": false,
+  "case_path": "sample-data/equipment-delay-case",
+  "decisions": [
+    {
+      "decided_by": "demo-reviewer",
+      "decision_id": "HD-ONSITE-001",
+      "decision_request_id": "HDR-ONSITE-001",
+      "outcome": "confirmed"
+    }
+  ],
+  "inject_commercial_failure": false,
+  "run_id": "awaiting-approval-contract-demo",
+  "schema_version": "project-recovery-council.replay-input.v1"
+}

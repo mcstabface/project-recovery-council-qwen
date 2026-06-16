@@ -1,0 +1,140 @@
+{
+  "schema_version": "v1",
+  "schemas": [
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/recovery-case.schema.json",
+      "intended_consumer": "workflow runner and external case systems",
+      "intended_producer": "case intake",
+      "schema_id": "project-recovery-council.recovery-case.v1",
+      "title": "RecoveryCase",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/evidence-record.schema.json",
+      "intended_consumer": "experts and evidence auditors",
+      "intended_producer": "fixture loader or evidence adapters",
+      "schema_id": "project-recovery-council.evidence-record.v1",
+      "title": "EvidenceRecord",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/evidence-reference.schema.json",
+      "intended_consumer": "auditors, recommendations, and artifact inspectors",
+      "intended_producer": "experts and validators",
+      "schema_id": "project-recovery-council.evidence-reference.v1",
+      "title": "EvidenceReference",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/expert-request.schema.json",
+      "intended_consumer": "expert adapters",
+      "intended_producer": "Director",
+      "schema_id": "project-recovery-council.expert-request.v1",
+      "title": "ExpertRequest",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/expert-finding.schema.json",
+      "intended_consumer": "workflow runner and artifact inspectors",
+      "intended_producer": "expert adapters",
+      "schema_id": "project-recovery-council.expert-finding.v1",
+      "title": "ExpertFinding",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/contradiction.schema.json",
+      "intended_consumer": "human gate and recommendation workflow",
+      "intended_producer": "EvidenceAuditor",
+      "schema_id": "project-recovery-council.contradiction.v1",
+      "title": "Contradiction",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/human-decision-request.schema.json",
+      "intended_consumer": "human task systems",
+      "intended_producer": "workflow runner",
+      "schema_id": "project-recovery-council.human-decision-request.v1",
+      "title": "HumanDecisionRequest",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/human-decision.schema.json",
+      "intended_consumer": "workflow runner",
+      "intended_producer": "human task systems or demo CLI",
+      "schema_id": "project-recovery-council.human-decision.v1",
+      "title": "HumanDecision",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/recovery-option.schema.json",
+      "intended_consumer": "approval workflow",
+      "intended_producer": "RecoveryPlanner",
+      "schema_id": "project-recovery-council.recovery-option.v1",
+      "title": "RecoveryOption",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/final-recommendation.schema.json",
+      "intended_consumer": "case governance and approval systems",
+      "intended_producer": "RecoveryPlanner",
+      "schema_id": "project-recovery-council.final-recommendation.v1",
+      "title": "FinalRecommendation",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/audit-event.schema.json",
+      "intended_consumer": "artifact inspectors and case history systems",
+      "intended_producer": "workflow runner",
+      "schema_id": "project-recovery-council.audit-event.v1",
+      "title": "AuditEvent",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/persisted-workflow-state.schema.json",
+      "intended_consumer": "resume workflow and artifact inspectors",
+      "intended_producer": "workflow runner",
+      "schema_id": "project-recovery-council.persisted-workflow-state.v1",
+      "title": "PersistedWorkflowState",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/run-summary.schema.json",
+      "intended_consumer": "operators and artifact inspectors",
+      "intended_producer": "workflow runner",
+      "schema_id": "project-recovery-council.run-summary.v1",
+      "title": "RunSummary",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/replay-input.schema.json",
+      "intended_consumer": "replay runner",
+      "intended_producer": "workflow runner",
+      "schema_id": "project-recovery-council.replay-input.v1",
+      "title": "ReplayInput",
+      "version": "v1"
+    },
+    {
+      "compatibility_notes": "Initial v1 contract. No forward/backward compatibility beyond exact v1 schema is guaranteed.",
+      "file_path": "schemas/v1/run-artifact-manifest.schema.json",
+      "intended_consumer": "artifact inspectors",
+      "intended_producer": "workflow runner",
+      "schema_id": "project-recovery-council.run-artifact-manifest.v1",
+      "title": "RunArtifactManifest",
+      "version": "v1"
+    }
+  ]
+}

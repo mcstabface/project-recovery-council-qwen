@@ -1,0 +1,416 @@
+{
+  "$defs": {
+    "ConfidenceAssessment": {
+      "additionalProperties": false,
+      "description": "Explicit confidence summary for a conclusion.",
+      "properties": {
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "level": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Level",
+          "type": "string"
+        },
+        "rationale": {
+          "minLength": 1,
+          "title": "Rationale",
+          "type": "string"
+        },
+        "score": {
+          "maximum": 1.0,
+          "minimum": 0.0,
+          "title": "Score",
+          "type": "number"
+        }
+      },
+      "required": [
+        "level",
+        "score",
+        "rationale"
+      ],
+      "title": "ConfidenceAssessment",
+      "type": "object"
+    },
+    "Contradiction": {
+      "additionalProperties": false,
+      "description": "Contradictory evidence requiring resolution before final authorization.",
+      "properties": {
+        "conflicting_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "minItems": 2,
+          "title": "Conflicting Evidence",
+          "type": "array"
+        },
+        "contradiction_id": {
+          "minLength": 1,
+          "title": "Contradiction Id",
+          "type": "string"
+        },
+        "issue": {
+          "minLength": 1,
+          "title": "Issue",
+          "type": "string"
+        },
+        "requires_human_confirmation": {
+          "default": true,
+          "title": "Requires Human Confirmation",
+          "type": "boolean"
+        },
+        "status": {
+          "default": "unresolved",
+          "enum": [
+            "unresolved",
+            "resolved",
+            "dismissed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contradiction_id",
+        "issue",
+        "conflicting_evidence",
+        "summary"
+      ],
+      "title": "Contradiction",
+      "type": "object"
+    },
+    "EvidenceReference": {
+      "additionalProperties": false,
+      "description": "Source-level pointer used by findings, decisions, and recommendations.",
+      "properties": {
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "title": "Source File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_file",
+        "locator"
+      ],
+      "title": "EvidenceReference",
+      "type": "object"
+    },
+    "HumanDecisionRequest": {
+      "additionalProperties": false,
+      "description": "Blocking request for human confirmation or approval.",
+      "properties": {
+        "blocking": {
+          "default": true,
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "contradictions": {
+          "items": {
+            "$ref": "#/$defs/Contradiction"
+          },
+          "title": "Contradictions",
+          "type": "array"
+        },
+        "decision_request_id": {
+          "minLength": 1,
+          "title": "Decision Request Id",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "requested_by": {
+          "minLength": 1,
+          "title": "Requested By",
+          "type": "string"
+        },
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "answered",
+            "cancelled"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_request_id",
+        "case_id",
+        "reason",
+        "question",
+        "requested_by"
+      ],
+      "title": "HumanDecisionRequest",
+      "type": "object"
+    },
+    "RecoveryOption": {
+      "additionalProperties": false,
+      "description": "Candidate recovery action with cited economics.",
+      "properties": {
+        "assumptions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Assumptions",
+          "type": "array"
+        },
+        "avoided_delay_days": {
+          "minimum": 0,
+          "title": "Avoided Delay Days",
+          "type": "integer"
+        },
+        "avoided_exposure_usd": {
+          "minimum": 0,
+          "title": "Avoided Exposure Usd",
+          "type": "integer"
+        },
+        "cost_usd": {
+          "minimum": 0,
+          "title": "Cost Usd",
+          "type": "integer"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "label": {
+          "minLength": 1,
+          "title": "Label",
+          "type": "string"
+        },
+        "option_id": {
+          "minLength": 1,
+          "title": "Option Id",
+          "type": "string"
+        },
+        "required_approvals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Required Approvals",
+          "type": "array"
+        },
+        "warnings": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Warnings",
+          "type": "array"
+        }
+      },
+      "required": [
+        "option_id",
+        "label",
+        "description",
+        "cost_usd",
+        "avoided_delay_days",
+        "avoided_exposure_usd"
+      ],
+      "title": "RecoveryOption",
+      "type": "object"
+    }
+  },
+  "$id": "project-recovery-council.final-recommendation.v1",
+  "additionalProperties": false,
+  "description": "Draft or authorized recovery recommendation.",
+  "properties": {
+    "approval_status": {
+      "default": "not_requested",
+      "enum": [
+        "not_requested",
+        "pending",
+        "approved",
+        "rejected"
+      ],
+      "title": "Approval Status",
+      "type": "string"
+    },
+    "assumptions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Assumptions",
+      "type": "array"
+    },
+    "case_id": {
+      "minLength": 1,
+      "title": "Case Id",
+      "type": "string"
+    },
+    "confidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ConfidenceAssessment"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "contradictions": {
+      "items": {
+        "$ref": "#/$defs/Contradiction"
+      },
+      "title": "Contradictions",
+      "type": "array"
+    },
+    "evidence": {
+      "items": {
+        "$ref": "#/$defs/EvidenceReference"
+      },
+      "title": "Evidence",
+      "type": "array"
+    },
+    "gross_avoided_exposure_usd": {
+      "title": "Gross Avoided Exposure Usd",
+      "type": "integer"
+    },
+    "human_decision_request": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/HumanDecisionRequest"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "human_decision_required": {
+      "title": "Human Decision Required",
+      "type": "boolean"
+    },
+    "mitigation_cost_usd": {
+      "minimum": 0,
+      "title": "Mitigation Cost Usd",
+      "type": "integer"
+    },
+    "options_considered": {
+      "items": {
+        "$ref": "#/$defs/RecoveryOption"
+      },
+      "minItems": 1,
+      "title": "Options Considered",
+      "type": "array"
+    },
+    "preferred_option_id": {
+      "minLength": 1,
+      "title": "Preferred Option Id",
+      "type": "string"
+    },
+    "recommendation_id": {
+      "minLength": 1,
+      "title": "Recommendation Id",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "draft",
+        "blocked_pending_human_confirmation",
+        "authorized",
+        "rejected"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "unmitigated_exposure_usd": {
+      "minimum": 0,
+      "title": "Unmitigated Exposure Usd",
+      "type": "integer"
+    },
+    "warnings": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Warnings",
+      "type": "array"
+    }
+  },
+  "required": [
+    "recommendation_id",
+    "case_id",
+    "status",
+    "summary",
+    "preferred_option_id",
+    "options_considered",
+    "unmitigated_exposure_usd",
+    "mitigation_cost_usd",
+    "gross_avoided_exposure_usd",
+    "human_decision_required"
+  ],
+  "title": "FinalRecommendation",
+  "type": "object",
+  "x-schema-version": "v1"
+}

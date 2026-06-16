@@ -6,6 +6,8 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from project_recovery_council.adapters import DeterministicExpertAdapter, ExpertAdapter
+from project_recovery_council.artifacts import ArtifactEntry, RunArtifactManifest, RunSummary
 from project_recovery_council.audit import AuditRecorder, DeterministicClock
 from project_recovery_council.contracts import (
     CaseStage,
@@ -20,7 +22,8 @@ from project_recovery_council.contracts import (
 )
 from project_recovery_council.director import RuleBasedDirector
 from project_recovery_council.fixtures import CaseBundle, load_equipment_delay_case
-from project_recovery_council.serialization import write_json
+from project_recovery_council.persistence import context_to_persisted_state
+from project_recovery_council.serialization import sha256_file, write_json
 from project_recovery_council.state import (
     ExpertSelection,
     WorkflowConfig,
@@ -28,13 +31,6 @@ from project_recovery_council.state import (
     WorkflowStage,
     WorkflowTransitionError,
     validate_transition,
-)
-from project_recovery_council.stubs import (
-    DeterministicCommercialExpert,
-    DeterministicEvidenceAuditor,
-    DeterministicRecoveryPlanner,
-    DeterministicRiskExpert,
-    DeterministicScheduleExpert,
 )
 from project_recovery_council.validation import (
     assert_expected_results,
@@ -68,7 +64,8 @@ def default_workflow_config(
     artifacts_root: Path | str = DEFAULT_ARTIFACTS_ROOT,
     run_id: str = "equipment-delay-standard",
     inject_commercial_failure: bool = False,
-    auto_human_decision: bool = True,
+    auto_human_decision: bool = False,
+    auto_final_approval: bool = False,
 ) -> WorkflowConfig:
     return WorkflowConfig(
         case_path=Path(case_path),
@@ -76,6 +73,7 @@ def default_workflow_config(
         run_id=run_id,
         inject_commercial_failure=inject_commercial_failure,
         auto_human_decision=auto_human_decision,
+        auto_final_approval=auto_final_approval,
     )
 
 
@@ -101,19 +99,16 @@ class LocalWorkflowRunner:
         config: WorkflowConfig,
         *,
         director: RuleBasedDirector | None = None,
+        expert_adapter: ExpertAdapter | None = None,
         clock: DeterministicClock | None = None,
     ) -> None:
         self.config = config
         self.director = director or RuleBasedDirector()
         self.clock = clock or DeterministicClock()
         self.context: WorkflowContext | None = None
-        self.schedule_expert = DeterministicScheduleExpert()
-        self.commercial_expert = DeterministicCommercialExpert(
-            fail_first_attempt=config.inject_commercial_failure
+        self.expert_adapter = expert_adapter or DeterministicExpertAdapter(
+            inject_commercial_failure=config.inject_commercial_failure
         )
-        self.risk_expert = DeterministicRiskExpert()
-        self.evidence_auditor = DeterministicEvidenceAuditor()
-        self.recovery_planner = DeterministicRecoveryPlanner()
 
     def run(self, *, write_artifacts: bool = True) -> WorkflowRunResult:
         context = self.run_until_human_gate()
@@ -121,6 +116,11 @@ class LocalWorkflowRunner:
             if not self.config.auto_human_decision:
                 return WorkflowRunResult(context=context)
             self.resume_with_human_decision()
+        if self.context and self.context.state == WorkflowStage.AWAITING_FINAL_APPROVAL:
+            if self.config.auto_final_approval:
+                self.approve_final()
+            else:
+                return WorkflowRunResult(context=self.context)
         if self.context is None:
             raise WorkflowExecutionError("workflow context was not initialized")
         result = WorkflowRunResult(context=self.context)
@@ -150,35 +150,119 @@ class LocalWorkflowRunner:
                 f"cannot resume from state {context.state.value}; expected awaiting_human_decision"
             )
         decision = decision or self._simulated_not_onsite_decision(context)
+        self.record_human_decision(decision)
+        return self.resume_after_recorded_human_decision()
+
+    def record_human_decision(self, decision: HumanDecision) -> WorkflowContext:
+        context = self._require_context()
+        if context.state != WorkflowStage.AWAITING_HUMAN_DECISION:
+            raise WorkflowTransitionError(
+                f"cannot record human decision from state {context.state.value}; expected awaiting_human_decision"
+            )
+        pending_ids = {request.decision_request_id for request in context.human_decision_requests if request.status == "pending"}
+        if decision.decision_request_id not in pending_ids:
+            raise WorkflowExecutionError(f"no pending human decision request: {decision.decision_request_id}")
+        if any(existing.decision_request_id == decision.decision_request_id for existing in context.human_decisions):
+            raise WorkflowExecutionError(f"duplicate decision for request: {decision.decision_request_id}")
         context.human_decisions.append(decision)
-        self._answer_latest_human_request(context)
         context.audit.record(
             "human_decision_received",
-            "simulated-human",
+            decision.decided_by,
             "Human decision confirms the generator skid is not onsite.",
             evidence=decision.evidence,
             metadata={"decision_id": decision.decision_id, "outcome": decision.outcome},
         )
+        return context
+
+    def resume_after_recorded_human_decision(self) -> WorkflowContext:
+        context = self._require_context()
+        if context.state != WorkflowStage.AWAITING_HUMAN_DECISION:
+            raise WorkflowTransitionError(
+                f"cannot resume from state {context.state.value}; expected awaiting_human_decision"
+            )
+        pending = [request for request in context.human_decision_requests if request.status == "pending"]
+        if not pending:
+            raise WorkflowExecutionError("no pending human request to resume")
+        request = pending[-1]
+        if not any(decision.decision_request_id == request.decision_request_id for decision in context.human_decisions):
+            raise WorkflowExecutionError(f"no decision recorded for request: {request.decision_request_id}")
+        self._answer_request(context, request.decision_request_id)
         self._transition(context, WorkflowStage.RECOVERY_PLANNING)
         self._plan_recovery(context)
+        return context
+
+    def approve_final(self, actor: str = "simulated-approver") -> WorkflowContext:
+        context = self._require_context()
+        if context.state != WorkflowStage.AWAITING_FINAL_APPROVAL:
+            raise WorkflowTransitionError(
+                f"cannot approve from state {context.state.value}; expected awaiting_final_approval"
+            )
+        approval = self._simulated_final_approval(context, actor=actor)
+        context.human_decisions.append(approval)
+        context.audit.record(
+            "final_approval_recorded",
+            actor,
+            "Final approval recorded for accelerated logistics recommendation.",
+            metadata={"decision_id": approval.decision_id, "outcome": approval.outcome},
+        )
+        draft = context.draft_recommendation
+        if draft is None:
+            raise WorkflowExecutionError("cannot approve without a draft recommendation")
+        final = draft.model_copy(
+            update={
+                "status": "authorized",
+                "approval_status": "approved",
+                "summary": (
+                    "Accelerated logistics is authorized for the 13-day projected milestone "
+                    "delay without intervention: the 48000 USD mitigation is lower than the "
+                    "195000 USD unmitigated exposure, and the equipment is confirmed not onsite "
+                    "by human decision."
+                ),
+                "warnings": [
+                    "Authorization assumes accelerated logistics can still recover the 13-day projected milestone slip.",
+                    "Execution remains subject to implementing the approved logistics option before secondary effects emerge.",
+                ],
+            }
+        )
+        context.final_recommendation = final
+        context.audit.record(
+            "final_recommendation_created",
+            "RecoveryPlanner",
+            "Final recovery recommendation created.",
+            evidence=final.evidence,
+            metadata={
+                "recommendation_id": final.recommendation_id,
+                "approval_status": final.approval_status,
+                "preferred_option_id": final.preferred_option_id,
+            },
+        )
+        self._transition(context, WorkflowStage.COMPLETED)
+        context.audit.record(
+            "case_completed",
+            "workflow",
+            "Case workflow completed with final recommendation.",
+            metadata={"final_recommendation_id": final.recommendation_id},
+        )
         return context
 
     def write_artifacts(self, context: WorkflowContext) -> Path:
         run_path = context.config.artifacts_root / context.config.run_id
         replay_input = self._replay_input(context)
-        summary = {
-            "run_id": context.config.run_id,
-            "case_id": context.bundle.case.case_id,
-            "state": context.state.value,
-            "inject_commercial_failure": context.config.inject_commercial_failure,
-            "selected_experts": context.selections,
-            "expert_request_count": len(context.expert_requests),
-            "expert_finding_count": len(context.expert_findings),
-            "contradiction_count": len(context.contradictions),
-            "human_decision_count": len(context.human_decisions),
-            "audit_event_count": len(context.audit_events),
-            "run_path": run_path,
-        }
+        state = context_to_persisted_state(context)
+        summary = RunSummary(
+            run_id=context.config.run_id,
+            case_id=context.bundle.case.case_id,
+            state=context.state,
+            inject_commercial_failure=context.config.inject_commercial_failure,
+            selected_experts=context.selections,
+            expert_request_count=len(context.expert_requests),
+            expert_finding_count=len(context.expert_findings),
+            contradiction_count=len(context.contradictions),
+            human_decision_count=len(context.human_decisions),
+            audit_event_count=len(context.audit_events),
+            run_path=run_path.as_posix(),
+        )
+        write_json(run_path / "workflow-state.json", state)
         write_json(run_path / "run-summary.json", summary)
         write_json(run_path / "audit-events.json", context.audit_events)
         write_json(run_path / "expert-findings.json", context.expert_findings)
@@ -188,6 +272,7 @@ class LocalWorkflowRunner:
         write_json(run_path / "draft-recommendation.json", context.draft_recommendation)
         write_json(run_path / "final-recommendation.json", context.final_recommendation)
         write_json(run_path / "replay-input.json", replay_input)
+        self._write_artifact_manifest(run_path, context)
         return run_path
 
     def _initialize_context(self) -> WorkflowContext:
@@ -322,13 +407,23 @@ class LocalWorkflowRunner:
         request: ExpertRequest,
         bundle: CaseBundle,
     ) -> ExpertFinding:
-        if expert_role == "ScheduleExpert":
-            return self.schedule_expert.evaluate(request, bundle)
-        if expert_role == "CommercialExpert":
-            return self.commercial_expert.evaluate(request, bundle)
-        if expert_role == "RiskExpert":
-            return self.risk_expert.evaluate(request, bundle)
-        raise WorkflowExecutionError(f"unsupported finding expert role: {expert_role}")
+        result = self.expert_adapter.execute(
+            expert_role,
+            request,
+            bundle,
+            attempt=request.attempt,
+            correlation_id=f"corr-{request.request_id.lower()}",
+        )
+        if result.finding is not None:
+            return result.finding
+        return ExpertFinding(
+            finding_id=f"FIND-{expert_role.upper()}-ADAPTER-FAILED-{request.attempt:03d}",
+            request_id=request.request_id,
+            expert_role=expert_role,
+            status=ExpertStatus.FAILED,
+            failure_reason=result.failure_reason or f"{expert_role} adapter returned no finding",
+            retry_count=request.attempt - 1,
+        )
 
     def _review_contradictions(self, context: WorkflowContext) -> None:
         self._transition(context, WorkflowStage.CONTRADICTION_REVIEW)
@@ -350,7 +445,16 @@ class LocalWorkflowRunner:
             "EvidenceAuditor execution started.",
             metadata={"request_id": request.request_id, "attempt": 1},
         )
-        contradictions = self.evidence_auditor.audit(context.bundle.case, context.bundle)
+        result = self.expert_adapter.execute(
+            "EvidenceAuditor",
+            request,
+            context.bundle,
+            attempt=1,
+            correlation_id=f"corr-{request.request_id.lower()}",
+        )
+        if result.status != "completed":
+            raise WorkflowExecutionError(result.failure_reason or "EvidenceAuditor failed")
+        contradictions = result.contradictions
         context.contradictions.extend(contradictions)
         context.audit.record(
             "expert_execution_completed",
@@ -398,7 +502,16 @@ class LocalWorkflowRunner:
             "RecoveryPlanner execution started.",
             metadata={"request_id": request.request_id, "attempt": 1},
         )
-        base_recommendation = self.recovery_planner.plan(context.bundle.case, context.bundle)
+        result = self.expert_adapter.execute(
+            "RecoveryPlanner",
+            request,
+            context.bundle,
+            attempt=1,
+            correlation_id=f"corr-{request.request_id.lower()}",
+        )
+        if result.status != "completed" or result.recommendation is None:
+            raise WorkflowExecutionError(result.failure_reason or "RecoveryPlanner failed")
+        base_recommendation = result.recommendation
         draft = self._post_human_draft_recommendation(context, base_recommendation)
         context.draft_recommendation = draft
         option = draft.options_considered[0]
@@ -423,49 +536,6 @@ class LocalWorkflowRunner:
             metadata={"request_id": request.request_id, "recommendation_id": draft.recommendation_id},
         )
         self._transition(context, WorkflowStage.AWAITING_FINAL_APPROVAL)
-        approval = self._simulated_final_approval(context)
-        context.human_decisions.append(approval)
-        context.audit.record(
-            "final_approval_recorded",
-            "simulated-approver",
-            "Final approval recorded for accelerated logistics recommendation.",
-            metadata={"decision_id": approval.decision_id, "outcome": approval.outcome},
-        )
-        final = draft.model_copy(
-            update={
-                "status": "authorized",
-                "approval_status": "approved",
-                "summary": (
-                    "Accelerated logistics is authorized for the 13-day projected milestone "
-                    "delay without intervention: the 48000 USD mitigation is lower than the "
-                    "195000 USD unmitigated exposure, and the equipment is confirmed not onsite "
-                    "by simulated human decision."
-                ),
-                "warnings": [
-                    "Authorization assumes accelerated logistics can still recover the 13-day projected milestone slip.",
-                    "Execution remains subject to implementing the approved logistics option before secondary effects emerge.",
-                ],
-            }
-        )
-        context.final_recommendation = final
-        context.audit.record(
-            "final_recommendation_created",
-            "RecoveryPlanner",
-            "Final recovery recommendation created.",
-            evidence=final.evidence,
-            metadata={
-                "recommendation_id": final.recommendation_id,
-                "approval_status": final.approval_status,
-                "preferred_option_id": final.preferred_option_id,
-            },
-        )
-        self._transition(context, WorkflowStage.COMPLETED)
-        context.audit.record(
-            "case_completed",
-            "workflow",
-            "Case workflow completed with final recommendation.",
-            metadata={"final_recommendation_id": final.recommendation_id},
-        )
 
     def _post_human_draft_recommendation(
         self,
@@ -498,7 +568,7 @@ class LocalWorkflowRunner:
                     f"unmitigated exposure is {actual['unmitigated_exposure_usd']} USD; "
                     f"mitigation cost is {actual['mitigation_cost_usd']} USD; gross avoided exposure "
                     f"before secondary effects is {actual['gross_avoided_exposure_before_secondary_effects_usd']} USD. "
-                    "Equipment is confirmed not onsite by simulated human decision."
+                    "Equipment is confirmed not onsite by human decision."
                 ),
                 "warnings": [
                     "Draft recommendation remains subject to final authorization.",
@@ -537,33 +607,44 @@ class LocalWorkflowRunner:
             requested_by="EvidenceAuditor",
         )
 
-    def _simulated_not_onsite_decision(self, context: WorkflowContext) -> HumanDecision:
+    def _simulated_not_onsite_decision(
+        self,
+        context: WorkflowContext,
+        actor: str = "simulated-human",
+    ) -> HumanDecision:
         request = context.human_decision_requests[-1]
         evidence = request.evidence
         return HumanDecision(
             decision_id="HD-ONSITE-001",
             decision_request_id=request.decision_request_id,
             outcome="confirmed",
-            rationale="Simulated human decision confirms the generator skid is not onsite.",
-            decided_by="simulated-human",
+            rationale="Human decision confirms the generator skid is not onsite.",
+            decided_by=actor,
             decided_at=context.audit.model_timestamp(),
             evidence=evidence,
         )
 
-    def _simulated_final_approval(self, context: WorkflowContext) -> HumanDecision:
+    def _simulated_final_approval(
+        self,
+        context: WorkflowContext,
+        actor: str = "simulated-approver",
+    ) -> HumanDecision:
         return HumanDecision(
             decision_id="HD-FINAL-APPROVAL-001",
             decision_request_id="HDR-FINAL-APPROVAL-001",
             outcome="approved",
-            rationale="Simulated final approver authorizes the accelerated logistics recommendation.",
-            decided_by="simulated-approver",
+            rationale="Final approver authorizes the accelerated logistics recommendation.",
+            decided_by=actor,
             decided_at=context.audit.model_timestamp(),
             evidence=context.draft_recommendation.evidence if context.draft_recommendation else [],
         )
 
-    def _answer_latest_human_request(self, context: WorkflowContext) -> None:
-        request = context.human_decision_requests[-1]
-        context.human_decision_requests[-1] = request.model_copy(update={"status": "answered"})
+    def _answer_request(self, context: WorkflowContext, decision_request_id: str) -> None:
+        for index, request in enumerate(context.human_decision_requests):
+            if request.decision_request_id == decision_request_id:
+                context.human_decision_requests[index] = request.model_copy(update={"status": "answered"})
+                return
+        raise WorkflowExecutionError(f"unknown human decision request: {decision_request_id}")
 
     def _expert_request(
         self,
@@ -637,8 +718,59 @@ class LocalWorkflowRunner:
             "case_path": context.config.case_path.as_posix(),
             "inject_commercial_failure": context.config.inject_commercial_failure,
             "auto_human_decision": context.config.auto_human_decision,
-            "simulated_human_decision": {
-                "onsite_status": "not_onsite",
-                "decision_id": "HD-ONSITE-001",
-            },
+            "decisions": [
+                {
+                    "decision_id": decision.decision_id,
+                    "decision_request_id": decision.decision_request_id,
+                    "outcome": decision.outcome,
+                    "decided_by": decision.decided_by,
+                }
+                for decision in context.human_decisions
+            ],
         }
+
+    def _write_artifact_manifest(self, run_path: Path, context: WorkflowContext) -> None:
+        generated_at = (
+            context.audit_events[-1].occurred_at.isoformat()
+            if context.audit_events
+            else "2026-06-29T16:00:00+00:00"
+        )
+        entries = [
+            self._artifact_entry(run_path, "workflow-state.json", "project-recovery-council.persisted-workflow-state.v1", generated_at),
+            self._artifact_entry(run_path, "run-summary.json", "project-recovery-council.run-summary.v1", generated_at),
+            self._artifact_entry(run_path, "audit-events.json", "project-recovery-council.audit-events.v1", generated_at),
+            self._artifact_entry(run_path, "expert-findings.json", "project-recovery-council.expert-findings.v1", generated_at),
+            self._artifact_entry(run_path, "contradictions.json", "project-recovery-council.contradictions.v1", generated_at),
+            self._artifact_entry(run_path, "human-decisions.json", "project-recovery-council.human-decisions.v1", generated_at),
+            self._artifact_entry(run_path, "human-decision-requests.json", "project-recovery-council.human-decision-requests.v1", generated_at),
+            self._artifact_entry(run_path, "draft-recommendation.json", "project-recovery-council.nullable-final-recommendation.v1", generated_at, required=False),
+            self._artifact_entry(run_path, "final-recommendation.json", "project-recovery-council.nullable-final-recommendation.v1", generated_at, required=False),
+            self._artifact_entry(run_path, "replay-input.json", "project-recovery-council.replay-input.v1", generated_at),
+        ]
+        manifest = RunArtifactManifest(
+            run_id=context.config.run_id,
+            case_id=context.bundle.case.case_id,
+            workflow_status=context.state,
+            generated_at=generated_at,
+            artifacts=entries,
+        )
+        write_json(run_path / "artifact-manifest.json", manifest)
+
+    def _artifact_entry(
+        self,
+        run_path: Path,
+        name: str,
+        schema_id: str,
+        generated_at: str,
+        *,
+        required: bool = True,
+    ) -> ArtifactEntry:
+        path = run_path / name
+        return ArtifactEntry(
+            name=name,
+            relative_path=name,
+            schema_id=schema_id,
+            sha256=sha256_file(path),
+            generated_at=generated_at,
+            required=required,
+        )

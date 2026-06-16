@@ -31,10 +31,15 @@ class DeterministicClock:
 class AuditRecorder:
     """Append-only ordered audit event builder."""
 
-    def __init__(self, case_id: str, clock: DeterministicClock | None = None) -> None:
+    def __init__(
+        self,
+        case_id: str,
+        clock: DeterministicClock | None = None,
+        existing_events: list[AuditEvent] | None = None,
+    ) -> None:
         self.case_id = case_id
         self.clock = clock or DeterministicClock()
-        self._events: list[AuditEvent] = []
+        self._events: list[AuditEvent] = list(existing_events or [])
 
     @property
     def events(self) -> list[AuditEvent]:
@@ -69,4 +74,3 @@ class AuditRecorder:
         """Return a deterministic timestamp for non-audit model fields."""
 
         return self.clock.now()
-

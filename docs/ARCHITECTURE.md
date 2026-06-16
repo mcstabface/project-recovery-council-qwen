@@ -11,6 +11,8 @@ fixtures. The boundary is intentionally narrow:
 - abstract expert interfaces
 - deterministic stubs for contract tests
 - local orchestration layer and CLI
+- versioned schema export
+- persisted run-state and artifact contract validation
 
 No runtime code connects to external systems.
 
@@ -27,23 +29,29 @@ No runtime code connects to external systems.
 6. The `EvidenceAuditor` detects contradictory evidence.
 7. Unresolved contradictions create a `HumanDecisionRequest` and pause the
    workflow in `awaiting_human_decision`.
-8. A deterministic simulated human decision can resume the workflow.
-9. The `RecoveryPlanner` builds draft and final recommendations within the
-   boundaries.
-10. Audit history and run artifacts are written for replay.
+8. A separate invocation records a human decision and another invocation resumes
+   the workflow to final approval.
+9. A final approval invocation completes the case.
+10. Audit history and run artifacts are written for replay and inspection.
 
 ## Orchestration Layer
 
 The orchestration layer is explicit and separate from expert stubs:
 
-- `state.py` defines workflow states, selections, context, and transition
-  validation.
+- `state.py` defines workflow states, selections, persisted workflow state, and
+  transition validation.
 - `audit.py` emits ordered immutable audit events with deterministic timestamps.
 - `director.py` contains rule-based local expert selection and retry approval.
+- `adapters.py` defines the platform-neutral expert execution adapter boundary.
 - `workflow.py` runs validation, triage, expert execution, contradiction review,
   human decision pause/resume, recovery planning, final approval, and completion.
 - `serialization.py` writes JSON artifacts and compares replay equivalence.
-- `runner.py` and `__main__.py` expose local run, validate, and replay commands.
+- `persistence.py` converts between in-memory workflow context and versioned
+  persisted state.
+- `artifacts.py` defines the run artifact manifest and validates run directories.
+- `schemas.py` exports public JSON Schemas and the schema catalog.
+- `runner.py` and `__main__.py` expose local validate, start, status, decide,
+  resume, approve, inspect, run, replay, and schema export commands.
 
 Workflow stages are:
 
@@ -59,6 +67,35 @@ Workflow stages are:
 - `failed`
 
 Invalid transitions raise `WorkflowTransitionError`.
+
+## Persistent Pause And Resume
+
+`workflow-state.json` is the authoritative resumable state artifact. It contains
+schema version, run ID, case ID, current stage, completed stages, selected
+experts, expert requests and attempts, findings, contradictions, pending and
+answered human requests, received decisions, recovery options, draft and final
+recommendations, approval state, audit sequence position, audit events, and
+failure information when present.
+
+The workflow does not automatically provide human decisions in the core
+lifecycle. The `run` command is a demo helper that explicitly opts into simulated
+human decision and final approval.
+
+## Expert Adapter Boundary
+
+`ExpertAdapter` decouples orchestration from concrete expert execution. Adapter
+results carry expert name, request ID, attempt number, status, structured result,
+typed failure or timeout representation, correlation ID, and metadata for future
+external orchestration.
+
+Available adapters:
+
+- `DeterministicExpertAdapter`: wraps local deterministic stubs.
+- `ExternalExpertAdapter`: safely disabled placeholder that returns a typed
+  failure and performs no network or SDK call.
+
+The workflow calls the adapter boundary for ScheduleExpert, CommercialExpert,
+RiskExpert, EvidenceAuditor, and RecoveryPlanner.
 
 ## Expert Interfaces
 
@@ -97,6 +134,8 @@ For the current case, `RuleBasedDirector` selects:
 - Replay comparison ignores timestamps and run-specific identifiers while
   comparing logical findings, audit event ordering, decisions, contradictions,
   and final recommendation content.
+- Artifact inspection fails incomplete runs that claim completion and completed
+  runs that lack final approval or final recommendation.
 
 ## Future Integration Points
 

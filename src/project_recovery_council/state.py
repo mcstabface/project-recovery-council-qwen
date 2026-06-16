@@ -7,6 +7,8 @@ from enum import StrEnum
 from pathlib import Path
 from typing import Literal
 
+from pydantic import Field
+
 from project_recovery_council.audit import AuditRecorder
 from project_recovery_council.contracts import (
     AuditEvent,
@@ -17,6 +19,7 @@ from project_recovery_council.contracts import (
     FinalRecommendation,
     HumanDecision,
     HumanDecisionRequest,
+    RecoveryOption,
 )
 from project_recovery_council.fixtures import CaseBundle
 
@@ -76,6 +79,54 @@ class ExpertSelection(ContractModel):
     required: bool = True
 
 
+class ExpertAttemptRecord(ContractModel):
+    """Persisted record of one expert execution attempt."""
+
+    expert_role: str
+    request_id: str
+    attempt: int
+    status: str
+    finding_id: str | None = None
+    failure_reason: str | None = None
+    correlation_id: str | None = None
+
+
+class WorkflowFailureInfo(ContractModel):
+    """Persisted failure information for a failed workflow."""
+
+    stage: WorkflowStage
+    error_type: str
+    message: str
+
+
+class PersistedWorkflowState(ContractModel):
+    """Versioned persisted state sufficient to resume a workflow in a new process."""
+
+    schema_version: str = "project-recovery-council.persisted-workflow-state.v1"
+    run_id: str
+    case_id: str
+    case_path: str
+    artifacts_root: str
+    current_workflow_stage: WorkflowStage
+    completed_stages: list[WorkflowStage] = Field(default_factory=list)
+    selected_experts: list[ExpertSelection] = Field(default_factory=list)
+    expert_requests: list[ExpertRequest] = Field(default_factory=list)
+    expert_attempts: list[ExpertAttemptRecord] = Field(default_factory=list)
+    expert_findings: list[ExpertFinding] = Field(default_factory=list)
+    contradictions: list[Contradiction] = Field(default_factory=list)
+    pending_human_requests: list[HumanDecisionRequest] = Field(default_factory=list)
+    answered_human_requests: list[HumanDecisionRequest] = Field(default_factory=list)
+    received_human_decisions: list[HumanDecision] = Field(default_factory=list)
+    recovery_options: list[RecoveryOption] = Field(default_factory=list)
+    draft_recommendation: FinalRecommendation | None = None
+    final_recommendation: FinalRecommendation | None = None
+    approval_state: Literal["not_requested", "pending", "approved", "rejected"] = "not_requested"
+    audit_sequence_position: int = 0
+    audit_events: list[AuditEvent] = Field(default_factory=list)
+    inject_commercial_failure: bool = False
+    failure_information: WorkflowFailureInfo | None = None
+
+
 @dataclass(frozen=True)
 class WorkflowConfig:
     """Configurable inputs for one local workflow execution."""
@@ -84,7 +135,8 @@ class WorkflowConfig:
     artifacts_root: Path
     run_id: str
     inject_commercial_failure: bool = False
-    auto_human_decision: bool = True
+    auto_human_decision: bool = False
+    auto_final_approval: bool = False
 
 
 @dataclass
@@ -108,4 +160,3 @@ class WorkflowContext:
     @property
     def audit_events(self) -> list[AuditEvent]:
         return self.audit.events
-

@@ -1,0 +1,95 @@
+{
+  "$defs": {
+    "WorkflowStage": {
+      "enum": [
+        "initialized",
+        "validating",
+        "triaging",
+        "expert_analysis",
+        "contradiction_review",
+        "awaiting_human_decision",
+        "recovery_planning",
+        "awaiting_final_approval",
+        "completed",
+        "failed"
+      ],
+      "title": "WorkflowStage",
+      "type": "string"
+    }
+  },
+  "$id": "project-recovery-council.run-summary.v1",
+  "additionalProperties": false,
+  "description": "Small summary of a workflow run.",
+  "properties": {
+    "audit_event_count": {
+      "minimum": 0,
+      "title": "Audit Event Count",
+      "type": "integer"
+    },
+    "case_id": {
+      "title": "Case Id",
+      "type": "string"
+    },
+    "contradiction_count": {
+      "minimum": 0,
+      "title": "Contradiction Count",
+      "type": "integer"
+    },
+    "expert_finding_count": {
+      "minimum": 0,
+      "title": "Expert Finding Count",
+      "type": "integer"
+    },
+    "expert_request_count": {
+      "minimum": 0,
+      "title": "Expert Request Count",
+      "type": "integer"
+    },
+    "human_decision_count": {
+      "minimum": 0,
+      "title": "Human Decision Count",
+      "type": "integer"
+    },
+    "inject_commercial_failure": {
+      "title": "Inject Commercial Failure",
+      "type": "boolean"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "run_path": {
+      "title": "Run Path",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "project-recovery-council.run-summary.v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "selected_experts": {
+      "items": {},
+      "title": "Selected Experts",
+      "type": "array"
+    },
+    "state": {
+      "$ref": "#/$defs/WorkflowStage"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_id",
+    "state",
+    "inject_commercial_failure",
+    "selected_experts",
+    "expert_request_count",
+    "expert_finding_count",
+    "contradiction_count",
+    "human_decision_count",
+    "audit_event_count",
+    "run_path"
+  ],
+  "title": "RunSummary",
+  "type": "object",
+  "x-schema-version": "v1"
+}

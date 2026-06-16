@@ -1,0 +1,42 @@
+{
+  "$id": "project-recovery-council.evidence-reference.v1",
+  "additionalProperties": false,
+  "description": "Source-level pointer used by findings, decisions, and recommendations.",
+  "properties": {
+    "excerpt": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Excerpt"
+    },
+    "locator": {
+      "minLength": 1,
+      "title": "Locator",
+      "type": "string"
+    },
+    "record_id": {
+      "minLength": 1,
+      "title": "Record Id",
+      "type": "string"
+    },
+    "source_file": {
+      "minLength": 1,
+      "title": "Source File",
+      "type": "string"
+    }
+  },
+  "required": [
+    "record_id",
+    "source_file",
+    "locator"
+  ],
+  "title": "EvidenceReference",
+  "type": "object",
+  "x-schema-version": "v1"
+}

@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "ArtifactEntry": {
+      "additionalProperties": false,
+      "description": "Manifest entry for one generated run artifact.",
+      "properties": {
+        "generated_at": {
+          "minLength": 1,
+          "title": "Generated At",
+          "type": "string"
+        },
+        "media_type": {
+          "default": "application/json",
+          "title": "Media Type",
+          "type": "string"
+        },
+        "name": {
+          "minLength": 1,
+          "title": "Name",
+          "type": "string"
+        },
+        "relative_path": {
+          "minLength": 1,
+          "title": "Relative Path",
+          "type": "string"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "schema_id": {
+          "minLength": 1,
+          "title": "Schema Id",
+          "type": "string"
+        },
+        "sha256": {
+          "maxLength": 64,
+          "minLength": 64,
+          "title": "Sha256",
+          "type": "string"
+        }
+      },
+      "required": [
+        "name",
+        "relative_path",
+        "schema_id",
+        "sha256",
+        "generated_at"
+      ],
+      "title": "ArtifactEntry",
+      "type": "object"
+    },
+    "WorkflowStage": {
+      "enum": [
+        "initialized",
+        "validating",
+        "triaging",
+        "expert_analysis",
+        "contradiction_review",
+        "awaiting_human_decision",
+        "recovery_planning",
+        "awaiting_final_approval",
+        "completed",
+        "failed"
+      ],
+      "title": "WorkflowStage",
+      "type": "string"
+    }
+  },
+  "$id": "project-recovery-council.run-artifact-manifest.v1",
+  "additionalProperties": false,
+  "description": "Formal manifest for inspectable workflow run artifacts.",
+  "properties": {
+    "artifact_contract_version": {
+      "default": "project-recovery-council.run-artifacts.v1",
+      "title": "Artifact Contract Version",
+      "type": "string"
+    },
+    "artifacts": {
+      "items": {
+        "$ref": "#/$defs/ArtifactEntry"
+      },
+      "minItems": 1,
+      "title": "Artifacts",
+      "type": "array"
+    },
+    "case_id": {
+      "minLength": 1,
+      "title": "Case Id",
+      "type": "string"
+    },
+    "generated_at": {
+      "minLength": 1,
+      "title": "Generated At",
+      "type": "string"
+    },
+    "run_id": {
+      "minLength": 1,
+      "title": "Run Id",
+      "type": "string"
+    },
+    "workflow_status": {
+      "$ref": "#/$defs/WorkflowStage"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_id",
+    "workflow_status",
+    "generated_at",
+    "artifacts"
+  ],
+  "title": "RunArtifactManifest",
+  "type": "object",
+  "x-schema-version": "v1"
+}

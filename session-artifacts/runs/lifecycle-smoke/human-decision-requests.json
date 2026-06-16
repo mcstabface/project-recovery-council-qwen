@@ -1,0 +1,60 @@
+[
+  {
+    "blocking": true,
+    "case_id": "PRC-EQ-DELAY-001",
+    "contradictions": [
+      {
+        "conflicting_evidence": [
+          {
+            "excerpt": "The generator skid is onsite and released to installation.",
+            "locator": "section:Equipment Status",
+            "record_id": "PRG-ONSITE-001",
+            "source_file": "progress-report.md"
+          },
+          {
+            "excerpt": "The generator skid has not arrived at the site.",
+            "locator": "section:Supplier Message",
+            "record_id": "SUP-NOT-ARRIVED-001",
+            "source_file": "supplier-correspondence.md"
+          },
+          {
+            "excerpt": "actual_arrival_date is null",
+            "locator": "/records/0/actual_arrival_date",
+            "record_id": "LOG-STATUS-001",
+            "source_file": "logistics-status.json"
+          }
+        ],
+        "contradiction_id": "CONTRA-ONSITE-001",
+        "issue": "equipment_onsite_status",
+        "requires_human_confirmation": true,
+        "status": "unresolved",
+        "summary": "Progress reporting says the equipment is onsite, but supplier correspondence and the logistics record show it has not arrived."
+      }
+    ],
+    "decision_request_id": "HDR-ONSITE-001",
+    "evidence": [
+      {
+        "excerpt": "The generator skid is onsite and released to installation.",
+        "locator": "section:Equipment Status",
+        "record_id": "PRG-ONSITE-001",
+        "source_file": "progress-report.md"
+      },
+      {
+        "excerpt": "The generator skid has not arrived at the site.",
+        "locator": "section:Supplier Message",
+        "record_id": "SUP-NOT-ARRIVED-001",
+        "source_file": "supplier-correspondence.md"
+      },
+      {
+        "excerpt": "actual_arrival_date is null",
+        "locator": "/records/0/actual_arrival_date",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "question": "Confirm whether the generator skid has physically arrived onsite.",
+    "reason": "Onsite status is contradicted by cited source records.",
+    "requested_by": "EvidenceAuditor",
+    "status": "answered"
+  }
+]

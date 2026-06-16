@@ -1,0 +1,21 @@
+{
+  "auto_human_decision": true,
+  "case_path": "sample-data/equipment-delay-case",
+  "decisions": [
+    {
+      "decided_by": "simulated-human",
+      "decision_id": "HD-ONSITE-001",
+      "decision_request_id": "HDR-ONSITE-001",
+      "outcome": "confirmed"
+    },
+    {
+      "decided_by": "simulated-approver",
+      "decision_id": "HD-FINAL-APPROVAL-001",
+      "decision_request_id": "HDR-FINAL-APPROVAL-001",
+      "outcome": "approved"
+    }
+  ],
+  "inject_commercial_failure": false,
+  "run_id": "complete-contract-demo-replay",
+  "schema_version": "project-recovery-council.replay-input.v1"
+}

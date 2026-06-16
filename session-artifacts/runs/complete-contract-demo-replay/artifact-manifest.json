@@ -1,0 +1,99 @@
+{
+  "artifact_contract_version": "project-recovery-council.run-artifacts.v1",
+  "artifacts": [
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "workflow-state.json",
+      "relative_path": "workflow-state.json",
+      "required": true,
+      "schema_id": "project-recovery-council.persisted-workflow-state.v1",
+      "sha256": "85a3e00b68db5a00de8c9ffe1891f22c0c048846d296516772a5c3ecc8523ab5"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "run-summary.json",
+      "relative_path": "run-summary.json",
+      "required": true,
+      "schema_id": "project-recovery-council.run-summary.v1",
+      "sha256": "80a8ffd9445f2f9cf95bc0303fcf2ced0154d58d492711f5a079e078c5dd262b"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "audit-events.json",
+      "relative_path": "audit-events.json",
+      "required": true,
+      "schema_id": "project-recovery-council.audit-events.v1",
+      "sha256": "33480327e32cbe354cf7fd1e043d45da64bcdb82ab24f41be7a7e05c504d6778"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "expert-findings.json",
+      "relative_path": "expert-findings.json",
+      "required": true,
+      "schema_id": "project-recovery-council.expert-findings.v1",
+      "sha256": "5e774539a0afc7e2e15cf128cb0eaa1c45db53d885866e5f352a5fb522c8cdae"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "contradictions.json",
+      "relative_path": "contradictions.json",
+      "required": true,
+      "schema_id": "project-recovery-council.contradictions.v1",
+      "sha256": "5a88c08814c16b44f3c4b5c624be11721eb3186835529d3c90c6a8c093e2dd07"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "human-decisions.json",
+      "relative_path": "human-decisions.json",
+      "required": true,
+      "schema_id": "project-recovery-council.human-decisions.v1",
+      "sha256": "54c4367f7de00e2efa665f5c40027f48f038e5fdf8f5bbd19e085d47b1a327d9"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "human-decision-requests.json",
+      "relative_path": "human-decision-requests.json",
+      "required": true,
+      "schema_id": "project-recovery-council.human-decision-requests.v1",
+      "sha256": "ca03599f089694a66bd8cb597f7689525aaad24520805d13e35e884ab0603da6"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "draft-recommendation.json",
+      "relative_path": "draft-recommendation.json",
+      "required": false,
+      "schema_id": "project-recovery-council.nullable-final-recommendation.v1",
+      "sha256": "e4f2024e8378b4d8411caad4694a0326c23faac417ccb28057b72bce326a9d6f"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "final-recommendation.json",
+      "relative_path": "final-recommendation.json",
+      "required": false,
+      "schema_id": "project-recovery-council.nullable-final-recommendation.v1",
+      "sha256": "1f5fdd22d240a1717a1db803b9d367952acda3eca33deadb73a700cb8103a9a8"
+    },
+    {
+      "generated_at": "2026-06-29T16:00:40+00:00",
+      "media_type": "application/json",
+      "name": "replay-input.json",
+      "relative_path": "replay-input.json",
+      "required": true,
+      "schema_id": "project-recovery-council.replay-input.v1",
+      "sha256": "70f2281ac5566540a5e8041d6f5d81e514948e8a3ef1304fa5ee7ba646ffab8d"
+    }
+  ],
+  "case_id": "PRC-EQ-DELAY-001",
+  "generated_at": "2026-06-29T16:00:40+00:00",
+  "run_id": "complete-contract-demo-replay",
+  "workflow_status": "completed"
+}

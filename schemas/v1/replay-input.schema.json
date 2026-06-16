@@ -1,0 +1,45 @@
+{
+  "$id": "project-recovery-council.replay-input.v1",
+  "additionalProperties": false,
+  "description": "Replay input recorded with each run.",
+  "properties": {
+    "auto_human_decision": {
+      "default": false,
+      "title": "Auto Human Decision",
+      "type": "boolean"
+    },
+    "case_path": {
+      "title": "Case Path",
+      "type": "string"
+    },
+    "decisions": {
+      "items": {
+        "additionalProperties": true,
+        "type": "object"
+      },
+      "title": "Decisions",
+      "type": "array"
+    },
+    "inject_commercial_failure": {
+      "title": "Inject Commercial Failure",
+      "type": "boolean"
+    },
+    "run_id": {
+      "title": "Run Id",
+      "type": "string"
+    },
+    "schema_version": {
+      "default": "project-recovery-council.replay-input.v1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "run_id",
+    "case_path",
+    "inject_commercial_failure"
+  ],
+  "title": "ReplayInput",
+  "type": "object",
+  "x-schema-version": "v1"
+}

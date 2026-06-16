@@ -16,16 +16,23 @@ Completed in this run:
 - CLI commands for validate, run, failure-injection run, and replay
 - replayable run artifacts
 - deterministic commercial-expert failure injection and retry tests
+- persistent pause/resume across process invocations
+- versioned JSON Schema exports and schema catalog
+- expert adapter boundary
+- run artifact manifest and inspect command
+- replay acceptance profile
+- UiPath Maestro mapping document
 
 ## Next Slice
 
-Harden the workflow output contract:
+Harden compatibility and review ergonomics:
 
-- add JSON Schema exports for public contracts and run artifacts
-- add a fixture replay acceptance document
 - add a small sample artifact index for human review
 - add explicit case-state mutation helpers if future workflows need persisted
   case snapshots
+- add contract compatibility tests that compare generated schemas to checked-in
+  schemas
+- add a migration policy document before any v2 schema work begins
 
 ## Later Slices
 

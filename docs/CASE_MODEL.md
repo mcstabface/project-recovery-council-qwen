@@ -19,6 +19,10 @@ The foundation defines typed models for:
 - `RecoveryOption`
 - `FinalRecommendation`
 - `AuditEvent`
+- persisted workflow state
+- run summary
+- replay input
+- run artifact manifest
 
 ## Evidence References
 
@@ -76,7 +80,7 @@ Audit events are not private reasoning logs.
 ## Workflow State
 
 Workflow state is represented outside the case contract in the local execution
-context. Allowed stages are:
+context and in the persisted `workflow-state.json` artifact. Allowed stages are:
 
 - `initialized`
 - `validating`
@@ -93,9 +97,20 @@ Transitions are validated before state changes. This keeps case lifecycle
 semantics explicit without embedding orchestration-specific mutable state inside
 expert findings.
 
+`workflow-state.json` is versioned as
+`project-recovery-council.persisted-workflow-state.v1`. Incompatible versions
+fail clearly and are not silently migrated.
+
 ## Recommendation Approval
 
 `FinalRecommendation` now carries optional confidence and an `approval_status`.
 The local workflow creates a draft recommendation after human confirmation and
 then records deterministic final approval before creating the authorized final
 recommendation.
+
+## Run Artifact Manifest
+
+Each run writes `artifact-manifest.json` using
+`project-recovery-council.run-artifacts.v1`. Manifest entries include relative
+path, media type, schema identifier, SHA-256 checksum, generation timestamp, and
+required/optional status.

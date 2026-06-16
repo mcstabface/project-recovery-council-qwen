@@ -1,0 +1,126 @@
+{
+  "run_id": "project-recovery-council-contracts-resume-2026-06-16",
+  "created_on": "2026-06-16",
+  "status": "complete",
+  "scope": "versioned contracts, adapter boundary, persistent pause/resume, artifact validation",
+  "created_or_modified_files": [
+    "README.md",
+    "docs/ARCHITECTURE.md",
+    "docs/CASE_MODEL.md",
+    "docs/DEVELOPMENT_PLAN.md",
+    "docs/REPLAY_ACCEPTANCE_PROFILE.json",
+    "docs/RUN_ARTIFACT_CONTRACT.md",
+    "docs/UIPATH_MAESTRO_MAPPING.md",
+    "decisions/ADR-0003-versioned-contracts-and-resumable-workflows.md",
+    "schemas/v1/schema-catalog.json",
+    "src/project_recovery_council/__init__.py",
+    "src/project_recovery_council/__main__.py",
+    "src/project_recovery_council/adapters.py",
+    "src/project_recovery_council/artifacts.py",
+    "src/project_recovery_council/audit.py",
+    "src/project_recovery_council/persistence.py",
+    "src/project_recovery_council/runner.py",
+    "src/project_recovery_council/schemas.py",
+    "src/project_recovery_council/serialization.py",
+    "src/project_recovery_council/state.py",
+    "src/project_recovery_council/workflow.py",
+    "tests/test_contract_hardening.py",
+    "tests/test_workflow_runner.py",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_16_CONTRACTS_RESUME.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_16_CONTRACTS_RESUME.json"
+  ],
+  "schema_export": {
+    "directory": "schemas/v1",
+    "schema_count": 15,
+    "catalog": "schemas/v1/schema-catalog.json",
+    "schema_ids": [
+      "project-recovery-council.recovery-case.v1",
+      "project-recovery-council.evidence-record.v1",
+      "project-recovery-council.evidence-reference.v1",
+      "project-recovery-council.expert-request.v1",
+      "project-recovery-council.expert-finding.v1",
+      "project-recovery-council.contradiction.v1",
+      "project-recovery-council.human-decision-request.v1",
+      "project-recovery-council.human-decision.v1",
+      "project-recovery-council.recovery-option.v1",
+      "project-recovery-council.final-recommendation.v1",
+      "project-recovery-council.audit-event.v1",
+      "project-recovery-council.persisted-workflow-state.v1",
+      "project-recovery-council.run-summary.v1",
+      "project-recovery-council.replay-input.v1",
+      "project-recovery-council.run-artifact-manifest.v1"
+    ]
+  },
+  "tests_run": [
+    {
+      "command": "python -m pytest",
+      "result": "passed",
+      "stdout_summary": "37 passed in 1.03s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council export-schemas",
+      "result": "passed",
+      "stdout_summary": "schemas exported: schemas/v1; schema count: 15"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council start --run-id paused-contract-demo",
+      "result": "passed",
+      "stdout_summary": "run started: session-artifacts/runs/paused-contract-demo; stage: awaiting_human_decision"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council decide session-artifacts/runs/paused-contract-demo --request-id HDR-ONSITE-001 --decision equipment_not_onsite --actor demo-reviewer",
+      "result": "passed",
+      "stdout_summary": "decision recorded: HDR-ONSITE-001; stage: awaiting_human_decision"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council resume session-artifacts/runs/paused-contract-demo",
+      "result": "passed",
+      "stdout_summary": "run resumed: session-artifacts/runs/paused-contract-demo; stage: awaiting_final_approval"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council approve session-artifacts/runs/paused-contract-demo --actor demo-approver",
+      "result": "passed",
+      "stdout_summary": "approval recorded: demo-approver; stage: completed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council inspect session-artifacts/runs/paused-contract-demo",
+      "result": "passed",
+      "stdout_summary": "artifact inspection passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council replay session-artifacts/runs/complete-contract-demo --run-id complete-contract-demo-replay",
+      "result": "passed",
+      "stdout_summary": "replay completed: session-artifacts/runs/complete-contract-demo-replay; logically equivalent: true"
+    }
+  ],
+  "canonical_run_artifacts": [
+    "session-artifacts/runs/awaiting-human-contract-demo/",
+    "session-artifacts/runs/awaiting-approval-contract-demo/",
+    "session-artifacts/runs/paused-contract-demo/",
+    "session-artifacts/runs/complete-contract-demo/",
+    "session-artifacts/runs/complete-contract-demo-replay/"
+  ],
+  "adapter_architecture": {
+    "deterministic": "DeterministicExpertAdapter wraps local stubs",
+    "external": "ExternalExpertAdapter is safely disabled and returns typed failure"
+  },
+  "artifact_validation": {
+    "checks_required_files": true,
+    "checks_json_parse": true,
+    "checks_pydantic_models": true,
+    "checks_sha256": true,
+    "checks_audit_sequence": true,
+    "checks_evidence_references": true,
+    "checks_pending_gates": true,
+    "checks_completion_claims": true
+  },
+  "known_limitations": [
+    "No byte-for-byte schema drift test yet.",
+    "No contract migration policy for future v2 schemas yet.",
+    "Run IDs are caller-controlled and reused IDs overwrite the existing run directory.",
+    "Artifact inspection uses Pydantic validation rather than an independent JSON Schema validator.",
+    "ExternalExpertAdapter is intentionally disabled."
+  ],
+  "next_recommended_step": "Add schema drift tests and a contract migration policy before integration work."
+}
+

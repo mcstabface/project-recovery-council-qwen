@@ -1,0 +1,8 @@
+{
+  "auto_human_decision": false,
+  "case_path": "sample-data/equipment-delay-case",
+  "decisions": [],
+  "inject_commercial_failure": false,
+  "run_id": "awaiting-human-contract-demo",
+  "schema_version": "project-recovery-council.replay-input.v1"
+}

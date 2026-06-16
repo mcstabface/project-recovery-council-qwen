@@ -1,0 +1,113 @@
+{
+  "$defs": {
+    "CaseStage": {
+      "enum": [
+        "intake",
+        "evidence_review",
+        "expert_analysis",
+        "human_confirmation",
+        "recovery_planning",
+        "final_recommendation"
+      ],
+      "title": "CaseStage",
+      "type": "string"
+    },
+    "EvidenceReference": {
+      "additionalProperties": false,
+      "description": "Source-level pointer used by findings, decisions, and recommendations.",
+      "properties": {
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "title": "Source File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_file",
+        "locator"
+      ],
+      "title": "EvidenceReference",
+      "type": "object"
+    }
+  },
+  "$id": "project-recovery-council.expert-request.v1",
+  "additionalProperties": false,
+  "description": "Narrow work packet sent from the Director to a specialist.",
+  "properties": {
+    "attempt": {
+      "default": 1,
+      "minimum": 1,
+      "title": "Attempt",
+      "type": "integer"
+    },
+    "case_id": {
+      "minLength": 1,
+      "title": "Case Id",
+      "type": "string"
+    },
+    "evidence_scope": {
+      "items": {
+        "$ref": "#/$defs/EvidenceReference"
+      },
+      "title": "Evidence Scope",
+      "type": "array"
+    },
+    "expert_role": {
+      "minLength": 1,
+      "title": "Expert Role",
+      "type": "string"
+    },
+    "max_attempts": {
+      "default": 2,
+      "minimum": 1,
+      "title": "Max Attempts",
+      "type": "integer"
+    },
+    "question": {
+      "minLength": 1,
+      "title": "Question",
+      "type": "string"
+    },
+    "request_id": {
+      "minLength": 1,
+      "title": "Request Id",
+      "type": "string"
+    },
+    "stage": {
+      "$ref": "#/$defs/CaseStage"
+    }
+  },
+  "required": [
+    "request_id",
+    "case_id",
+    "expert_role",
+    "stage",
+    "question"
+  ],
+  "title": "ExpertRequest",
+  "type": "object",
+  "x-schema-version": "v1"
+}

@@ -1,0 +1,759 @@
+[
+  {
+    "action": "case_created",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0001",
+    "event_type": "case_created",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "record",
+        "record_id": "CASE-INTAKE-001",
+        "source_file": "case.json"
+      }
+    ],
+    "metadata": {
+      "title": "Synthetic generator skid delivery delay"
+    },
+    "occurred_at": "2026-06-29T16:00:00Z",
+    "sequence": 1,
+    "summary": "Recovery case created from synthetic fixture bundle."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0002",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "initialized",
+      "to": "validating"
+    },
+    "occurred_at": "2026-06-29T16:00:01Z",
+    "sequence": 2,
+    "summary": "Workflow stage changed from initialized to validating."
+  },
+  {
+    "action": "fixture_validation_started",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0003",
+    "event_type": "fixture_validation_started",
+    "evidence": [],
+    "metadata": {
+      "case_path": "sample-data/equipment-delay-case"
+    },
+    "occurred_at": "2026-06-29T16:00:02Z",
+    "sequence": 3,
+    "summary": "Fixture validation started."
+  },
+  {
+    "action": "fixture_validation_completed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0004",
+    "event_type": "fixture_validation_completed",
+    "evidence": [],
+    "metadata": {
+      "evidence_record_count": 8
+    },
+    "occurred_at": "2026-06-29T16:00:03Z",
+    "sequence": 4,
+    "summary": "Fixture validation completed successfully."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0005",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "validating",
+      "to": "triaging"
+    },
+    "occurred_at": "2026-06-29T16:00:04Z",
+    "sequence": 5,
+    "summary": "Workflow stage changed from validating to triaging."
+  },
+  {
+    "action": "expert_selected",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0006",
+    "event_type": "expert_selected",
+    "evidence": [],
+    "metadata": {
+      "expert_role": "ScheduleExpert",
+      "phase": "expert_analysis",
+      "rationale": "Delivery forecast moved later than baseline and milestone impact must be calculated."
+    },
+    "occurred_at": "2026-06-29T16:00:05Z",
+    "sequence": 6,
+    "summary": "ScheduleExpert selected."
+  },
+  {
+    "action": "expert_selected",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0007",
+    "event_type": "expert_selected",
+    "evidence": [],
+    "metadata": {
+      "expert_role": "CommercialExpert",
+      "phase": "expert_analysis",
+      "rationale": "Cost summary contains delay exposure and mitigation economics."
+    },
+    "occurred_at": "2026-06-29T16:00:06Z",
+    "sequence": 7,
+    "summary": "CommercialExpert selected."
+  },
+  {
+    "action": "expert_selected",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0008",
+    "event_type": "expert_selected",
+    "evidence": [],
+    "metadata": {
+      "expert_role": "EvidenceAuditor",
+      "phase": "contradiction_review",
+      "rationale": "Onsite progress assertion conflicts with logistics arrival data."
+    },
+    "occurred_at": "2026-06-29T16:00:07Z",
+    "sequence": 8,
+    "summary": "EvidenceAuditor selected."
+  },
+  {
+    "action": "expert_selected",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0009",
+    "event_type": "expert_selected",
+    "evidence": [],
+    "metadata": {
+      "expert_role": "RiskExpert",
+      "phase": "expert_analysis",
+      "rationale": "Risk register contains an unresolved status-conflict risk."
+    },
+    "occurred_at": "2026-06-29T16:00:08Z",
+    "sequence": 9,
+    "summary": "RiskExpert selected."
+  },
+  {
+    "action": "expert_selected",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0010",
+    "event_type": "expert_selected",
+    "evidence": [],
+    "metadata": {
+      "expert_role": "RecoveryPlanner",
+      "phase": "recovery_planning",
+      "rationale": "Approved accelerated logistics option is available subject to project approval."
+    },
+    "occurred_at": "2026-06-29T16:00:09Z",
+    "sequence": 10,
+    "summary": "RecoveryPlanner selected."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0011",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "triaging",
+      "to": "expert_analysis"
+    },
+    "occurred_at": "2026-06-29T16:00:10Z",
+    "sequence": 11,
+    "summary": "Workflow stage changed from triaging to expert_analysis."
+  },
+  {
+    "action": "expert_request_created",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0012",
+    "event_type": "expert_request_created",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "expert_role": "ScheduleExpert",
+      "request_id": "REQ-SCHEDULE-001"
+    },
+    "occurred_at": "2026-06-29T16:00:11Z",
+    "sequence": 12,
+    "summary": "Request created for ScheduleExpert."
+  },
+  {
+    "action": "expert_execution_started",
+    "actor": "ScheduleExpert",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0013",
+    "event_type": "expert_execution_started",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "request_id": "REQ-SCHEDULE-001"
+    },
+    "occurred_at": "2026-06-29T16:00:12Z",
+    "sequence": 13,
+    "summary": "ScheduleExpert execution started."
+  },
+  {
+    "action": "expert_execution_completed",
+    "actor": "ScheduleExpert",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0014",
+    "event_type": "expert_execution_completed",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      }
+    ],
+    "metadata": {
+      "attempt": 1,
+      "finding_id": "FIND-SCHEDULE-001",
+      "request_id": "REQ-SCHEDULE-001",
+      "status": "completed"
+    },
+    "occurred_at": "2026-06-29T16:00:13Z",
+    "sequence": 14,
+    "summary": "ScheduleExpert execution completed."
+  },
+  {
+    "action": "expert_request_created",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0015",
+    "event_type": "expert_request_created",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "expert_role": "CommercialExpert",
+      "request_id": "REQ-COMMERCIAL-001"
+    },
+    "occurred_at": "2026-06-29T16:00:14Z",
+    "sequence": 15,
+    "summary": "Request created for CommercialExpert."
+  },
+  {
+    "action": "expert_execution_started",
+    "actor": "CommercialExpert",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0016",
+    "event_type": "expert_execution_started",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "request_id": "REQ-COMMERCIAL-001"
+    },
+    "occurred_at": "2026-06-29T16:00:15Z",
+    "sequence": 16,
+    "summary": "CommercialExpert execution started."
+  },
+  {
+    "action": "expert_execution_completed",
+    "actor": "CommercialExpert",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0017",
+    "event_type": "expert_execution_completed",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      }
+    ],
+    "metadata": {
+      "attempt": 1,
+      "finding_id": "FIND-COMMERCIAL-001",
+      "request_id": "REQ-COMMERCIAL-001",
+      "status": "completed"
+    },
+    "occurred_at": "2026-06-29T16:00:16Z",
+    "sequence": 17,
+    "summary": "CommercialExpert execution completed."
+  },
+  {
+    "action": "expert_request_created",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0018",
+    "event_type": "expert_request_created",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "expert_role": "RiskExpert",
+      "request_id": "REQ-RISK-001"
+    },
+    "occurred_at": "2026-06-29T16:00:17Z",
+    "sequence": 18,
+    "summary": "Request created for RiskExpert."
+  },
+  {
+    "action": "expert_execution_started",
+    "actor": "RiskExpert",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0019",
+    "event_type": "expert_execution_started",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "request_id": "REQ-RISK-001"
+    },
+    "occurred_at": "2026-06-29T16:00:18Z",
+    "sequence": 19,
+    "summary": "RiskExpert execution started."
+  },
+  {
+    "action": "expert_execution_completed",
+    "actor": "RiskExpert",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0020",
+    "event_type": "expert_execution_completed",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "row:2",
+        "record_id": "RISK-001",
+        "source_file": "risk-register.csv"
+      }
+    ],
+    "metadata": {
+      "attempt": 1,
+      "finding_id": "FIND-RISK-001",
+      "request_id": "REQ-RISK-001",
+      "status": "completed"
+    },
+    "occurred_at": "2026-06-29T16:00:19Z",
+    "sequence": 20,
+    "summary": "RiskExpert execution completed."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0021",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "expert_analysis",
+      "to": "contradiction_review"
+    },
+    "occurred_at": "2026-06-29T16:00:20Z",
+    "sequence": 21,
+    "summary": "Workflow stage changed from expert_analysis to contradiction_review."
+  },
+  {
+    "action": "expert_request_created",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0022",
+    "event_type": "expert_request_created",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "expert_role": "EvidenceAuditor",
+      "request_id": "REQ-EVIDENCE-001"
+    },
+    "occurred_at": "2026-06-29T16:00:21Z",
+    "sequence": 22,
+    "summary": "Request created for EvidenceAuditor."
+  },
+  {
+    "action": "expert_execution_started",
+    "actor": "EvidenceAuditor",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0023",
+    "event_type": "expert_execution_started",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "request_id": "REQ-EVIDENCE-001"
+    },
+    "occurred_at": "2026-06-29T16:00:22Z",
+    "sequence": 23,
+    "summary": "EvidenceAuditor execution started."
+  },
+  {
+    "action": "expert_execution_completed",
+    "actor": "EvidenceAuditor",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0024",
+    "event_type": "expert_execution_completed",
+    "evidence": [],
+    "metadata": {
+      "contradiction_count": 1,
+      "request_id": "REQ-EVIDENCE-001"
+    },
+    "occurred_at": "2026-06-29T16:00:23Z",
+    "sequence": 24,
+    "summary": "EvidenceAuditor execution completed."
+  },
+  {
+    "action": "contradiction_detected",
+    "actor": "EvidenceAuditor",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0025",
+    "event_type": "contradiction_detected",
+    "evidence": [
+      {
+        "excerpt": "The generator skid is onsite and released to installation.",
+        "locator": "section:Equipment Status",
+        "record_id": "PRG-ONSITE-001",
+        "source_file": "progress-report.md"
+      },
+      {
+        "excerpt": "The generator skid has not arrived at the site.",
+        "locator": "section:Supplier Message",
+        "record_id": "SUP-NOT-ARRIVED-001",
+        "source_file": "supplier-correspondence.md"
+      },
+      {
+        "excerpt": "actual_arrival_date is null",
+        "locator": "/records/0/actual_arrival_date",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "metadata": {
+      "contradiction_id": "CONTRA-ONSITE-001",
+      "issue": "equipment_onsite_status"
+    },
+    "occurred_at": "2026-06-29T16:00:24Z",
+    "sequence": 25,
+    "summary": "Progress reporting says the equipment is onsite, but supplier correspondence and the logistics record show it has not arrived."
+  },
+  {
+    "action": "human_decision_requested",
+    "actor": "EvidenceAuditor",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0026",
+    "event_type": "human_decision_requested",
+    "evidence": [
+      {
+        "excerpt": "The generator skid is onsite and released to installation.",
+        "locator": "section:Equipment Status",
+        "record_id": "PRG-ONSITE-001",
+        "source_file": "progress-report.md"
+      },
+      {
+        "excerpt": "The generator skid has not arrived at the site.",
+        "locator": "section:Supplier Message",
+        "record_id": "SUP-NOT-ARRIVED-001",
+        "source_file": "supplier-correspondence.md"
+      },
+      {
+        "excerpt": "actual_arrival_date is null",
+        "locator": "/records/0/actual_arrival_date",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "metadata": {
+      "decision_request_id": "HDR-ONSITE-001"
+    },
+    "occurred_at": "2026-06-29T16:00:25Z",
+    "sequence": 26,
+    "summary": "Human confirmation requested for contradicted onsite status."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0027",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "contradiction_review",
+      "to": "awaiting_human_decision"
+    },
+    "occurred_at": "2026-06-29T16:00:26Z",
+    "sequence": 27,
+    "summary": "Workflow stage changed from contradiction_review to awaiting_human_decision."
+  },
+  {
+    "action": "human_decision_received",
+    "actor": "simulated-human",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0028",
+    "event_type": "human_decision_received",
+    "evidence": [
+      {
+        "excerpt": "The generator skid is onsite and released to installation.",
+        "locator": "section:Equipment Status",
+        "record_id": "PRG-ONSITE-001",
+        "source_file": "progress-report.md"
+      },
+      {
+        "excerpt": "The generator skid has not arrived at the site.",
+        "locator": "section:Supplier Message",
+        "record_id": "SUP-NOT-ARRIVED-001",
+        "source_file": "supplier-correspondence.md"
+      },
+      {
+        "excerpt": "actual_arrival_date is null",
+        "locator": "/records/0/actual_arrival_date",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "metadata": {
+      "decision_id": "HD-ONSITE-001",
+      "outcome": "confirmed"
+    },
+    "occurred_at": "2026-06-29T16:00:28Z",
+    "sequence": 28,
+    "summary": "Human decision confirms the generator skid is not onsite."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0029",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "awaiting_human_decision",
+      "to": "recovery_planning"
+    },
+    "occurred_at": "2026-06-29T16:00:29Z",
+    "sequence": 29,
+    "summary": "Workflow stage changed from awaiting_human_decision to recovery_planning."
+  },
+  {
+    "action": "expert_request_created",
+    "actor": "Director",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0030",
+    "event_type": "expert_request_created",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "expert_role": "RecoveryPlanner",
+      "request_id": "REQ-RECOVERY-001"
+    },
+    "occurred_at": "2026-06-29T16:00:30Z",
+    "sequence": 30,
+    "summary": "Request created for RecoveryPlanner."
+  },
+  {
+    "action": "expert_execution_started",
+    "actor": "RecoveryPlanner",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0031",
+    "event_type": "expert_execution_started",
+    "evidence": [],
+    "metadata": {
+      "attempt": 1,
+      "request_id": "REQ-RECOVERY-001"
+    },
+    "occurred_at": "2026-06-29T16:00:31Z",
+    "sequence": 31,
+    "summary": "RecoveryPlanner execution started."
+  },
+  {
+    "action": "recovery_option_created",
+    "actor": "RecoveryPlanner",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0032",
+    "event_type": "recovery_option_created",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "section:Delay Exposure",
+        "record_id": "CTR-DELAY-001",
+        "source_file": "contract-excerpt.md"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "metadata": {
+      "cost_usd": 48000,
+      "option_id": "REC-ACCEL-LOGISTICS"
+    },
+    "occurred_at": "2026-06-29T16:00:32Z",
+    "sequence": 32,
+    "summary": "Accelerated logistics recovery option created."
+  },
+  {
+    "action": "draft_recommendation_created",
+    "actor": "RecoveryPlanner",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0033",
+    "event_type": "draft_recommendation_created",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "section:Delay Exposure",
+        "record_id": "CTR-DELAY-001",
+        "source_file": "contract-excerpt.md"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "metadata": {
+      "approval_status": "pending",
+      "recommendation_id": "FREC-EQ-001"
+    },
+    "occurred_at": "2026-06-29T16:00:33Z",
+    "sequence": 33,
+    "summary": "Draft recovery recommendation created after human confirmation."
+  },
+  {
+    "action": "expert_execution_completed",
+    "actor": "RecoveryPlanner",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0034",
+    "event_type": "expert_execution_completed",
+    "evidence": [],
+    "metadata": {
+      "recommendation_id": "FREC-EQ-001",
+      "request_id": "REQ-RECOVERY-001"
+    },
+    "occurred_at": "2026-06-29T16:00:34Z",
+    "sequence": 34,
+    "summary": "RecoveryPlanner execution completed."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0035",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "recovery_planning",
+      "to": "awaiting_final_approval"
+    },
+    "occurred_at": "2026-06-29T16:00:35Z",
+    "sequence": 35,
+    "summary": "Workflow stage changed from recovery_planning to awaiting_final_approval."
+  },
+  {
+    "action": "final_approval_recorded",
+    "actor": "simulated-approver",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0036",
+    "event_type": "final_approval_recorded",
+    "evidence": [],
+    "metadata": {
+      "decision_id": "HD-FINAL-APPROVAL-001",
+      "outcome": "approved"
+    },
+    "occurred_at": "2026-06-29T16:00:37Z",
+    "sequence": 36,
+    "summary": "Final approval recorded for accelerated logistics recommendation."
+  },
+  {
+    "action": "final_recommendation_created",
+    "actor": "RecoveryPlanner",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0037",
+    "event_type": "final_recommendation_created",
+    "evidence": [
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "SCH-DELIVERY-001",
+        "source_file": "schedule.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "COST-SUMMARY-001",
+        "source_file": "cost-summary.json"
+      },
+      {
+        "excerpt": null,
+        "locator": "section:Delay Exposure",
+        "record_id": "CTR-DELAY-001",
+        "source_file": "contract-excerpt.md"
+      },
+      {
+        "excerpt": null,
+        "locator": "/records/0",
+        "record_id": "LOG-STATUS-001",
+        "source_file": "logistics-status.json"
+      }
+    ],
+    "metadata": {
+      "approval_status": "approved",
+      "preferred_option_id": "REC-ACCEL-LOGISTICS",
+      "recommendation_id": "FREC-EQ-001"
+    },
+    "occurred_at": "2026-06-29T16:00:38Z",
+    "sequence": 37,
+    "summary": "Final recovery recommendation created."
+  },
+  {
+    "action": "workflow_stage_changed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0038",
+    "event_type": "workflow_stage_changed",
+    "evidence": [],
+    "metadata": {
+      "from": "awaiting_final_approval",
+      "to": "completed"
+    },
+    "occurred_at": "2026-06-29T16:00:39Z",
+    "sequence": 38,
+    "summary": "Workflow stage changed from awaiting_final_approval to completed."
+  },
+  {
+    "action": "case_completed",
+    "actor": "workflow",
+    "case_id": "PRC-EQ-DELAY-001",
+    "event_id": "AUDIT-0039",
+    "event_type": "case_completed",
+    "evidence": [],
+    "metadata": {
+      "final_recommendation_id": "FREC-EQ-001"
+    },
+    "occurred_at": "2026-06-29T16:00:40Z",
+    "sequence": 39,
+    "summary": "Case workflow completed with final recommendation."
+  }
+]

@@ -1,0 +1,386 @@
+{
+  "$defs": {
+    "AuditEvent": {
+      "additionalProperties": false,
+      "description": "Append-only event for preserving case and orchestration history.",
+      "properties": {
+        "action": {
+          "minLength": 1,
+          "title": "Action",
+          "type": "string"
+        },
+        "actor": {
+          "minLength": 1,
+          "title": "Actor",
+          "type": "string"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "event_id": {
+          "minLength": 1,
+          "title": "Event Id",
+          "type": "string"
+        },
+        "event_type": {
+          "default": "legacy",
+          "minLength": 1,
+          "title": "Event Type",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "metadata": {
+          "additionalProperties": true,
+          "title": "Metadata",
+          "type": "object"
+        },
+        "occurred_at": {
+          "format": "date-time",
+          "title": "Occurred At",
+          "type": "string"
+        },
+        "sequence": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Sequence",
+          "type": "integer"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "event_id",
+        "case_id",
+        "occurred_at",
+        "actor",
+        "action",
+        "summary"
+      ],
+      "title": "AuditEvent",
+      "type": "object"
+    },
+    "CaseStage": {
+      "enum": [
+        "intake",
+        "evidence_review",
+        "expert_analysis",
+        "human_confirmation",
+        "recovery_planning",
+        "final_recommendation"
+      ],
+      "title": "CaseStage",
+      "type": "string"
+    },
+    "CaseStatus": {
+      "enum": [
+        "open",
+        "under_review",
+        "waiting_for_human",
+        "ready_for_recommendation",
+        "closed"
+      ],
+      "title": "CaseStatus",
+      "type": "string"
+    },
+    "Contradiction": {
+      "additionalProperties": false,
+      "description": "Contradictory evidence requiring resolution before final authorization.",
+      "properties": {
+        "conflicting_evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "minItems": 2,
+          "title": "Conflicting Evidence",
+          "type": "array"
+        },
+        "contradiction_id": {
+          "minLength": 1,
+          "title": "Contradiction Id",
+          "type": "string"
+        },
+        "issue": {
+          "minLength": 1,
+          "title": "Issue",
+          "type": "string"
+        },
+        "requires_human_confirmation": {
+          "default": true,
+          "title": "Requires Human Confirmation",
+          "type": "boolean"
+        },
+        "status": {
+          "default": "unresolved",
+          "enum": [
+            "unresolved",
+            "resolved",
+            "dismissed"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        }
+      },
+      "required": [
+        "contradiction_id",
+        "issue",
+        "conflicting_evidence",
+        "summary"
+      ],
+      "title": "Contradiction",
+      "type": "object"
+    },
+    "EvidenceRecord": {
+      "additionalProperties": false,
+      "description": "Compact representation of one cited source record.",
+      "properties": {
+        "fields": {
+          "additionalProperties": true,
+          "title": "Fields",
+          "type": "object"
+        },
+        "record_date": {
+          "anyOf": [
+            {
+              "format": "date",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Record Date"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "record_type": {
+          "minLength": 1,
+          "title": "Record Type",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "title": "Source File",
+          "type": "string"
+        },
+        "summary": {
+          "minLength": 1,
+          "title": "Summary",
+          "type": "string"
+        },
+        "title": {
+          "minLength": 1,
+          "title": "Title",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_file",
+        "record_type",
+        "title",
+        "summary"
+      ],
+      "title": "EvidenceRecord",
+      "type": "object"
+    },
+    "EvidenceReference": {
+      "additionalProperties": false,
+      "description": "Source-level pointer used by findings, decisions, and recommendations.",
+      "properties": {
+        "excerpt": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Excerpt"
+        },
+        "locator": {
+          "minLength": 1,
+          "title": "Locator",
+          "type": "string"
+        },
+        "record_id": {
+          "minLength": 1,
+          "title": "Record Id",
+          "type": "string"
+        },
+        "source_file": {
+          "minLength": 1,
+          "title": "Source File",
+          "type": "string"
+        }
+      },
+      "required": [
+        "record_id",
+        "source_file",
+        "locator"
+      ],
+      "title": "EvidenceReference",
+      "type": "object"
+    },
+    "HumanDecisionRequest": {
+      "additionalProperties": false,
+      "description": "Blocking request for human confirmation or approval.",
+      "properties": {
+        "blocking": {
+          "default": true,
+          "title": "Blocking",
+          "type": "boolean"
+        },
+        "case_id": {
+          "minLength": 1,
+          "title": "Case Id",
+          "type": "string"
+        },
+        "contradictions": {
+          "items": {
+            "$ref": "#/$defs/Contradiction"
+          },
+          "title": "Contradictions",
+          "type": "array"
+        },
+        "decision_request_id": {
+          "minLength": 1,
+          "title": "Decision Request Id",
+          "type": "string"
+        },
+        "evidence": {
+          "items": {
+            "$ref": "#/$defs/EvidenceReference"
+          },
+          "title": "Evidence",
+          "type": "array"
+        },
+        "question": {
+          "minLength": 1,
+          "title": "Question",
+          "type": "string"
+        },
+        "reason": {
+          "minLength": 1,
+          "title": "Reason",
+          "type": "string"
+        },
+        "requested_by": {
+          "minLength": 1,
+          "title": "Requested By",
+          "type": "string"
+        },
+        "status": {
+          "default": "pending",
+          "enum": [
+            "pending",
+            "answered",
+            "cancelled"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "decision_request_id",
+        "case_id",
+        "reason",
+        "question",
+        "requested_by"
+      ],
+      "title": "HumanDecisionRequest",
+      "type": "object"
+    }
+  },
+  "$id": "project-recovery-council.recovery-case.v1",
+  "additionalProperties": false,
+  "description": "Governed project-delivery exception case.",
+  "properties": {
+    "audit_history": {
+      "items": {
+        "$ref": "#/$defs/AuditEvent"
+      },
+      "title": "Audit History",
+      "type": "array"
+    },
+    "case_id": {
+      "minLength": 1,
+      "title": "Case Id",
+      "type": "string"
+    },
+    "contradictions": {
+      "items": {
+        "$ref": "#/$defs/Contradiction"
+      },
+      "title": "Contradictions",
+      "type": "array"
+    },
+    "evidence_records": {
+      "items": {
+        "$ref": "#/$defs/EvidenceRecord"
+      },
+      "title": "Evidence Records",
+      "type": "array"
+    },
+    "human_decision_requests": {
+      "items": {
+        "$ref": "#/$defs/HumanDecisionRequest"
+      },
+      "title": "Human Decision Requests",
+      "type": "array"
+    },
+    "opened_on": {
+      "format": "date",
+      "title": "Opened On",
+      "type": "string"
+    },
+    "stage": {
+      "$ref": "#/$defs/CaseStage"
+    },
+    "status": {
+      "$ref": "#/$defs/CaseStatus"
+    },
+    "summary": {
+      "minLength": 1,
+      "title": "Summary",
+      "type": "string"
+    },
+    "title": {
+      "minLength": 1,
+      "title": "Title",
+      "type": "string"
+    }
+  },
+  "required": [
+    "case_id",
+    "title",
+    "status",
+    "stage",
+    "opened_on",
+    "summary"
+  ],
+  "title": "RecoveryCase",
+  "type": "object",
+  "x-schema-version": "v1"
+}

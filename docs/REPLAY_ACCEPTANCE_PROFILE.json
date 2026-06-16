@@ -1,0 +1,39 @@
+{
+  "schema_version": "project-recovery-council.replay-acceptance.v1",
+  "compared_fields": [
+    "terminal_status",
+    "selected_experts",
+    "expert_findings",
+    "contradictions",
+    "decision_requests",
+    "human_decisions",
+    "recovery_options",
+    "final_recommendation"
+  ],
+  "ignored_fields": [
+    "run_id",
+    "event_id",
+    "occurred_at",
+    "decided_at",
+    "run_path",
+    "artifact_path",
+    "sha256",
+    "generated_at"
+  ],
+  "order_sensitive_fields": [
+    "selected_experts",
+    "expert_findings",
+    "contradictions",
+    "decision_requests",
+    "human_decisions",
+    "recovery_options",
+    "audit_events"
+  ],
+  "compatibility_notes": [
+    "This profile applies only to project-recovery-council v1 local workflow artifacts.",
+    "Audit event ordering is validated separately by artifact inspection and remains order-sensitive.",
+    "Checksums are excluded from logical replay equivalence because they can derive from ignored timestamps and run identifiers.",
+    "No compatibility is guaranteed for future schema versions until an explicit migration profile exists."
+  ]
+}
+

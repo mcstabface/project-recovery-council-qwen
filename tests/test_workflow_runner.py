@@ -74,11 +74,16 @@ def test_simulated_human_decision_resume_completes_workflow(tmp_path: Path) -> N
 
     context = runner.resume_with_human_decision()
 
-    assert context.state == WorkflowStage.COMPLETED
+    assert context.state == WorkflowStage.AWAITING_FINAL_APPROVAL
     assert context.human_decisions[0].rationale.endswith("not onsite.")
     assert context.human_decision_requests[0].status == "answered"
+    assert context.draft_recommendation.status == "draft"
+    assert context.draft_recommendation.human_decision_required is False
+
+    context = runner.approve_final()
+
+    assert context.state == WorkflowStage.COMPLETED
     assert context.final_recommendation.status == "authorized"
-    assert context.final_recommendation.human_decision_required is False
 
 
 def test_ordered_audit_sequencing(tmp_path: Path) -> None:
@@ -177,4 +182,3 @@ def test_replay_equivalence(tmp_path: Path) -> None:
     assert replayed.run_path != original.run_path
     assert replayed.replay_comparison["equivalent"] is True
     assert read_json(replayed.run_path / "replay-comparison.json")["equivalent"] is True
-
