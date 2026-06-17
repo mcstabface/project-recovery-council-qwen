@@ -68,6 +68,7 @@ ROLE_CANONICAL_CLAIM_KEYS: dict[str, list[str]] = {
         "unmitigated_exposure_usd",
         "mitigation_cost_usd",
         "gross_avoided_exposure_usd",
+        "avoided_exposure_usd",
     ],
     AgentRole.EVIDENCE_AUDITOR.value: [
         "claim_support",
@@ -79,6 +80,11 @@ ROLE_CANONICAL_CLAIM_KEYS: dict[str, list[str]] = {
         "C-DELAY-EXPOSURE-15K-USD-PER-DAY",
         "C-UNMITIGATED-EXPOSURE-195K-USD",
         "C-ACCEL-COST-48K-USD",
+        "delay_exposure_usd_per_day_support",
+        "delivery_shift_days_support",
+        "equipment_onsite_claim_conflict",
+        "forecast_milestone_slip_days_support",
+        "installation_total_float_consumed_days_support",
     ],
     AgentRole.RISK_EXPERT.value: [
         "risk",
@@ -91,6 +97,8 @@ ROLE_CANONICAL_CLAIM_KEYS: dict[str, list[str]] = {
         "conflicting_onsite_status_requires_human_confirmation",
         "recovery_option_approval_blocked",
         "escalation_required_for_milestone_integrity",
+        "escalation_requirement",
+        "milestone_slip_exposure",
     ],
     AgentRole.RECOVERY_PLANNER.value: [
         "preferred_option_id",
@@ -123,6 +131,7 @@ ROLE_CLAIM_ALIASES: dict[str, dict[str, str]] = {
         "remaining_float_after_delivery_shift_days": "installation_total_float_remaining_days",
         "remaining_total_float_after_delivery_shift_days": "installation_total_float_remaining_days",
         "projected_milestone_slip_days": "forecast_milestone_slip_days",
+        "forecast_milestone_date": "milestone_forecast_date_without_intervention",
         "baseline_milestone_date": "milestone_baseline_date",
         "forecast_milestone_date_without_intervention": "milestone_forecast_date_without_intervention",
         "contractual_milestone_baseline_date": "milestone_baseline_date",
@@ -134,6 +143,7 @@ ROLE_CLAIM_ALIASES: dict[str, dict[str, str]] = {
     AgentRole.COMMERCIAL_EXPERT.value: {
         "contractual_delay_exposure_usd_per_day": "delay_exposure_usd_per_day",
         "unmitigated_delay_exposure_usd": "unmitigated_exposure_usd",
+        "net_avoided_exposure_usd": "avoided_exposure_usd",
     },
     AgentRole.EVIDENCE_AUDITOR.value: {
         "claim-onsite-assertion": "C-ONSITE-ASSERTION",

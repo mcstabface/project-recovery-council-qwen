@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 from copy import deepcopy
+from decimal import Decimal, InvalidOperation
 from typing import Any, Literal
 
 from pydantic import Field
@@ -72,7 +73,7 @@ FINAL_FIELD_SOURCE_KEYS: dict[str, set[str]] = {
     "projected_slip_days": {"forecast_milestone_slip_days", "projected_milestone_slip_days"},
     "unmitigated_exposure_usd": {"unmitigated_exposure_usd"},
     "mitigation_cost_usd": {"mitigation_cost_usd"},
-    "gross_avoided_exposure_usd": {"gross_avoided_exposure_usd"},
+    "gross_avoided_exposure_usd": {"gross_avoided_exposure_usd", "avoided_exposure_usd"},
     "human_confirmation_required": {"human_escalation_required", "recovery_approval_risk", "onsite_status_conflict"},
     "onsite_status_contradiction_detected": {"onsite_status_conflict", "C-ONSITE-ASSERTION", "contradiction"},
     "preferred_option_id": {"unmitigated_exposure_usd", "mitigation_cost_usd", "gross_avoided_exposure_usd"},
@@ -139,7 +140,7 @@ def build_synthesis_handoff(
             claims = {}
         normalization = normalization_by_id.get(invocation_id)
         role_result = role_by_id.get(invocation_id)
-        semantic_status = _semantic_status(domain_by_id.get(invocation_id))
+        domain_result = domain_by_id.get(invocation_id)
         schema_valid = _schema_valid(invocation.result)
         normalization_valid = normalization.valid if normalization else False
         role_scope_valid = role_result.valid if role_result else False
@@ -152,6 +153,7 @@ def build_synthesis_handoff(
             normalization=normalization,
         )
         for canonical_key, value in claims.items():
+            semantic_status = _semantic_status_for_claim(domain_result, canonical_key)
             reasons = _exclusion_reasons(
                 schema_valid=schema_valid,
                 normalization_valid=normalization_valid,
@@ -224,11 +226,10 @@ def build_recommendation_authorization_state(
 ) -> RecommendationAuthorizationState:
     keys = {finding.canonical_claim_key for finding in validated_findings}
     has_schedule = "forecast_milestone_slip_days" in keys or "projected_milestone_slip_days" in keys
-    has_commercial = {
-        "unmitigated_exposure_usd",
-        "mitigation_cost_usd",
-        "gross_avoided_exposure_usd",
-    }.issubset(keys)
+    has_commercial = (
+        {"unmitigated_exposure_usd", "mitigation_cost_usd"}.issubset(keys)
+        and ("gross_avoided_exposure_usd" in keys or "avoided_exposure_usd" in keys)
+    )
     contradiction = _onsite_contradiction_unresolved(validated_findings)
     human_gate = _human_gate_required(validated_findings) or contradiction
     request_id = "HDR-ONSITE-001" if human_gate and contradiction else None
@@ -286,6 +287,42 @@ def merge_final_response_citations(
         citations[field] = sorted(dict.fromkeys(existing + selected))
     merged["citations"] = citations
     return merged
+
+
+def find_substantive_disagreements(findings: list[ValidatedFinding]) -> list[dict[str, Any]]:
+    eligible = [finding for finding in findings if finding.eligible_for_synthesis]
+    by_domain: dict[str, list[ValidatedFinding]] = {}
+    for finding in eligible:
+        by_domain.setdefault(_claim_domain(finding.canonical_claim_key), []).append(finding)
+    disagreements: list[dict[str, Any]] = []
+    for domain, domain_findings in by_domain.items():
+        if len(domain_findings) < 2:
+            continue
+        values = [_comparison_value(finding.value) for finding in domain_findings]
+        if domain == "equipment_onsite_status" and _onsite_values_are_human_gate_only(values):
+            continue
+        values = [value for value in values if value is not None]
+        if len(values) < 2:
+            continue
+        if all(_equivalent_values(values[0], value) for value in values[1:]):
+            continue
+        disagreements.append(
+            {
+                "disagreement_id": f"DISAG-{domain.upper()}",
+                "issue_domain": domain,
+                "conflicting_findings": [
+                    {
+                        "invocation_id": finding.invocation_id,
+                        "source_agent": finding.source_agent,
+                        "canonical_claim_key": finding.canonical_claim_key,
+                        "value": finding.value,
+                        "citations": finding.citations,
+                    }
+                    for finding in domain_findings
+                ],
+            }
+        )
+    return disagreements
 
 
 def synthesis_metrics(
@@ -366,6 +403,18 @@ def _semantic_status(result: Any) -> SemanticValidationStatus:
     if getattr(result, "valid", None) is False:
         return "failed"
     return "unavailable"
+
+
+def _semantic_status_for_claim(result: Any, canonical_key: str) -> SemanticValidationStatus:
+    if result is None:
+        return "unavailable"
+    invalid_claim_keys = set(getattr(result, "invalid_claim_keys", []) or [])
+    valid_claim_keys = set(getattr(result, "valid_claim_keys", []) or [])
+    if canonical_key in invalid_claim_keys:
+        return "failed"
+    if canonical_key in valid_claim_keys:
+        return "passed"
+    return _semantic_status(result)
 
 
 def _exclusion_reasons(
@@ -490,6 +539,72 @@ def _source_supported_final_fields(
         fields.append("preferred_option_id")
         fields.append("preferred_option_subject_to_approval")
     return sorted(set(fields))
+
+
+def _claim_domain(key: str) -> str:
+    if key in {
+        "forecast_milestone_slip_days",
+        "projected_milestone_slip_days",
+        "forecast_milestone_slip_days_support",
+        "C-MILESTONE-SLIP-13D",
+    }:
+        return "milestone_slip"
+    if key in {"delivery_movement_days", "delivery_shift_days", "delivery_shift_days_support"}:
+        return "delivery_movement"
+    if key in {
+        "onsite_status_conflict",
+        "conflicting_onsite_status_requires_human_confirmation",
+        "equipment_onsite_claim_conflict",
+        "C-ONSITE-ASSERTION",
+        "contradiction",
+    }:
+        return "equipment_onsite_status"
+    if key in {
+        "delay_exposure_usd_per_day",
+        "delay_exposure_usd_per_day_support",
+        "C-DELAY-EXPOSURE-15K-USD-PER-DAY",
+    }:
+        return "delay_exposure_rate"
+    if key in {"unmitigated_exposure_usd", "C-UNMITIGATED-EXPOSURE-195K-USD"}:
+        return "unmitigated_exposure"
+    if key in {"mitigation_cost_usd", "C-ACCEL-COST-48K-USD"}:
+        return "mitigation_cost"
+    if key in {"gross_avoided_exposure_usd", "avoided_exposure_usd"}:
+        return "avoided_exposure"
+    return key
+
+
+def _comparison_value(value: Any) -> Any:
+    if isinstance(value, dict):
+        for key in ["value", "days", "amount_usd", "assessment", "status", "supported"]:
+            if key in value:
+                if key in {"assessment", "status", "supported"} and str(value[key]).lower() in {
+                    "supported",
+                    "verified",
+                    "true",
+                    "yes",
+                }:
+                    return None
+                return value[key]
+    return value
+
+
+def _onsite_values_are_human_gate_only(values: list[Any]) -> bool:
+    if not values:
+        return False
+    text = " ".join(str(value).lower() for value in values)
+    if not any(term in text for term in ["conflict", "contradiction", "unresolved", "human", "confirmation", "blocked"]):
+        return False
+    return not any(term in text for term in ["resolved onsite", "confirmed onsite", "no conflict", "cleared"])
+
+
+def _equivalent_values(left: Any, right: Any) -> bool:
+    if left == right:
+        return True
+    try:
+        return Decimal(str(left)) == Decimal(str(right))
+    except (InvalidOperation, ValueError):
+        return False
 
 
 def _preferred_recovery_option_id(bundle: CaseBundle) -> str | None:

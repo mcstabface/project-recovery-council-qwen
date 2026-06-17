@@ -90,6 +90,12 @@ Check that final preferred-option and approval-condition citations were
 preserved or deterministically merged from validated findings before comparing
 runs.
 
+Also review `arbitration-decisions.json`. ArbiterAgent should be skipped when
+there is no substantive disagreement among eligible validated findings, when all
+findings were excluded by deterministic validation, or when the only unresolved
+issue is the human onsite-status evidence gate. Skipped arbitration should show
+`arbiter_required: false` and should not add a provider invocation.
+
 ## 7. Offline Comparison
 
 ```bash
@@ -125,6 +131,22 @@ PYTHONPATH=src python -m project_recovery_council live-variant \
 If a limit is exceeded, the runner preserves completed artifacts, marks the run
 incomplete, records the limit in `final-variant-result.json`, and exits
 nonzero.
+
+## Diagnostic Derived Rebuild
+
+When a live run completed provider execution but failed derived artifact
+validation, preserve that run unchanged and rebuild only the deterministic
+derived artifacts into a new directory:
+
+```bash
+PYTHONPATH=src python -m project_recovery_council rebuild-derived-artifacts \
+  experiment-artifacts/live/<run-id> \
+  --output experiment-artifacts/live-diagnostics/<run-id>-derived
+```
+
+This command makes zero provider calls. The derived output is labeled
+diagnostic and non-empirical, records source artifact hashes, and is rejected by
+normal `compare-live` unless diagnostic overrides are used.
 
 ## Before Commit
 

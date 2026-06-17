@@ -29,6 +29,21 @@ Only findings that pass required validation are eligible for normal synthesis.
 Invalid findings remain visible in `excluded-findings.json` but are not included
 in the planner's normal validated claim set.
 
+Fixed-chain and dynamic-council variants use the same deterministic processing
+path after each specialist provider response:
+
+- `LiveVariantRun._validate_specialist` performs schema, normalization,
+  role-scope, and domain-semantic validation.
+- `build_synthesis_handoff` converts validated specialist artifacts into the
+  envelope.
+- `build_recommendation_authorization_state` derives the deterministic
+  recommendation and authorization state.
+- `merge_final_citations` augments accepted final structured responses only
+  with citations already present in eligible findings.
+
+The dynamic council does not have a separate specialist-validation path. If a
+future divergence appears, it should be treated as an orchestration defect.
+
 ## Artifacts
 
 Future fixed-chain and dynamic-council runs write:
@@ -38,6 +53,8 @@ Future fixed-chain and dynamic-council runs write:
 - `synthesis-input.json`
 - `recommendation-authorization-state.json`
 - `synthesis-metrics.json`
+- `commercial-semantic-validation.json` when `CommercialExpert` ran
+- `commercial-semantic-metrics.json` when `CommercialExpert` ran
 
 `raw-provider-responses.json` preserves raw provider text for diagnostics.
 Accepted final parsed responses may include deterministic citation augmentation
@@ -94,3 +111,11 @@ evidence to form a recommendation.
 Synthesis metrics track finding retention, citation propagation, validated
 claim utilization, recommendation correctness, authorization gate correctness,
 recommendation-with-pending-approval correctness, and synthesis omissions.
+
+## Diagnostic Rebuilds
+
+`rebuild-derived-artifacts` reruns deterministic normalization, role validation,
+domain semantic validation, handoff construction, evaluation, and authorization
+state derivation from an existing live run's persisted invocation records. It
+does not call the provider, does not overwrite the source run, and labels the
+output as a derived diagnostic replay rather than an empirical run.

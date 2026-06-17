@@ -19,6 +19,11 @@ from project_recovery_council.claim_normalization import (
     normalize_claim_keys,
     normalize_response_payload,
 )
+from project_recovery_council.commercial_semantics import (
+    CommercialSemanticValidationResult,
+    commercial_semantic_metrics,
+    validate_commercial_semantics,
+)
 from project_recovery_council.contracts import ContractModel
 from project_recovery_council.evaluation import evaluate_model_result
 from project_recovery_council.experiment_artifacts import (
@@ -69,6 +74,7 @@ from project_recovery_council.synthesis_handoff import (
     SynthesisHandoff,
     SynthesisInput,
     build_synthesis_handoff,
+    find_substantive_disagreements,
     merge_final_response_citations,
     synthesis_metrics,
 )
@@ -114,6 +120,8 @@ class DomainSemanticValidationResult(ContractModel):
     valid: bool | None = None
     checked_fields: list[str] = Field(default_factory=list)
     semantic_violations: list[str] = Field(default_factory=list)
+    valid_claim_keys: list[str] = Field(default_factory=list)
+    invalid_claim_keys: list[str] = Field(default_factory=list)
     concise_findings: list[str] = Field(default_factory=list)
 
 
@@ -136,6 +144,12 @@ class LiveVariantSummary(ContractModel):
     final_invocation_id: str | None = None
     final_response_available: bool = False
     evaluation_available: bool = False
+    provider_execution_completed: bool = False
+    derived_artifact_validation_failed: bool = False
+    artifact_validation_errors: list[str] = Field(default_factory=list)
+    empirical_result_usable_for_comparison: bool = True
+    diagnostic_replay: bool = False
+    source_run_id: str | None = None
     role_scope_compliance: MetricApplicability = Field(
         default_factory=lambda: _metric_unavailable("role-scope validation was not recorded")
     )
@@ -227,9 +241,12 @@ class LiveVariantRun:
         self.normalization_results: list[ClaimNormalizationResult] = []
         self.normalized_responses: list[dict[str, Any]] = []
         self.schedule_results: list[ScheduleSemanticValidationResult] = []
+        self.commercial_results: list[CommercialSemanticValidationResult] = []
         self.domain_results: list[DomainSemanticValidationResult] = []
         self.routing_decisions: list[dict[str, Any]] = []
         self.disagreements: list[dict[str, Any]] = []
+        self.arbitration_decisions: list[dict[str, Any]] = []
+        self.governance_payloads: list[dict[str, Any]] = []
         self.synthesis_handoffs: list[SynthesisHandoff] = []
         self.synthesis_inputs: list[SynthesisInput] = []
         self.final_result: ModelResult | None = None
@@ -237,6 +254,8 @@ class LiveVariantRun:
         self.evaluation_report: EvaluationReport | None = None
         self.stopped_by_limit: str | None = None
         self.failure_reason: str | None = None
+        self.diagnostic_replay = False
+        self.source_run_id: str | None = None
 
     @property
     def completed(self) -> bool:
@@ -274,7 +293,7 @@ class LiveVariantRun:
             result = self._invoke_specialist(role=role, step_id=f"fixed_{role}")
             if result is None:
                 return
-            specialist_context.append(self._context_for_last_invocation())
+            specialist_context.append(self._compact_context_for_last_invocation())
             if self._should_stop_after_last_invocation():
                 return
         handoff = self._build_synthesis_handoff(target_agent=AgentRole.RECOVERY_PLANNER.value)
@@ -313,7 +332,7 @@ class LiveVariantRun:
             result = self._invoke_specialist(role=role, step_id=f"dynamic_{role}")
             if result is None:
                 return
-            specialist_context.append(self._context_for_last_invocation())
+            specialist_context.append(self._compact_context_for_last_invocation())
             if self._should_stop_after_last_invocation():
                 return
         audit_result = self._invoke_specialist(
@@ -323,38 +342,53 @@ class LiveVariantRun:
         )
         if audit_result is None:
             return
-        specialist_context.append(self._context_for_last_invocation())
+        specialist_context.append(self._compact_context_for_last_invocation())
         if self._should_stop_after_last_invocation():
             return
-        arbitration_context = self._validation_issues()
         arbiter_handoff = self._build_synthesis_handoff(target_agent=AgentRole.ARBITER.value)
-        arbiter_prompt = self._render_synthesis_prompt(
-            role=AgentRole.ARBITER.value,
-            schema_id=ARBITER_RESPONSE_SCHEMA,
-            synthesis_input=arbiter_handoff.synthesis_input,
-            routing_context=self.routing_decisions,
-            arbitration_context=arbitration_context,
-        )
-        arbiter_result = self._invoke(
-            role=AgentRole.ARBITER.value,
-            schema_id=ARBITER_RESPONSE_SCHEMA,
-            step_id="dynamic_arbitration",
-            prompt=arbiter_prompt,
-            selected_record_ids=[],
-        )
-        if arbiter_result is None:
-            return
-        if arbiter_result.parsed_response:
-            self.disagreements.extend(arbiter_result.parsed_response.get("unresolved_disagreements", []))
-        if self._should_stop_after_last_invocation():
-            return
+        substantive_disagreements = find_substantive_disagreements(arbiter_handoff.validated_findings)
+        arbiter_context: list[Any]
+        if not substantive_disagreements:
+            decision = {
+                "arbiter_required": False,
+                "arbiter_skip_reason": self._arbiter_skip_reason(arbiter_handoff),
+                "disagreement_count": 0,
+            }
+            self.arbitration_decisions.append(decision)
+            self.disagreements.append(decision)
+            arbiter_context = [decision]
+        else:
+            decision = {
+                "arbiter_required": True,
+                "arbiter_skip_reason": None,
+                "disagreement_count": len(substantive_disagreements),
+            }
+            self.arbitration_decisions.append(decision)
+            arbiter_prompt = self._render_arbiter_prompt(
+                synthesis_input=arbiter_handoff.synthesis_input,
+                disagreement_records=substantive_disagreements,
+            )
+            arbiter_result = self._invoke(
+                role=AgentRole.ARBITER.value,
+                schema_id=ARBITER_RESPONSE_SCHEMA,
+                step_id="dynamic_arbitration",
+                prompt=arbiter_prompt,
+                selected_record_ids=[],
+            )
+            if arbiter_result is None:
+                return
+            if arbiter_result.parsed_response:
+                self.disagreements.extend(arbiter_result.parsed_response.get("unresolved_disagreements", []))
+            if self._should_stop_after_last_invocation():
+                return
+            arbiter_context = [arbiter_result.parsed_response]
         planner_handoff = self._build_synthesis_handoff(target_agent=AgentRole.RECOVERY_PLANNER.value)
         final_prompt = self._render_synthesis_prompt(
             role=AgentRole.RECOVERY_PLANNER.value,
             schema_id=RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
             synthesis_input=planner_handoff.synthesis_input,
             routing_context=self.routing_decisions,
-            arbitration_context=[arbiter_result.parsed_response],
+            arbitration_context=arbiter_context,
         )
         final_result = self._invoke(
             role=AgentRole.RECOVERY_PLANNER.value,
@@ -374,11 +408,17 @@ class LiveVariantRun:
         specialist_context: list[dict[str, Any]] | None = None,
     ) -> ModelResult | None:
         prompt = (
-            self._render_contextual_specialist_prompt(role, specialist_context)
+            self._render_evidence_auditor_prompt(specialist_context)
+            if role == AgentRole.EVIDENCE_AUDITOR.value and specialist_context
+            else self._render_contextual_specialist_prompt(role, specialist_context)
             if specialist_context
             else self._render_standard_prompt(role, SPECIALIST_FINDING_RESPONSE_SCHEMA)
         )
-        selected_record_ids = selected_evidence_record_ids(self.bundle, role)
+        selected_record_ids = (
+            self._audit_selected_record_ids(specialist_context)
+            if role == AgentRole.EVIDENCE_AUDITOR.value and specialist_context
+            else selected_evidence_record_ids(self.bundle, role)
+        )
         result = self._invoke(
             role=role,
             schema_id=SPECIALIST_FINDING_RESPONSE_SCHEMA,
@@ -494,6 +534,27 @@ class LiveVariantRun:
                     checked_fields=schedule_result.checked_fields,
                     semantic_violations=schedule_result.semantic_violations,
                     concise_findings=schedule_result.concise_findings,
+                )
+            )
+        elif role == AgentRole.COMMERCIAL_EXPERT.value:
+            commercial_result = validate_commercial_semantics(
+                invocation_id=invocation_id,
+                response_payload=normalized_payload,
+                bundle=self.bundle,
+            )
+            self.commercial_results.append(commercial_result)
+            self.domain_results.append(
+                DomainSemanticValidationResult(
+                    invocation_id=invocation_id,
+                    role=role,
+                    validator="CommercialExpertSemanticValidator.v1",
+                    implemented=True,
+                    valid=commercial_result.valid,
+                    checked_fields=commercial_result.checked_fields,
+                    semantic_violations=commercial_result.semantic_violations,
+                    valid_claim_keys=commercial_result.valid_claim_keys,
+                    invalid_claim_keys=commercial_result.invalid_claim_keys,
+                    concise_findings=commercial_result.concise_findings,
                 )
             )
         else:
@@ -670,6 +731,84 @@ class LiveVariantRun:
             f"{json.dumps(to_jsonable(specialist_context or []), indent=2, sort_keys=True)}\n"
         )
 
+    def _render_evidence_auditor_prompt(self, specialist_context: list[dict[str, Any]] | None) -> str:
+        catalog = load_prompt_catalog(PROMPT_VERSION)
+        schema_model = SCHEMA_REGISTRY[SPECIALIST_FINDING_RESPONSE_SCHEMA]
+        selected_record_ids = self._audit_selected_record_ids(specialist_context)
+        packet = {
+            "correlation_id": self.experiment_id,
+            "case_id": self.bundle.case.case_id,
+            "experiment_variant": self.variant.value,
+            "invocation_purpose": self.variant.value,
+            "invocation_role": AgentRole.EVIDENCE_AUDITOR.value,
+            "prompt_version": PROMPT_VERSION,
+            "selected_evidence_record_ids": selected_record_ids,
+            "specialist_claims": specialist_context or [],
+            "known_contradiction_candidates": [
+                {
+                    "issue": "equipment_onsite_status",
+                    "record_ids": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+                }
+            ],
+            "source_evidence": self._evidence_snippets(selected_record_ids),
+            "expected_response_schema": SPECIALIST_FINDING_RESPONSE_SCHEMA,
+            "expected_output_json_schema": schema_model.model_json_schema(),
+        }
+        self._record_governance_payload(
+            agent_role=AgentRole.EVIDENCE_AUDITOR.value,
+            payload=packet,
+            selected_record_ids=selected_record_ids,
+        )
+        return (
+            f"{catalog[AgentRole.EVIDENCE_AUDITOR.value].content}\n\n"
+            "## Compact evidence-audit packet\n"
+            f"{json.dumps(to_jsonable(packet), indent=2, sort_keys=True)}\n"
+        )
+
+    def _render_arbiter_prompt(
+        self,
+        *,
+        synthesis_input: SynthesisInput,
+        disagreement_records: list[dict[str, Any]],
+    ) -> str:
+        catalog = load_prompt_catalog(PROMPT_VERSION)
+        schema_model = SCHEMA_REGISTRY[ARBITER_RESPONSE_SCHEMA]
+        record_ids = sorted(
+            {
+                record_id
+                for disagreement in disagreement_records
+                for finding in disagreement.get("conflicting_findings", [])
+                for record_id in finding.get("citations", [])
+            }
+        )
+        packet = {
+            "correlation_id": self.experiment_id,
+            "case_id": self.bundle.case.case_id,
+            "experiment_variant": self.variant.value,
+            "invocation_purpose": self.variant.value,
+            "invocation_role": AgentRole.ARBITER.value,
+            "prompt_version": PROMPT_VERSION,
+            "selected_evidence_record_ids": record_ids,
+            "disagreement_records": disagreement_records,
+            "human_gate_status": {
+                "blocking_human_request": synthesis_input.recommendation_authorization_state.blocking_human_request,
+                "unresolved_contradictions": synthesis_input.recommendation_authorization_state.unresolved_contradictions,
+            },
+            "source_evidence": self._evidence_snippets(record_ids),
+            "expected_response_schema": ARBITER_RESPONSE_SCHEMA,
+            "expected_output_json_schema": schema_model.model_json_schema(),
+        }
+        self._record_governance_payload(
+            agent_role=AgentRole.ARBITER.value,
+            payload=packet,
+            selected_record_ids=record_ids,
+        )
+        return (
+            f"{catalog[AgentRole.ARBITER.value].content}\n\n"
+            "## Compact arbitration packet\n"
+            f"{json.dumps(to_jsonable(packet), indent=2, sort_keys=True)}\n"
+        )
+
     def _render_synthesis_prompt(
         self,
         *,
@@ -707,17 +846,68 @@ class LiveVariantRun:
             f"{json.dumps(to_jsonable(payload), indent=2, sort_keys=True)}\n"
         )
 
-    def _context_for_last_invocation(self) -> dict[str, Any]:
+    def _compact_context_for_last_invocation(self) -> dict[str, Any]:
         invocation = self.invocations[-1]
+        normalized = _last_normalized_response(self.normalized_responses, invocation.invocation_id)
+        claims = normalized.get("claims", {}) if isinstance(normalized, dict) else {}
+        citations = normalized.get("citations", {}) if isinstance(normalized, dict) else {}
         return {
             "invocation_id": invocation.invocation_id,
             "agent_role": invocation.agent_role,
             "schema_valid": not invocation.result.validation_errors and invocation.result.parsed_response is not None,
-            "parsed_response": invocation.result.parsed_response,
+            "claims": claims if isinstance(claims, dict) else {},
+            "citations": citations if isinstance(citations, dict) else {},
             "normalization": _last_for_invocation(self.normalization_results, invocation.invocation_id),
             "role_validation": _last_for_invocation(self.role_results, invocation.invocation_id),
             "domain_semantic_validation": _last_for_invocation(self.domain_results, invocation.invocation_id),
         }
+
+    def _audit_selected_record_ids(self, specialist_context: list[dict[str, Any]] | None) -> list[str]:
+        record_ids: set[str] = {"PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"}
+        for item in specialist_context or []:
+            citations = item.get("citations", {})
+            if isinstance(citations, dict):
+                for ids in citations.values():
+                    if isinstance(ids, list):
+                        record_ids.update(str(record_id) for record_id in ids)
+            claims = item.get("claims", {})
+            if isinstance(claims, dict):
+                for value in claims.values():
+                    record_ids.update(_embedded_record_ids(value))
+        return sorted(record_id for record_id in record_ids if record_id in self.bundle.evidence_by_id)
+
+    def _evidence_snippets(self, record_ids: list[str]) -> list[dict[str, Any]]:
+        snippets = []
+        for record_id in record_ids:
+            record = self.bundle.evidence_by_id.get(record_id)
+            if record is None:
+                continue
+            snippets.append(
+                {
+                    "record_id": record.record_id,
+                    "record_type": record.record_type,
+                    "title": record.title,
+                    "summary": record.summary,
+                    "fields": record.fields,
+                }
+            )
+        return snippets
+
+    def _record_governance_payload(self, *, agent_role: str, payload: dict[str, Any], selected_record_ids: list[str]) -> None:
+        self.governance_payloads.append(
+            {
+                "agent_role": agent_role,
+                "payload_size_characters": len(json.dumps(to_jsonable(payload), sort_keys=True)),
+                "selected_evidence_record_ids": selected_record_ids,
+            }
+        )
+
+    def _arbiter_skip_reason(self, handoff: SynthesisHandoff) -> str:
+        if not handoff.validated_findings:
+            return "no eligible validated findings"
+        if handoff.recommendation_authorization_state.blocking_human_request:
+            return "only unresolved issue is the human evidence gate"
+        return "no substantive disagreement among eligible validated findings"
 
     def _build_synthesis_handoff(self, *, target_agent: str) -> SynthesisHandoff:
         handoff = build_synthesis_handoff(
@@ -747,7 +937,7 @@ class LiveVariantRun:
     def summary(self) -> LiveVariantSummary:
         input_tokens, output_tokens, total_tokens = _token_totals(self.results)
         role_applicability = _role_scope_applicability(self.role_results)
-        semantic_applicability = _schedule_semantic_applicability(self.schedule_results)
+        semantic_applicability = _domain_semantic_applicability(self.domain_results)
         status = "completed" if self.completed else "incomplete"
         if self.failure_reason and not self.stopped_by_limit:
             status = "failed"
@@ -763,6 +953,12 @@ class LiveVariantRun:
             final_invocation_id=self.final_invocation_id,
             final_response_available=self.final_result is not None and self.final_result.parsed_response is not None,
             evaluation_available=self.evaluation_report is not None,
+            provider_execution_completed=bool(self.invocations)
+            and not any(result.finish_status != FinishStatus.COMPLETED for result in self.results)
+            and self.stopped_by_limit is None,
+            empirical_result_usable_for_comparison=self.completed and not self.diagnostic_replay,
+            diagnostic_replay=self.diagnostic_replay,
+            source_run_id=self.source_run_id,
             role_scope_compliance=role_applicability,
             semantic_validation_compliance=semantic_applicability,
             role_scope_compliance_rate=role_applicability.score,
@@ -818,6 +1014,123 @@ def run_controlled_live_variant(
     )
 
 
+def rebuild_derived_artifacts(
+    *,
+    source_run_path: Path | str,
+    output_path: Path | str,
+    case_path: Path | str = DEFAULT_CASE_PATH,
+    replace_existing: bool = False,
+) -> Path:
+    source = Path(source_run_path)
+    output = Path(output_path)
+    if output.exists() and not replace_existing:
+        raise FileExistsError(f"derived artifact path already exists: {output.as_posix()}")
+    if not (source / "invocation-records.json").exists():
+        raise FileNotFoundError(f"missing invocation-records.json in {source.as_posix()}")
+    experiment_config = read_json(source / "experiment-config.json")
+    provider_config = read_json(source / "sanitized-provider-config.json")
+    invocations = [AgentInvocation.model_validate(item) for item in read_json(source / "invocation-records.json")]
+    selected_records = read_json(source / "selected-evidence-records.json") if (source / "selected-evidence-records.json").exists() else []
+    prompt_records = read_json(source / "rendered-prompt-hashes.json") if (source / "rendered-prompt-hashes.json").exists() else []
+    bundle = load_equipment_delay_case(case_path)
+    config = _config_from_sanitized(provider_config)
+    run = LiveVariantRun(
+        experiment_id=output.name,
+        variant=ExperimentVariant(experiment_config["variant"]),
+        bundle=bundle,
+        config=config,
+        controls=LiveRunControls(),
+        client=_NoopModelClient(),
+        time_func=lambda: 0.0,
+    )
+    run.diagnostic_replay = True
+    run.source_run_id = str(experiment_config.get("experiment_id") or source.name)
+    run.prompt_records = prompt_records if isinstance(prompt_records, list) else []
+    selected_by_id = {
+        item.get("invocation_id"): item
+        for item in selected_records
+        if isinstance(item, dict)
+    }
+    for invocation in invocations:
+        run.invocations.append(invocation)
+        run.results.append(invocation.result)
+        selected = selected_by_id.get(invocation.invocation_id)
+        if selected:
+            run.selected_evidence_records.append(selected)
+        else:
+            record_ids = invocation.request.metadata.get("selected_evidence_record_ids", [])
+            run.selected_evidence_records.append(
+                {
+                    "invocation_id": invocation.invocation_id,
+                    "agent_role": invocation.agent_role,
+                    "record_ids": record_ids if isinstance(record_ids, list) else [],
+                }
+            )
+        if invocation.agent_role in SPECIALIST_ROLES:
+            run._validate_specialist(
+                role=invocation.agent_role,
+                result=invocation.result,
+                selected_record_ids=run.selected_evidence_records[-1]["record_ids"],
+            )
+    if any(invocation.agent_role in SPECIALIST_ROLES for invocation in invocations):
+        run._build_synthesis_handoff(target_agent=AgentRole.RECOVERY_PLANNER.value)
+    for invocation in reversed(run.invocations):
+        if invocation.agent_role in FINAL_RESPONSE_ROLES:
+            run._set_final_result(invocation.result, invocation.invocation_id)
+            break
+    if output.exists() and replace_existing:
+        shutil.rmtree(output)
+    root = write_live_variant_artifacts(
+        run,
+        artifacts_root=output.parent,
+        replace_existing=False,
+    )
+    source_hashes = {
+        path.name: sha256_file(path)
+        for path in sorted(source.glob("*.json"))
+        if path.is_file()
+    }
+    write_json(
+        root / "diagnostic-rebuild-metadata.json",
+        {
+            "diagnostic_replay": True,
+            "source_run_path": source.as_posix(),
+            "source_run_id": run.source_run_id,
+            "source_artifact_hashes": source_hashes,
+            "provider_calls_made": 0,
+            "empirical_result_usable_for_comparison": False,
+        },
+    )
+    _append_manifest_entry(
+        root,
+        name="diagnostic-rebuild-metadata",
+        relative_path="diagnostic-rebuild-metadata.json",
+        schema_id="project-recovery-council.qwen.live-diagnostic-rebuild-metadata.v1",
+    )
+    return root
+
+
+class _NoopModelClient:
+    provider = "diagnostic-replay"
+
+    def generate(self, request: ModelRequest) -> ModelResult:
+        raise RuntimeError("diagnostic rebuild must not invoke a model provider")
+
+
+def _config_from_sanitized(payload: dict[str, Any]) -> QwenProviderConfig:
+    return QwenProviderConfig(
+        api_key_env_var=str(payload.get("api_key_env_var") or "DASHSCOPE_API_KEY"),
+        base_url=str(payload.get("base_url") or "https://example.invalid/compatible-mode/v1"),
+        model_identifier=str(payload.get("model_identifier") or "diagnostic-replay-model"),
+        request_timeout_seconds=float(payload.get("request_timeout_seconds") or 30.0),
+        maximum_retries=int(payload.get("maximum_retries") or 0),
+        temperature=float(payload.get("temperature") or 0.0),
+        seed=payload.get("seed"),
+        structured_output_mode=payload.get("structured_output_mode") or "prompted_json",
+        provider_region_label=str(payload.get("provider_region_label") or "diagnostic-replay"),
+    )
+
+
 def write_live_variant_artifacts(
     run: LiveVariantRun,
     *,
@@ -868,6 +1181,12 @@ def write_live_variant_artifacts(
         ("normalized-structured-responses", "normalized-structured-responses.json", run.normalized_responses, bool(run.normalized_responses)),
         ("role-validation-results", "role-validation-results.json", run.role_results, bool(run.role_results)),
         ("schedule-semantic-validation", "schedule-semantic-validation.json", run.schedule_results, bool(run.schedule_results)),
+        (
+            "commercial-semantic-validation",
+            "commercial-semantic-validation.json",
+            run.commercial_results,
+            bool(run.commercial_results),
+        ),
         ("domain-semantic-validation-results", "domain-semantic-validation-results.json", run.domain_results, bool(run.domain_results)),
         (
             "validated-findings-envelope",
@@ -895,6 +1214,8 @@ def write_live_variant_artifacts(
         ("token-usage", "token-usage.json", _token_usage(run.invocations), True),
         ("retry-history", "retry-history.json", _retry_history(run.invocations), True),
         ("routing-decisions", "routing-decisions.json", run.routing_decisions, run.variant == ExperimentVariant.DYNAMIC_EXPERT_COUNCIL),
+        ("arbitration-decisions", "arbitration-decisions.json", run.arbitration_decisions, bool(run.arbitration_decisions)),
+        ("governance-payloads", "governance-payloads.json", run.governance_payloads, bool(run.governance_payloads)),
         ("disagreement-records", "disagreement-records.json", run.disagreements, False),
         ("final-variant-result", "final-variant-result.json", summary, True),
         ("evaluation-results", "evaluation-results.json", evaluation_payload, True),
@@ -911,7 +1232,14 @@ def write_live_variant_artifacts(
             _schedule_semantic_payload(run.schedule_results),
             bool(run.schedule_results),
         ),
+        (
+            "commercial-semantic-metrics",
+            "commercial-semantic-metrics.json",
+            _commercial_semantic_payload(run.commercial_results),
+            bool(run.commercial_results),
+        ),
         ("synthesis-metrics", "synthesis-metrics.json", synthesis_metric_payload, bool(latest_handoff)),
+        ("efficiency-metrics", "efficiency-metrics.json", _live_efficiency_payload(run), True),
         ("reproducibility", "reproducibility.json", _reproducibility(run), True),
     ]
 
@@ -942,6 +1270,7 @@ def write_live_variant_artifacts(
     )
     inspection = validate_experiment_artifacts(root)
     if not inspection.passed:
+        _mark_artifact_validation_failure(root, inspection.errors)
         raise RuntimeError(f"live variant artifact validation failed: {inspection.errors}")
     return root
 
@@ -968,6 +1297,8 @@ def compare_live_variant_runs(
         if not inspection.passed and not allow_incomplete:
             raise ValueError(f"invalid live run artifacts for {variant.value}: {inspection.errors}")
         summary = LiveVariantSummary.model_validate(read_json(path / "final-variant-result.json"))
+        if not summary.empirical_result_usable_for_comparison and not allow_incomplete:
+            raise ValueError(f"live run is not usable for normal comparison: {variant.value}: {path.as_posix()}")
         if not summary.completed and not allow_incomplete:
             raise ValueError(f"incomplete live run for {variant.value}: {path.as_posix()}")
         config = read_json(path / "sanitized-provider-config.json")
@@ -1020,6 +1351,48 @@ def compare_live_variant_runs(
 def live_variant_completed(path: Path | str) -> bool:
     summary = LiveVariantSummary.model_validate(read_json(Path(path) / "final-variant-result.json"))
     return summary.completed
+
+
+def _mark_artifact_validation_failure(root: Path, errors: list[str]) -> None:
+    final_path = root / "final-variant-result.json"
+    manifest_path = root / "artifact-manifest.json"
+    if not final_path.exists() or not manifest_path.exists():
+        return
+    summary = read_json(final_path)
+    if not isinstance(summary, dict):
+        return
+    summary["derived_artifact_validation_failed"] = True
+    summary["artifact_validation_errors"] = list(errors)
+    summary["empirical_result_usable_for_comparison"] = False
+    write_json(final_path, summary)
+    manifest = read_json(manifest_path)
+    if not isinstance(manifest, dict):
+        return
+    for entry in manifest.get("artifacts", []):
+        if isinstance(entry, dict) and entry.get("relative_path") == "final-variant-result.json":
+            entry["sha256"] = sha256_file(final_path)
+    write_json(manifest_path, manifest)
+
+
+def _append_manifest_entry(root: Path, *, name: str, relative_path: str, schema_id: str) -> None:
+    manifest_path = root / "artifact-manifest.json"
+    manifest = read_json(manifest_path)
+    if not isinstance(manifest, dict):
+        return
+    generated_at = _now()
+    artifacts = manifest.setdefault("artifacts", [])
+    if isinstance(artifacts, list):
+        artifacts.append(
+            ExperimentArtifactEntry(
+                name=name,
+                relative_path=relative_path,
+                schema_id=schema_id,
+                sha256=sha256_file(root / relative_path),
+                generated_at=generated_at,
+                required=True,
+            ).model_dump(mode="json")
+        )
+    write_json(manifest_path, manifest)
 
 
 def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariantSummary) -> LiveComparisonVariantRow:
@@ -1162,15 +1535,16 @@ def _role_scope_applicability(results: list[RoleValidationResult]) -> MetricAppl
     )
 
 
-def _schedule_semantic_applicability(results: list[ScheduleSemanticValidationResult]) -> MetricApplicability:
-    if not results:
+def _domain_semantic_applicability(results: list[DomainSemanticValidationResult]) -> MetricApplicability:
+    implemented = [result for result in results if result.implemented]
+    if not implemented:
         return _metric_not_applicable(
-            "specialized schedule semantic validation applies only to ScheduleExpert invocations"
+            "specialized semantic validation applies only to specialist invocations with implemented validators"
         )
-    metrics = schedule_semantic_metrics(results)
+    score = sum(1 for result in implemented if result.valid is True) / len(implemented)
     return _metric_from_score(
-        metrics["schedule_semantic_compliance_rate"],
-        unavailable_reason="schedule semantic validation score was unavailable",
+        score,
+        unavailable_reason="specialized semantic validation score was unavailable",
     )
 
 
@@ -1186,7 +1560,25 @@ def _schedule_semantic_payload(results: list[ScheduleSemanticValidationResult]) 
     metrics = schedule_semantic_metrics(results) if results else {}
     return {
         **metrics,
-        "applicability": _schedule_semantic_applicability(results),
+        "applicability": _metric_from_score(
+            metrics["schedule_semantic_compliance_rate"],
+            unavailable_reason="schedule semantic validation score was unavailable",
+        )
+        if results
+        else _metric_not_applicable("specialized schedule semantic validation applies only to ScheduleExpert invocations"),
+    }
+
+
+def _commercial_semantic_payload(results: list[CommercialSemanticValidationResult]) -> dict[str, Any]:
+    metrics = commercial_semantic_metrics(results) if results else {}
+    return {
+        **metrics,
+        "applicability": _metric_from_score(
+            metrics["commercial_semantic_compliance_rate"],
+            unavailable_reason="commercial semantic validation score was unavailable",
+        )
+        if results
+        else _metric_not_applicable("specialized commercial semantic validation applies only to CommercialExpert invocations"),
     }
 
 
@@ -1241,6 +1633,69 @@ def _last_for_invocation(items: list[Any], invocation_id: str) -> dict[str, Any]
         if getattr(item, "invocation_id", None) == invocation_id:
             return item.model_dump(mode="json")
     return None
+
+
+def _last_normalized_response(items: list[dict[str, Any]], invocation_id: str) -> dict[str, Any] | None:
+    for item in reversed(items):
+        if item.get("invocation_id") == invocation_id:
+            response = item.get("normalized_response")
+            return response if isinstance(response, dict) else None
+    return None
+
+
+def _embedded_record_ids(value: Any) -> set[str]:
+    if not isinstance(value, dict):
+        return set()
+    result: set[str] = set()
+    for key in ["citations", "evidence_record_ids", "source_record_ids", "record_ids"]:
+        ids = value.get(key)
+        if isinstance(ids, list):
+            result.update(str(record_id) for record_id in ids)
+    return result
+
+
+def _live_efficiency_payload(run: LiveVariantRun) -> dict[str, Any]:
+    selected = []
+    if run.routing_decisions:
+        selected = run.routing_decisions[-1].get("selected_agent_roles", [])
+    role_to_input_tokens: dict[str, int] = {}
+    for invocation in run.invocations:
+        if invocation.result.input_token_count is not None:
+            role_to_input_tokens[invocation.agent_role] = (
+                role_to_input_tokens.get(invocation.agent_role, 0) + invocation.result.input_token_count
+            )
+    selected_specialist_tokens = sum(
+        invocation.result.input_token_count or 0
+        for invocation in run.invocations
+        if invocation.agent_role in selected
+    )
+    total_input_tokens = sum(
+        invocation.result.input_token_count or 0
+        for invocation in run.invocations
+        if invocation.result.input_token_count is not None
+    )
+    return {
+        "director_selected_specialist_count": len(selected),
+        "governance_invocation_count": sum(
+            1
+            for invocation in run.invocations
+            if invocation.agent_role
+            in {AgentRole.DIRECTOR.value, AgentRole.EVIDENCE_AUDITOR.value, AgentRole.ARBITER.value}
+        ),
+        "arbiter_required": any(item.get("arbiter_required") is True for item in run.arbitration_decisions),
+        "arbiter_skipped": any(item.get("arbiter_required") is False for item in run.arbitration_decisions),
+        "evidence_auditor_input_tokens": role_to_input_tokens.get(AgentRole.EVIDENCE_AUDITOR.value),
+        "arbiter_input_tokens": role_to_input_tokens.get(AgentRole.ARBITER.value),
+        "planner_input_tokens": role_to_input_tokens.get(AgentRole.RECOVERY_PLANNER.value),
+        "dynamic_routing_savings_vs_fixed_specialist_set": (
+            max(len(SPECIALIST_ROLES) - len(selected), 0)
+            if run.variant == ExperimentVariant.DYNAMIC_EXPERT_COUNCIL
+            else 0
+        ),
+        "total_overhead_tokens_beyond_selected_specialists": (
+            total_input_tokens - selected_specialist_tokens if selected else None
+        ),
+    }
 
 
 def _raw_provider_responses(invocations: list[AgentInvocation]) -> list[dict[str, Any]]:
@@ -1373,6 +1828,7 @@ def _live_variant_schema_id_for(filename: str) -> str:
         "claim-normalization-results.json": "project-recovery-council.qwen.live-claim-normalization-results.v1",
         "normalized-structured-responses.json": "project-recovery-council.qwen.live-normalized-structured-responses.v1",
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+        "commercial-semantic-validation.json": "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
         "domain-semantic-validation-results.json": "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
         "validated-findings-envelope.json": "project-recovery-council.qwen.live-validated-findings-envelope.v1",
         "excluded-findings.json": "project-recovery-council.qwen.live-excluded-findings.v1",
@@ -1381,18 +1837,23 @@ def _live_variant_schema_id_for(filename: str) -> str:
             "project-recovery-council.qwen.live-recommendation-authorization-state.v1"
         ),
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
+        "commercial-semantic-metrics.json": "project-recovery-council.qwen.live-commercial-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
         "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",
         "token-usage.json": "project-recovery-council.qwen.live-token-usage.v1",
         "retry-history.json": "project-recovery-council.qwen.live-retry-history.v1",
         "routing-decisions.json": "project-recovery-council.qwen.live-routing-decisions.v1",
+        "arbitration-decisions.json": "project-recovery-council.qwen.live-arbitration-decisions.v1",
+        "governance-payloads.json": "project-recovery-council.qwen.live-governance-payloads.v1",
         "disagreement-records.json": "project-recovery-council.qwen.live-disagreement-records.v1",
         "final-variant-result.json": "project-recovery-council.qwen.live-final-variant-result.v1",
         "evaluation-results.json": "project-recovery-council.qwen.live-evaluation-results.v1",
         "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
         "claim-normalization-metrics.json": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
         "synthesis-metrics.json": "project-recovery-council.qwen.live-synthesis-metrics.v1",
+        "efficiency-metrics.json": "project-recovery-council.qwen.live-efficiency-metrics.v1",
+        "diagnostic-rebuild-metadata.json": "project-recovery-council.qwen.live-diagnostic-rebuild-metadata.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 

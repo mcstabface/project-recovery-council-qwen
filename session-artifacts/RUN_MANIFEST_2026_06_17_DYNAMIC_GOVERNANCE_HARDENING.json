@@ -1,0 +1,74 @@
+{
+  "manifest_id": "RUN_MANIFEST_2026_06_17_DYNAMIC_GOVERNANCE_HARDENING",
+  "created_on": "2026-06-17",
+  "repository": "project-recovery-council-qwen",
+  "git_base": "5b288a1ca803ca95ea9119bde1f96c121bafaf4e",
+  "live_network_requests_made": false,
+  "scope": [
+    "shared fixed-chain and dynamic-council specialist validation",
+    "commercial semantic validation",
+    "dynamic Arbiter invocation policy",
+    "compact EvidenceAuditor and Arbiter governance payloads",
+    "failed-run preservation and no-network diagnostic rebuilds",
+    "dynamic governance efficiency metrics"
+  ],
+  "source_changes": [
+    "src/project_recovery_council/__main__.py",
+    "src/project_recovery_council/claim_normalization.py",
+    "src/project_recovery_council/commercial_semantics.py",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/live_variant_runner.py",
+    "src/project_recovery_council/role_scope.py",
+    "src/project_recovery_council/synthesis_handoff.py"
+  ],
+  "test_changes": [
+    "tests/test_dynamic_council_governance.py",
+    "tests/test_live_variant_runner.py"
+  ],
+  "documentation_changes": [
+    "README.md",
+    "docs/CLAIM_NORMALIZATION.md",
+    "docs/DYNAMIC_COUNCIL_GOVERNANCE_POLICY.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_COMPARISON_RUNBOOK.md",
+    "docs/LIVE_PROVIDER_PLAN.md",
+    "docs/METRICS.md",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "docs/VALIDATED_FINDINGS_HANDOFF.md",
+    "decisions/ADR-0015-shared-dynamic-validation-and-arbitration-policy.md"
+  ],
+  "process_artifacts": [
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_17_DYNAMIC_GOVERNANCE_HARDENING.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_17_DYNAMIC_GOVERNANCE_HARDENING.json"
+  ],
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_dynamic_council_governance.py tests/test_live_variant_runner.py tests/test_validated_findings_handoff.py tests/test_claim_normalization.py tests/test_schedule_semantics.py tests/test_qwen_evaluation.py",
+      "result": "75 passed in 1.11s"
+    },
+    {
+      "command": "python -m pytest",
+      "result": "153 passed, 1 skipped in 6.91s"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed with no output"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "result": "prompt validation passed"
+    }
+  ],
+  "limitations": [
+    "No live network request was made in this build.",
+    "Prior live artifacts were not modified or relabeled.",
+    "Frozen schemas/v1 and the deterministic oracle were not modified.",
+    "Diagnostic rebuilds are not empirical live results and are rejected by normal compare-live input."
+  ]
+}

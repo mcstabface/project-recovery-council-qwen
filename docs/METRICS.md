@@ -54,6 +54,19 @@ Required deterministic checks:
 - authorization gate correctness
 - recommendation with pending approval correctness
 - synthesis omission count
+- commercial semantic compliance rate
+- delay exposure rate correctness
+- unmitigated exposure correctness
+- mitigation cost correctness
+- avoided exposure correctness
+- Director-selected specialist count
+- governance invocation count
+- Arbiter required or skipped
+- EvidenceAuditor input tokens
+- Arbiter input tokens
+- planner input tokens
+- dynamic routing savings versus fixed specialist set
+- total overhead tokens beyond selected specialists
 
 Provider pricing is never invented. Offline fixtures leave provider token,
 latency, and cost values null unless a fixture or provider explicitly supplies
@@ -125,6 +138,27 @@ variant. Live reports represent that as `N/A`.
 - `schedule_semantic_compliance_rate`: the share of ScheduleExpert semantic
   validations that pass all checked schedule rules.
 
+## Commercial Semantic Metrics
+
+Commercial semantic metrics apply to `CommercialExpert` outputs after schema
+validation, normalization, and role-scope validation. They record arithmetic
+agreement with the deterministic expected results without rewriting provider
+output.
+
+- `delay_exposure_rate_correctness`: whether delay exposure is 15000 USD per
+  day.
+- `unmitigated_exposure_correctness`: whether unmitigated exposure equals delay
+  exposure multiplied by the forecast milestone slip.
+- `mitigation_cost_correctness`: whether mitigation cost is 48000 USD.
+- `avoided_exposure_correctness`: whether avoided exposure equals unmitigated
+  exposure minus mitigation cost.
+- `commercial_semantic_compliance_rate`: the share of implemented commercial
+  semantic validations that pass all checked commercial rules.
+
+If a response contains both an invalid `gross_avoided_exposure_usd` and a valid
+`avoided_exposure_usd`, the invalid field remains excluded while the valid net
+avoided-exposure finding can still be retained for synthesis.
+
 ## Live Comparison Metrics
 
 `compare-live` reports one row per completed live AI variant:
@@ -179,3 +213,19 @@ and the onsite-status contradiction is detected, the authorization state must
 record `blocked_pending_human_confirmation`, `HDR-ONSITE-001`, and the
 unresolved `equipment_onsite_status` contradiction unless a recorded human
 decision has cleared the gate.
+
+## Governance Efficiency Metrics
+
+Dynamic council live runs also write `efficiency-metrics.json` with governance
+counts and prompt-size indicators:
+
+- Director-selected specialist count
+- governance invocation count
+- Arbiter required or skipped status
+- EvidenceAuditor, Arbiter, and planner prompt sizes
+- dynamic routing savings versus the fixed specialist set
+- total overhead tokens beyond selected specialists, when provider usage is
+  available
+
+These metrics describe orchestration overhead. They do not estimate cost unless
+explicit provider pricing is supplied.

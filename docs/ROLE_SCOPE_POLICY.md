@@ -49,7 +49,7 @@ Supported aliases, such as `baseline_delivery_date`,
 `forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
 `remaining_total_float_days`,
 `remaining_total_float_after_delivery_shift_days`, `float_consumed_days`,
-`contractual_milestone_baseline_date`, and
+`forecast_milestone_date`, `contractual_milestone_baseline_date`, and
 `contractual_milestone_forecast_without_intervention`, are normalized before
 role validation. They are not role-policy keys themselves.
 
@@ -65,9 +65,15 @@ arrival facts.
 
 Allowed claim keys include `delay_exposure_usd_per_day`,
 `forecast_milestone_slip_days`, `unmitigated_exposure_usd`,
-`mitigation_cost_usd`, and `gross_avoided_exposure_usd`. Observed aliases such
-as `contractual_delay_exposure_usd_per_day` and
-`unmitigated_delay_exposure_usd` are normalized before role validation.
+`mitigation_cost_usd`, `gross_avoided_exposure_usd`, and
+`avoided_exposure_usd`. Observed aliases such as
+`contractual_delay_exposure_usd_per_day`, `unmitigated_delay_exposure_usd`, and
+`net_avoided_exposure_usd` are normalized before role validation.
+
+CommercialExpert also receives deterministic commercial-semantic validation.
+The validator accepts the valid avoided-exposure finding separately from an
+incorrect gross avoided-exposure field; invalid commercial fields are preserved
+but excluded from normal synthesis.
 
 ## EvidenceAuditor
 
@@ -82,6 +88,12 @@ Supported audit claim IDs are explicit and versioned for the synthetic case:
 this registry. Arbitrary unknown audit claim IDs are not accepted as valid
 role-policy keys.
 
+Observed dynamic audit support keys are also explicit typed assessment keys:
+`delay_exposure_usd_per_day_support`, `delivery_shift_days_support`,
+`equipment_onsite_claim_conflict`, `forecast_milestone_slip_days_support`, and
+`installation_total_float_consumed_days_support`. They are support records, not
+permission for arbitrary free-form claim IDs.
+
 ## RiskExpert
 
 May receive risk register records and relevant schedule/status/contradiction
@@ -92,9 +104,10 @@ Allowed risk claim keys include `onsite_status_conflict`,
 `recovery_approval_risk`, `milestone_slip_impact`,
 `conflicting_onsite_status_requires_human_confirmation`,
 `recovery_option_approval_blocked`, and
-`escalation_required_for_milestone_integrity`. A risk finding may state that
-authorization is blocked pending human confirmation; it must not convert that
-gate into a commercial recommendation or final approval decision.
+`escalation_required_for_milestone_integrity`, `escalation_requirement`, and
+`milestone_slip_exposure`. A risk finding may state that authorization is
+blocked pending human confirmation; it must not convert that gate into a
+commercial recommendation or final approval decision.
 
 ## RecoveryPlanner
 

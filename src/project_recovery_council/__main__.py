@@ -30,6 +30,7 @@ from project_recovery_council.live_variant_runner import (
     LiveRunControls,
     compare_live_variant_runs,
     live_variant_completed,
+    rebuild_derived_artifacts,
     run_controlled_live_variant,
 )
 from project_recovery_council.offline_experiments import (
@@ -144,6 +145,15 @@ def build_parser() -> argparse.ArgumentParser:
     compare_live_parser.add_argument("--output-root", type=Path, default=Path("experiment-artifacts") / "live-comparisons")
     compare_live_parser.add_argument("--comparison-id", default=None)
     compare_live_parser.add_argument("--allow-incomplete", action="store_true")
+
+    rebuild_parser = subparsers.add_parser(
+        "rebuild-derived-artifacts",
+        help="replay persisted live provider responses through deterministic derived-artifact processing",
+    )
+    rebuild_parser.add_argument("run_path", type=Path)
+    rebuild_parser.add_argument("--output", required=True, type=Path)
+    rebuild_parser.add_argument("--case-path", type=Path, default=DEFAULT_CASE_PATH)
+    rebuild_parser.add_argument("--replace-existing", action="store_true")
 
     return parser
 
@@ -385,6 +395,17 @@ def main(argv: list[str] | None = None) -> int:
                 allow_incomplete=args.allow_incomplete,
             )
             print(f"live comparison artifacts written: {run_path}")
+            return 0
+
+        if args.command == "rebuild-derived-artifacts":
+            run_path = rebuild_derived_artifacts(
+                source_run_path=args.run_path,
+                output_path=args.output,
+                case_path=args.case_path,
+                replace_existing=args.replace_existing,
+            )
+            print(f"derived diagnostic artifacts written: {run_path}")
+            print("provider_calls_made: 0")
             return 0
 
     except Exception as exc:

@@ -29,6 +29,8 @@ and token usage fields:
   `fixed_expert_chain`, and `dynamic_expert_council`
 - offline `compare-live` reporting across three completed live variant
   directories
+- no-network diagnostic rebuilds of derived artifacts from persisted live
+  invocation records
 
 ## Deferred
 

@@ -62,12 +62,14 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-claim-normalization-results.v1",
     "project-recovery-council.qwen.live-normalized-structured-responses.v1",
     "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+    "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
     "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
     "project-recovery-council.qwen.live-validated-findings-envelope.v1",
     "project-recovery-council.qwen.live-excluded-findings.v1",
     "project-recovery-council.qwen.live-synthesis-input.v1",
     "project-recovery-council.qwen.live-recommendation-authorization-state.v1",
     "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
+    "project-recovery-council.qwen.live-commercial-semantic-metrics.v1",
     "project-recovery-council.qwen.live-synthesis-metrics.v1",
     "project-recovery-council.qwen.live-raw-provider-responses.v1",
     "project-recovery-council.qwen.live-parsed-structured-responses.v1",
@@ -77,10 +79,14 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-role-compliance-metrics.v1",
     "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
     "project-recovery-council.qwen.live-routing-decisions.v1",
+    "project-recovery-council.qwen.live-arbitration-decisions.v1",
+    "project-recovery-council.qwen.live-governance-payloads.v1",
     "project-recovery-council.qwen.live-disagreement-records.v1",
     "project-recovery-council.qwen.live-final-variant-result.v1",
     "project-recovery-council.qwen.live-evaluation-results.v1",
     "project-recovery-council.qwen.live-comparison-report.v1",
+    "project-recovery-council.qwen.live-efficiency-metrics.v1",
+    "project-recovery-council.qwen.live-diagnostic-rebuild-metadata.v1",
     "project-recovery-council.qwen.live-reproducibility.v1",
 }
 
@@ -210,6 +216,7 @@ def _schema_id_for(filename: str) -> str:
             "project-recovery-council.qwen.live-normalized-structured-responses.v1"
         ),
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+        "commercial-semantic-validation.json": "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
         "domain-semantic-validation-results.json": (
             "project-recovery-council.qwen.live-domain-semantic-validation-results.v1"
         ),
@@ -220,6 +227,7 @@ def _schema_id_for(filename: str) -> str:
             "project-recovery-council.qwen.live-recommendation-authorization-state.v1"
         ),
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
+        "commercial-semantic-metrics.json": "project-recovery-council.qwen.live-commercial-semantic-metrics.v1",
         "synthesis-metrics.json": "project-recovery-council.qwen.live-synthesis-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
@@ -229,10 +237,14 @@ def _schema_id_for(filename: str) -> str:
         "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
         "claim-normalization-metrics.json": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
         "routing-decisions.json": "project-recovery-council.qwen.live-routing-decisions.v1",
+        "arbitration-decisions.json": "project-recovery-council.qwen.live-arbitration-decisions.v1",
+        "governance-payloads.json": "project-recovery-council.qwen.live-governance-payloads.v1",
         "disagreement-records.json": "project-recovery-council.qwen.live-disagreement-records.v1",
         "final-variant-result.json": "project-recovery-council.qwen.live-final-variant-result.v1",
         "live-comparison-report.json": "project-recovery-council.qwen.live-comparison-report.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
+        "efficiency-metrics.json": "project-recovery-council.qwen.live-efficiency-metrics.v1",
+        "diagnostic-rebuild-metadata.json": "project-recovery-council.qwen.live-diagnostic-rebuild-metadata.v1",
     }[filename]
 
 
@@ -256,6 +268,7 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
     normalized_responses = loaded_payloads.get("normalized-structured-responses.json")
     parsed_responses = loaded_payloads.get("parsed-structured-responses.json")
     schedule_results = loaded_payloads.get("schedule-semantic-validation.json")
+    commercial_results = loaded_payloads.get("commercial-semantic-validation.json")
     if not isinstance(selected, list) or not selected:
         errors.append("standalone specialist live artifacts require selected-evidence-records.json")
     if not isinstance(role_results, list) or not role_results:
@@ -272,6 +285,14 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
     ]
     if schedule_invocation_ids and (not isinstance(schedule_results, list) or not schedule_results):
         errors.append("standalone ScheduleExpert live artifacts require schedule-semantic-validation.json")
+    commercial_invocation_ids = [
+        invocation.get("invocation_id")
+        for invocation in invocations
+        if isinstance(invocation, dict)
+        and invocation.get("agent_role") == "CommercialExpert"
+    ]
+    if commercial_invocation_ids and (not isinstance(commercial_results, list) or not commercial_results):
+        errors.append("CommercialExpert live artifacts require commercial-semantic-validation.json")
     selected_ids = {
         item.get("invocation_id")
         for item in selected or []

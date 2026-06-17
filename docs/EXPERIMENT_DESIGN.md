@@ -25,6 +25,9 @@ Recovery Planner produces the final recommendation.
 
 The Director cannot silently select every expert by default. Unknown or
 unsupported selected roles fail the run clearly rather than being guessed.
+ArbiterAgent runs only for substantive disagreements among eligible validated
+findings. Support-only audit records and unresolved human evidence gates do not
+by themselves trigger arbitration.
 
 ## Output Artifacts
 
@@ -107,6 +110,8 @@ Live variant artifacts include:
 - `token-usage.json`
 - `retry-history.json`
 - `routing-decisions.json` for dynamic council runs
+- `arbitration-decisions.json` for dynamic council runs
+- `governance-payloads.json` for dynamic council runs
 - `disagreement-records.json`
 - `final-variant-result.json`
 - `evaluation-results.json`
@@ -119,12 +124,15 @@ Specialist live artifacts additionally include:
 - `normalized-structured-responses.json`
 - `role-validation-results.json`
 - `domain-semantic-validation-results.json`
+- `commercial-semantic-validation.json` when `CommercialExpert` ran
+- `commercial-semantic-metrics.json` when `CommercialExpert` ran
 - `validated-findings-envelope.json`
 - `excluded-findings.json`
 - `synthesis-input.json`
 - `recommendation-authorization-state.json`
 - `claim-normalization-metrics.json`
 - `synthesis-metrics.json`
+- `efficiency-metrics.json`
 
 Raw parsed provider output remains in `parsed-structured-responses.json`.
 
@@ -145,6 +153,19 @@ validation. Future artifacts for those invocations include
 alongside selected evidence and role validation results. The validation artifact
 records expected and observed schedule values without modifying the provider
 response.
+
+Live `CommercialExpert` invocations also run deterministic commercial-semantic
+validation. The validator checks delay exposure rate, forecast slip,
+unmitigated exposure, mitigation cost, and avoided exposure arithmetic. If a
+provider supplies an invalid gross avoided-exposure field while also supplying a
+valid net avoided-exposure field, the valid finding remains eligible and the
+invalid field is excluded.
+
+Dynamic governance prompts are compact. EvidenceAuditor receives normalized
+specialist claims, claim-attached citations, validation status, cited evidence,
+and known contradiction candidates. ArbiterAgent, when required, receives only
+disagreement records, conflicting eligible findings, citations, limited
+supporting evidence, and human-gate status.
 
 `compare-live` requires completed and artifact-valid single-generalist,
 fixed-chain, and dynamic-council directories unless `--allow-incomplete` is
@@ -173,3 +194,13 @@ Validation layers are intentionally distinct:
 - Schedule-semantic validation checks whether `ScheduleExpert` arithmetic is
   consistent with `SCH-DELIVERY-001`, including qualitative
   `float_consumption_status` consistency when that claim is present.
+- Commercial-semantic validation checks whether `CommercialExpert` arithmetic is
+  consistent with the deterministic commercial expected results.
+
+## Diagnostic Rebuilds
+
+`rebuild-derived-artifacts` consumes an existing live run directory and writes a
+new derived diagnostic directory. It preserves raw responses and invocation
+records, makes no provider calls, reruns deterministic validation and
+evaluation, and records source run hashes. The derived output is marked
+non-empirical and is not accepted as normal `compare-live` input.

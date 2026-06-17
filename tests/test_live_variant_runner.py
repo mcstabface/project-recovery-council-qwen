@@ -356,7 +356,9 @@ def test_successful_fixed_chain_order_filtering_and_artifacts(tmp_path: Path, mo
     selected = read_json(path / "selected-evidence-records.json")
     schedule_records = next(item for item in selected if item["agent_role"] == AgentRole.SCHEDULE_EXPERT.value)
     assert schedule_records["record_ids"] == ["CASE-INTAKE-001", "SCH-DELIVERY-001"]
-    assert read_json(path / "domain-semantic-validation-results.json")[1]["implemented"] is False
+    commercial_semantic = read_json(path / "domain-semantic-validation-results.json")[1]
+    assert commercial_semantic["implemented"] is True
+    assert commercial_semantic["validator"] == "CommercialExpertSemanticValidator.v1"
 
 
 def test_specialist_compliance_metrics_remain_applicable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -389,7 +391,6 @@ def test_successful_dynamic_council_uses_director_selection(tmp_path: Path, monk
             schedule_response(),
             commercial_response(),
             auditor_response(),
-            arbiter_response(),
             recovery_response(),
         ],
         experiment_id="dynamic-ok",
@@ -403,9 +404,10 @@ def test_successful_dynamic_council_uses_director_selection(tmp_path: Path, monk
         AgentRole.SCHEDULE_EXPERT.value,
         AgentRole.COMMERCIAL_EXPERT.value,
         AgentRole.EVIDENCE_AUDITOR.value,
-        AgentRole.ARBITER.value,
         AgentRole.RECOVERY_PLANNER.value,
     ]
+    arbitration = read_json(path / "arbitration-decisions.json")[0]
+    assert arbitration["arbiter_required"] is False
 
 
 def test_unknown_director_role_rejected_without_guessing(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -642,7 +644,6 @@ def test_live_comparison_generation_and_incomplete_rejection(tmp_path: Path, mon
             schedule_response(),
             commercial_response(),
             auditor_response(),
-            arbiter_response(),
             recovery_response(),
         ],
         experiment_id="compare-dynamic",

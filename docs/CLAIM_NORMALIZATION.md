@@ -25,6 +25,7 @@ decisions are stored in `claim-normalization-results.json`.
 | `remaining_total_float_after_delivery_shift_days` | `installation_total_float_remaining_days` |
 | `projected_milestone_slip_days` | `forecast_milestone_slip_days` |
 | `baseline_milestone_date` | `milestone_baseline_date` |
+| `forecast_milestone_date` | `milestone_forecast_date_without_intervention` |
 | `forecast_milestone_date_without_intervention` | `milestone_forecast_date_without_intervention` |
 | `contractual_milestone_baseline_date` | `milestone_baseline_date` |
 | `contractual_milestone_forecast_without_intervention` | `milestone_forecast_date_without_intervention` |
@@ -40,10 +41,12 @@ are canonical ScheduleExpert claim keys, not aliases.
 | --- | --- |
 | `contractual_delay_exposure_usd_per_day` | `delay_exposure_usd_per_day` |
 | `unmitigated_delay_exposure_usd` | `unmitigated_exposure_usd` |
+| `net_avoided_exposure_usd` | `avoided_exposure_usd` |
 
 `forecast_milestone_slip_days`, `mitigation_cost_usd`, and
 `gross_avoided_exposure_usd` are supported canonical CommercialExpert claim
-keys.
+keys. `avoided_exposure_usd` is a canonical key used for the valid net avoided
+exposure when a provider distinguishes net from gross avoided exposure.
 
 ## EvidenceAuditor And RiskExpert v1 Keys
 
@@ -69,8 +72,14 @@ RiskExpert supports `onsite_status_conflict`, `recovery_approval_risk`,
 `milestone_slip_impact`,
 `conflicting_onsite_status_requires_human_confirmation`,
 `recovery_option_approval_blocked`, and
-`escalation_required_for_milestone_integrity` in addition to the earlier risk
-claim keys.
+`escalation_required_for_milestone_integrity`, `escalation_requirement`, and
+`milestone_slip_exposure` in addition to the earlier risk claim keys.
+
+EvidenceAuditor also supports explicit typed support assessment keys observed
+in dynamic council runs: `delay_exposure_usd_per_day_support`,
+`delivery_shift_days_support`, `equipment_onsite_claim_conflict`,
+`forecast_milestone_slip_days_support`, and
+`installation_total_float_consumed_days_support`.
 
 ## Conflict Rules
 

@@ -23,6 +23,10 @@ from project_recovery_council.experiment_contracts import (
 )
 from project_recovery_council.fixtures import CaseBundle
 from project_recovery_council.model_client import FinishStatus, ModelResult
+from project_recovery_council.commercial_semantics import (
+    CommercialSemanticValidationResult,
+    commercial_semantic_metrics,
+)
 from project_recovery_council.role_scope import RoleValidationResult, role_compliance_metrics
 from project_recovery_council.schedule_semantics import (
     ScheduleSemanticValidationResult,
@@ -210,6 +214,31 @@ def evaluation_metric_catalog() -> list[EvaluationMetric]:
             metric_id=EvaluationMetricId.SCHEDULE_SEMANTIC_COMPLIANCE_RATE,
             name="Schedule semantic compliance rate",
             description="Share of schedule semantic validations with no deterministic arithmetic violations.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.COMMERCIAL_SEMANTIC_COMPLIANCE_RATE,
+            name="Commercial semantic compliance rate",
+            description="Share of commercial semantic validations with no deterministic arithmetic violations.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.DELAY_EXPOSURE_RATE_CORRECTNESS,
+            name="Delay exposure rate correctness",
+            description="Whether delay exposure rate matches the commercial evidence.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.UNMITIGATED_EXPOSURE_CORRECTNESS,
+            name="Unmitigated exposure correctness",
+            description="Whether unmitigated exposure equals delay rate times milestone slip.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.MITIGATION_COST_CORRECTNESS,
+            name="Mitigation cost correctness",
+            description="Whether mitigation cost matches the commercial evidence.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.AVOIDED_EXPOSURE_CORRECTNESS,
+            name="Avoided exposure correctness",
+            description="Whether avoided exposure equals unmitigated exposure minus mitigation cost.",
         ),
         EvaluationMetric(
             metric_id=EvaluationMetricId.CLAIM_NORMALIZATION_SUCCESS_RATE,
@@ -706,5 +735,36 @@ def schedule_semantic_metric_results(results: list[ScheduleSemanticValidationRes
             metric_id=EvaluationMetricId.SCHEDULE_SEMANTIC_COMPLIANCE_RATE,
             score=metrics["schedule_semantic_compliance_rate"],
             passed=metrics["schedule_semantic_compliance_rate"] == 1.0,
+        ),
+    ]
+
+
+def commercial_semantic_metric_results(results: list[CommercialSemanticValidationResult]) -> list[MetricResult]:
+    metrics = commercial_semantic_metrics(results)
+    return [
+        MetricResult(
+            metric_id=EvaluationMetricId.COMMERCIAL_SEMANTIC_COMPLIANCE_RATE,
+            score=metrics["commercial_semantic_compliance_rate"],
+            passed=metrics["commercial_semantic_compliance_rate"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.DELAY_EXPOSURE_RATE_CORRECTNESS,
+            score=metrics["delay_exposure_rate_correctness"],
+            passed=metrics["delay_exposure_rate_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.UNMITIGATED_EXPOSURE_CORRECTNESS,
+            score=metrics["unmitigated_exposure_correctness"],
+            passed=metrics["unmitigated_exposure_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.MITIGATION_COST_CORRECTNESS,
+            score=metrics["mitigation_cost_correctness"],
+            passed=metrics["mitigation_cost_correctness"] == 1.0,
+        ),
+        MetricResult(
+            metric_id=EvaluationMetricId.AVOIDED_EXPOSURE_CORRECTNESS,
+            score=metrics["avoided_exposure_correctness"],
+            passed=metrics["avoided_exposure_correctness"] == 1.0,
         ),
     ]

@@ -90,6 +90,7 @@ prc-qwen inspect-experiment experiment-artifacts/offline-strong_modular_council
 prc-qwen live-smoke --model <model-id> --allow-network
 prc-qwen live-variant --variant single_generalist --model <model-id> --allow-network
 prc-qwen compare-live --generalist <path> --fixed-chain <path> --dynamic-council <path>
+prc-qwen rebuild-derived-artifacts <run-path> --output <derived-path>
 project-recovery-council validate
 project-recovery-council demo
 project-recovery-council inspect session-artifacts/canonical-demo
@@ -121,6 +122,7 @@ python -m project_recovery_council validate-prompts
 python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
 python -m project_recovery_council live-smoke --model <model-id> --allow-network
 python -m project_recovery_council live-variant --variant single_generalist --model <model-id> --allow-network
+python -m project_recovery_council rebuild-derived-artifacts experiment-artifacts/live/<run-id> --output experiment-artifacts/live-diagnostics/<run-id>-derived
 ```
 
 From this source tree without installing first:
@@ -145,6 +147,7 @@ PYTHONPATH=src python -m project_recovery_council validate-prompts
 PYTHONPATH=src python -m project_recovery_council inspect-experiment experiment-artifacts/offline-strong_modular_council
 PYTHONPATH=src python -m project_recovery_council live-smoke --model <model-id> --allow-network
 PYTHONPATH=src python -m project_recovery_council live-variant --variant single_generalist --model <model-id> --allow-network
+PYTHONPATH=src python -m project_recovery_council rebuild-derived-artifacts experiment-artifacts/live/<run-id> --output experiment-artifacts/live-diagnostics/<run-id>-derived
 ```
 
 Workflow runs write inspectable artifacts under:
