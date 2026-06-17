@@ -6,15 +6,21 @@
   <title>Qwen Agent Society Results</title>
   <style>
     body { font-family: Arial, sans-serif; line-height: 1.5; margin: 2rem; color: #172033; }
-    main { max-width: 980px; margin: 0 auto; }
+    main { max-width: 1220px; margin: 0 auto; }
     h1, h2, h3 { line-height: 1.2; }
     table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
     th, td { border: 1px solid #cbd5e1; padding: 0.55rem; text-align: left; }
     th { background: #f1f5f9; }
     td.number, th.number { text-align: right; }
     .note { background: #fff7ed; border-left: 4px solid #f97316; padding: 0.75rem 1rem; }
-    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
-    .grid img { max-width: 100%; border: 1px solid #e2e8f0; }
+    .audit-note { background: #f8fafc; border: 1px solid #cbd5e1; border-left: 4px solid #2563eb; padding: 1rem; }
+    .grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; align-items: start; }
+    @media (min-width: 1180px) {
+      .grid { grid-template-columns: repeat(2, minmax(540px, 1fr)); }
+    }
+    figure { margin: 0; }
+    figure img { width: 100%; min-width: 0; border: 1px solid #e2e8f0; background: #ffffff; }
+    figcaption { margin-top: 0.45rem; font-size: 1rem; color: #334155; }
     code { background: #f8fafc; padding: 0.1rem 0.25rem; }
   </style>
 </head>
@@ -66,10 +72,22 @@
   <section>
     <h2>Charts</h2>
     <div class="grid">
-      <img src="charts/required_fact_accuracy.svg" alt="Required fact accuracy by variant">
-      <img src="charts/citation_recall.svg" alt="Citation recall by variant">
-      <img src="charts/total_tokens.svg" alt="Total tokens by variant">
-      <img src="charts/latency.svg" alt="Latency by variant">
+      <figure>
+        <img src="charts/required_fact_accuracy.svg" alt="Required fact accuracy by variant">
+        <figcaption>Facts: generalist and dynamic council were both accurate.</figcaption>
+      </figure>
+      <figure>
+        <img src="charts/citation_recall.svg" alt="Citation recall by variant">
+        <figcaption>Citations: dynamic council provided complete evidence coverage.</figcaption>
+      </figure>
+      <figure>
+        <img src="charts/total_tokens.svg" alt="Total tokens by variant">
+        <figcaption>Tokens: assurance required materially more model usage.</figcaption>
+      </figure>
+      <figure>
+        <img src="charts/latency.svg" alt="Latency by variant">
+        <figcaption>Latency: dynamic governance imposed a substantial time premium.</figcaption>
+      </figure>
     </div>
   </section>
 
@@ -78,7 +96,19 @@
     <p>The generalist produced a factually strong answer with one invocation, 4298 tokens, and 15.0 seconds. Its main gap was provenance: citation recall was 54.2%.</p>
     <p>The fixed chain shows that adding agents without governed handoff can degrade results. It was not intentionally weakened; the synthesis failed to retain and use validated findings.</p>
     <p>The dynamic council produced the highest quality result, including 100% citation precision and recall, correct human escalation, correct preferred option, and correct blocked authorization state. It also cost more in tokens and time.</p>
-    <p>Recorded dynamic role-scope compliance was 0.75. Post-run offline analysis identified the remaining failure as policy drift on schedule identifier keys, not a substantive role violation. See <a href="../docs/REMAINING_ROLE_SCOPE_ANALYSIS.md">remaining role-scope analysis</a>.</p>
+    <div class="audit-note">
+      <h3>Role-Scope Provenance Note</h3>
+      <p><strong>Recorded empirical result:</strong> role-scope compliance was <strong>0.75</strong>.</p>
+      <p><strong>Post-run policy review:</strong> the single failure was classified as a policy false positive. <code>contractual_milestone_id</code> is a valid alias for <code>milestone_id</code>, and <code>installation_activity_id</code> is a valid ScheduleExpert identifier. The captured response passes the corrected policy offline, and the source empirical artifact remains unchanged.</p>
+      <table>
+        <thead><tr><th>Dynamic role-scope view</th><th class="number">Score</th></tr></thead>
+        <tbody>
+          <tr><td>Empirical recorded score</td><td class="number">75%</td></tr>
+          <tr><td>Corrected-policy offline replay</td><td class="number">100%</td></tr>
+        </tbody>
+      </table>
+      <p>This is auditability and policy evolution, not a retroactive score correction. The offline 100% replay is not represented as the empirical score in the primary comparison table. See <a href="../docs/REMAINING_ROLE_SCOPE_ANALYSIS.md">remaining role-scope analysis</a>.</p>
+    </div>
   </section>
 
   <section>

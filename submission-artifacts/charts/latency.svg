@@ -1,20 +1,35 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="720" height="420" role="img" aria-labelledby="title desc">
+<svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">
   <title id="title">Latency By Variant</title>
-  <desc id="desc">Bar chart comparing latency. Generalist took 15.0 seconds, Fixed chain took 37.0 seconds, Dynamic council took 66.5 seconds.</desc>
-  <rect width="720" height="420" fill="#ffffff"/>
-  <text x="40" y="36" font-family="Arial, sans-serif" font-size="22" font-weight="700">Latency</text>
-  <line x1="90" y1="330" x2="660" y2="330" stroke="#333333" stroke-width="1"/>
-  <line x1="90" y1="80" x2="90" y2="330" stroke="#333333" stroke-width="1"/>
-  <text x="62" y="334" font-family="Arial, sans-serif" font-size="12">0s</text>
-  <text x="32" y="84" font-family="Arial, sans-serif" font-size="12">66.5s</text>
-  <rect x="135" y="273.6" width="110" height="56.4" fill="#2563eb"/>
-  <rect x="305" y="191.0" width="110" height="139.0" fill="#64748b"/>
-  <rect x="475" y="80" width="110" height="250" fill="#059669"/>
-  <text x="145" y="265.6" font-family="Arial, sans-serif" font-size="14" font-weight="700">15.0s</text>
-  <text x="315" y="183.0" font-family="Arial, sans-serif" font-size="14" font-weight="700">37.0s</text>
-  <text x="485" y="72" font-family="Arial, sans-serif" font-size="14" font-weight="700">66.5s</text>
-  <text x="132" y="360" font-family="Arial, sans-serif" font-size="14">Generalist</text>
-  <text x="315" y="360" font-family="Arial, sans-serif" font-size="14">Fixed chain</text>
-  <text x="468" y="360" font-family="Arial, sans-serif" font-size="14">Dynamic council</text>
-  <text x="40" y="398" font-family="Arial, sans-serif" font-size="12" fill="#555555">Dynamic council carried a substantial latency premium.</text>
+  <desc id="desc">Horizontal bar chart. Latency axis starts at zero and runs to 70 seconds. Generalist took 15.0 seconds, Fixed chain took 37.0 seconds, Dynamic council took 66.5 seconds.</desc>
+  <rect width="1000" height="460" fill="#ffffff"/>
+  <text x="40" y="42" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#172033">Latency</text>
+  <text x="40" y="76" font-family="Arial, sans-serif" font-size="17" fill="#475569">Elapsed provider-run time in seconds. Axis starts at zero.</text>
+
+  <line x1="250" y1="380" x2="850" y2="380" stroke="#334155" stroke-width="2"/>
+  <g font-family="Arial, sans-serif" font-size="15" fill="#475569">
+    <line x1="250" y1="374" x2="250" y2="386" stroke="#334155"/>
+    <line x1="421.4" y1="374" x2="421.4" y2="386" stroke="#334155"/>
+    <line x1="592.9" y1="374" x2="592.9" y2="386" stroke="#334155"/>
+    <line x1="764.3" y1="374" x2="764.3" y2="386" stroke="#334155"/>
+    <line x1="850" y1="374" x2="850" y2="386" stroke="#334155"/>
+    <text x="244" y="410">0s</text>
+    <text x="408" y="410">20s</text>
+    <text x="579" y="410">40s</text>
+    <text x="750" y="410">60s</text>
+    <text x="836" y="410">70s</text>
+  </g>
+
+  <g font-family="Arial, sans-serif" font-size="20" fill="#172033">
+    <text x="40" y="139" font-weight="700">Generalist</text>
+    <rect x="250" y="110" width="128.6" height="52" rx="4" fill="#2563eb"/>
+    <text x="394" y="143" font-weight="700">15.0s</text>
+
+    <text x="40" y="229" font-weight="700">Fixed chain</text>
+    <rect x="250" y="200" width="317.1" height="52" rx="4" fill="#64748b"/>
+    <text x="583" y="233" font-weight="700">37.0s</text>
+
+    <text x="40" y="319" font-weight="700">Dynamic council</text>
+    <rect x="250" y="290" width="570.0" height="52" rx="4" fill="#059669"/>
+    <text x="836" y="323" font-weight="700">66.5s</text>
+  </g>
 </svg>

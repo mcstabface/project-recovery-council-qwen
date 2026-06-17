@@ -1,6 +1,7 @@
 import json
 import re
 import socket
+import xml.etree.ElementTree as ET
 from pathlib import Path
 from typing import Any
 
@@ -148,6 +149,64 @@ def test_charts_are_generated() -> None:
         assert "<svg" in text
         assert "<title" in text
         assert "<desc" in text
+
+
+def test_chart_svgs_contain_visible_values_and_accessible_metadata() -> None:
+    expected_values = {
+        "required_fact_accuracy.svg": ["100%", "20%", "100%"],
+        "citation_recall.svg": ["54.2%", "0%", "100%"],
+        "total_tokens.svg": ["4,298", "15,090", "25,785"],
+        "latency.svg": ["15.0s", "37.0s", "66.5s"],
+    }
+    for filename, values in expected_values.items():
+        path = SUBMISSION / "charts" / filename
+        text = path.read_text(encoding="utf-8")
+        root = ET.fromstring(text)
+        assert root.attrib["role"] == "img"
+        assert root.attrib["aria-labelledby"] == "title desc"
+        assert root.find("{http://www.w3.org/2000/svg}title") is not None
+        assert root.find("{http://www.w3.org/2000/svg}desc") is not None
+        for value in values:
+            assert value in text
+        assert "Generalist" in text
+        assert "Fixed chain" in text
+        assert "Dynamic council" in text
+
+
+def test_percentage_charts_use_fixed_zero_to_hundred_range() -> None:
+    for filename in ["required_fact_accuracy.svg", "citation_recall.svg"]:
+        text = (SUBMISSION / "charts" / filename).read_text(encoding="utf-8")
+        assert "Axis range: 0% to 100%" in text
+        assert "0%" in text
+        assert "100%" in text
+
+
+def test_html_role_scope_provenance_and_replay_distinction() -> None:
+    html = (SUBMISSION / "QWEN_AGENT_SOCIETY_RESULTS.html").read_text(encoding="utf-8")
+    primary_table = html.split("<section>")[3]
+
+    assert "role-scope compliance was <strong>0.75</strong>" in html
+    assert "policy false positive" in html
+    assert "contractual_milestone_id" in html
+    assert "valid alias for <code>milestone_id</code>" in html
+    assert "installation_activity_id" in html
+    assert "valid ScheduleExpert identifier" in html
+    assert "Corrected-policy offline replay</td><td class=\"number\">100%</td>" in html
+    assert "offline 100% replay is not represented as the empirical score" in html
+    assert "Corrected-policy offline replay" not in primary_table
+
+
+def test_html_chart_layout_is_responsive() -> None:
+    html = (SUBMISSION / "QWEN_AGENT_SOCIETY_RESULTS.html").read_text(encoding="utf-8")
+
+    assert "grid-template-columns: 1fr" in html
+    assert "@media (min-width: 1180px)" in html
+    assert "repeat(2, minmax(540px, 1fr))" in html
+    assert html.count("<figure>") == 4
+    assert "Facts: generalist and dynamic council were both accurate." in html
+    assert "Citations: dynamic council provided complete evidence coverage." in html
+    assert "Tokens: assurance required materially more model usage." in html
+    assert "Latency: dynamic governance imposed a substantial time premium." in html
 
 
 def test_submission_artifacts_do_not_require_network(monkeypatch) -> None:

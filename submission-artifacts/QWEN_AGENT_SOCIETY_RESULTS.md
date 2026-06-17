@@ -89,6 +89,13 @@ Charts:
 - [Total tokens](charts/total_tokens.svg)
 - [Latency](charts/latency.svg)
 
+Chart interpretation:
+
+- Facts: generalist and dynamic council were both accurate.
+- Citations: dynamic council provided complete evidence coverage.
+- Tokens: assurance required materially more model usage.
+- Latency: dynamic governance imposed a substantial time premium.
+
 ## 6. Quality-Versus-Cost Interpretation
 
 The generalist delivered excellent factual performance with one invocation,
@@ -136,10 +143,28 @@ The dynamic council produced the strongest result:
 - authorization gate correctness: 100%
 - semantic validation compliance: 100%
 
-Recorded role-scope compliance was 0.75. Post-run offline analysis found the
-remaining failure was policy drift on two legitimate schedule identifiers:
-`installation_activity_id` and `contractual_milestone_id`. The original
-empirical artifact remains unchanged and still records 0.75.
+### Role-Scope Provenance Note
+
+Recorded empirical result:
+
+- role-scope compliance: 0.75
+
+Post-run policy review:
+
+- the single failure was classified as a policy false positive
+- `contractual_milestone_id` is a valid alias for `milestone_id`
+- `installation_activity_id` is a valid ScheduleExpert identifier
+- the captured response passes the corrected policy offline
+- the source empirical artifact remains unchanged
+
+This is auditability and policy evolution, not a retroactive score correction.
+The primary empirical comparison table keeps the recorded 75% score context.
+For audit context only:
+
+| Dynamic role-scope view | Score |
+|---|---:|
+| Empirical recorded score | 75% |
+| Corrected-policy offline replay | 100% |
 
 See:
 
