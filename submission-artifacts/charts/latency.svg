@@ -1,35 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">
   <title id="title">Latency By Variant</title>
   <desc id="desc">Horizontal bar chart. Latency axis starts at zero and runs to 70 seconds. Generalist took 15.0 seconds, Fixed chain took 37.0 seconds, Dynamic council took 66.5 seconds.</desc>
-  <rect width="1000" height="460" fill="#ffffff"/>
-  <text x="40" y="42" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#172033">Latency</text>
-  <text x="40" y="76" font-family="Arial, sans-serif" font-size="17" fill="#475569">Elapsed provider-run time in seconds. Axis starts at zero.</text>
+  <rect width="1000" height="460" fill="#e5e7eb" />
+  <text x="40" y="42" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Latency</text>
+  <text x="40" y="76" font-family="Arial, sans-serif" font-size="17" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Elapsed provider-run time in seconds. Axis starts at zero.</text>
 
-  <line x1="250" y1="380" x2="850" y2="380" stroke="#334155" stroke-width="2"/>
+  <line x1="250" y1="380" x2="850" y2="380" stroke="#334155" stroke-width="2" />
   <g font-family="Arial, sans-serif" font-size="15" fill="#475569">
-    <line x1="250" y1="374" x2="250" y2="386" stroke="#334155"/>
-    <line x1="421.4" y1="374" x2="421.4" y2="386" stroke="#334155"/>
-    <line x1="592.9" y1="374" x2="592.9" y2="386" stroke="#334155"/>
-    <line x1="764.3" y1="374" x2="764.3" y2="386" stroke="#334155"/>
-    <line x1="850" y1="374" x2="850" y2="386" stroke="#334155"/>
-    <text x="244" y="410">0s</text>
-    <text x="408" y="410">20s</text>
-    <text x="579" y="410">40s</text>
-    <text x="750" y="410">60s</text>
-    <text x="836" y="410">70s</text>
+    <line x1="250" y1="374" x2="250" y2="386" stroke="#334155" />
+    <line x1="421.4" y1="374" x2="421.4" y2="386" stroke="#334155" />
+    <line x1="592.9" y1="374" x2="592.9" y2="386" stroke="#334155" />
+    <line x1="764.3" y1="374" x2="764.3" y2="386" stroke="#334155" />
+    <line x1="850" y1="374" x2="850" y2="386" stroke="#334155" />
+    <text x="244" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">0s</text>
+    <text x="408" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">20s</text>
+    <text x="579" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">40s</text>
+    <text x="750" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">60s</text>
+    <text x="836" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">70s</text>
   </g>
 
   <g font-family="Arial, sans-serif" font-size="20" fill="#172033">
-    <text x="40" y="139" font-weight="700">Generalist</text>
-    <rect x="250" y="110" width="128.6" height="52" rx="4" fill="#2563eb"/>
-    <text x="394" y="143" font-weight="700">15.0s</text>
+    <text x="40" y="139" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Generalist</text>
+    <rect x="250" y="110" width="128.6" height="52" rx="4" fill="#2563eb" />
+    <text x="394" y="143" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">15.0s</text>
 
-    <text x="40" y="229" font-weight="700">Fixed chain</text>
-    <rect x="250" y="200" width="317.1" height="52" rx="4" fill="#64748b"/>
-    <text x="583" y="233" font-weight="700">37.0s</text>
+    <text x="40" y="229" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Fixed chain</text>
+    <rect x="250" y="200" width="317.1" height="52" rx="4" fill="#64748b" />
+    <text x="583" y="233" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">37.0s</text>
 
-    <text x="40" y="319" font-weight="700">Dynamic council</text>
-    <rect x="250" y="290" width="570.0" height="52" rx="4" fill="#059669"/>
-    <text x="836" y="323" font-weight="700">66.5s</text>
+    <text x="40" y="319" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Dynamic council</text>
+    <rect x="250" y="290" width="570.0" height="52" rx="4" fill="#059669" />
+    <text x="836" y="323" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">66.5s</text>
   </g>
 </svg>

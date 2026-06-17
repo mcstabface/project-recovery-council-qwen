@@ -1,35 +1,36 @@
+<?xml version='1.0' encoding='utf-8'?>
 <svg xmlns="http://www.w3.org/2000/svg" width="1000" height="460" viewBox="0 0 1000 460" role="img" aria-labelledby="title desc">
   <title id="title">Citation Recall By Variant</title>
   <desc id="desc">Horizontal bar chart. Percentage axis is fixed from 0 to 100. Generalist is 54.2 percent, Fixed chain is 0 percent, Dynamic council is 100 percent.</desc>
-  <rect width="1000" height="460" fill="#ffffff"/>
-  <text x="40" y="42" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#172033">Citation Recall</text>
-  <text x="40" y="76" font-family="Arial, sans-serif" font-size="17" fill="#475569">Share of required source references present. Axis range: 0% to 100%.</text>
+  <rect width="1000" height="460" fill="#e5e7eb" />
+  <text x="40" y="42" font-family="Arial, sans-serif" font-size="30" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Citation Recall</text>
+  <text x="40" y="76" font-family="Arial, sans-serif" font-size="17" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Share of required source references present. Axis range: 0% to 100%.</text>
 
-  <line x1="250" y1="380" x2="850" y2="380" stroke="#334155" stroke-width="2"/>
+  <line x1="250" y1="380" x2="850" y2="380" stroke="#334155" stroke-width="2" />
   <g font-family="Arial, sans-serif" font-size="15" fill="#475569">
-    <line x1="250" y1="374" x2="250" y2="386" stroke="#334155"/>
-    <line x1="400" y1="374" x2="400" y2="386" stroke="#334155"/>
-    <line x1="550" y1="374" x2="550" y2="386" stroke="#334155"/>
-    <line x1="700" y1="374" x2="700" y2="386" stroke="#334155"/>
-    <line x1="850" y1="374" x2="850" y2="386" stroke="#334155"/>
-    <text x="241" y="410">0%</text>
-    <text x="387" y="410">25%</text>
-    <text x="537" y="410">50%</text>
-    <text x="687" y="410">75%</text>
-    <text x="833" y="410">100%</text>
+    <line x1="250" y1="374" x2="250" y2="386" stroke="#334155" />
+    <line x1="400" y1="374" x2="400" y2="386" stroke="#334155" />
+    <line x1="550" y1="374" x2="550" y2="386" stroke="#334155" />
+    <line x1="700" y1="374" x2="700" y2="386" stroke="#334155" />
+    <line x1="850" y1="374" x2="850" y2="386" stroke="#334155" />
+    <text x="241" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">0%</text>
+    <text x="387" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">25%</text>
+    <text x="537" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">50%</text>
+    <text x="687" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">75%</text>
+    <text x="833" y="410" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">100%</text>
   </g>
 
   <g font-family="Arial, sans-serif" font-size="20" fill="#172033">
-    <text x="40" y="139" font-weight="700">Generalist</text>
-    <rect x="250" y="110" width="325.2" height="52" rx="4" fill="#2563eb"/>
-    <text x="591" y="143" font-weight="700">54.2%</text>
+    <text x="40" y="139" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Generalist</text>
+    <rect x="250" y="110" width="325.2" height="52" rx="4" fill="#2563eb" />
+    <text x="591" y="143" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">54.2%</text>
 
-    <text x="40" y="229" font-weight="700">Fixed chain</text>
-    <rect x="250" y="200" width="2" height="52" rx="1" fill="#64748b"/>
-    <text x="268" y="233" font-weight="700">0%</text>
+    <text x="40" y="229" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Fixed chain</text>
+    <rect x="250" y="200" width="2" height="52" rx="1" fill="#64748b" />
+    <text x="268" y="233" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">0%</text>
 
-    <text x="40" y="319" font-weight="700">Dynamic council</text>
-    <rect x="250" y="290" width="600" height="52" rx="4" fill="#059669"/>
-    <text x="866" y="323" font-weight="700">100%</text>
+    <text x="40" y="319" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">Dynamic council</text>
+    <rect x="250" y="290" width="600" height="52" rx="4" fill="#059669" />
+    <text x="866" y="323" font-weight="700" fill="#111111" opacity="1" style="fill:#111111 !important;color:#111111 !important;opacity:1 !important">100%</text>
   </g>
 </svg>
