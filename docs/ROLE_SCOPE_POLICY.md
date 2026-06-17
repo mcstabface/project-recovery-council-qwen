@@ -58,10 +58,22 @@ May receive cost summary, contract excerpt, required schedule impact values, and
 minimal case identity. It may not resolve onsite status or supplier/logistics
 arrival facts.
 
+Allowed claim keys include `delay_exposure_usd_per_day`,
+`forecast_milestone_slip_days`, `unmitigated_exposure_usd`,
+`mitigation_cost_usd`, and `gross_avoided_exposure_usd`. Observed aliases such
+as `contractual_delay_exposure_usd_per_day` and
+`unmitigated_delay_exposure_usd` are normalized before role validation.
+
 ## EvidenceAuditor
 
 May receive all evidence needed to compare conflicting claims and citation
 support.
+
+Supported audit claim IDs are explicit and versioned for the synthetic case:
+`C-ONSITE-ASSERTION`, `C-MILESTONE-SLIP-13D`,
+`C-DELAY-EXPOSURE-15K-USD-PER-DAY`, `C-UNMITIGATED-EXPOSURE-195K-USD`, and
+`C-ACCEL-COST-48K-USD`. Arbitrary unknown audit claim IDs are not accepted as
+valid role-policy keys.
 
 ## RiskExpert
 
@@ -69,10 +81,20 @@ May receive risk register records and relevant schedule/status/contradiction
 records. It must not make commercial exposure or recovery-option preference
 claims.
 
+Allowed risk claim keys include `onsite_status_conflict`,
+`recovery_approval_risk`, and `milestone_slip_impact`. A risk finding may state
+that authorization is blocked pending human confirmation; it must not convert
+that gate into a commercial recommendation or final approval decision.
+
 ## RecoveryPlanner
 
 May receive validated specialist findings, approved or unresolved
 contradictions, recovery options, and human decisions when available.
+
+RecoveryPlanner synthesis receives the compact validated-findings envelope, not
+verbose raw specialist provider responses. Recommendation and authorization are
+separate: pending human confirmation blocks authorization, but it does not by
+itself require abstaining from a recovery recommendation.
 
 ## DirectorAgent
 

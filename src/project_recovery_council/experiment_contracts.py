@@ -85,6 +85,13 @@ class EvaluationMetricId(StrEnum):
     ALIAS_APPLICATION_COUNT = "alias_application_count"
     UNKNOWN_CLAIM_KEY_COUNT = "unknown_claim_key_count"
     CLAIM_ALIAS_CONFLICT_COUNT = "claim_alias_conflict_count"
+    SPECIALIST_FINDING_RETENTION_RATE = "specialist_finding_retention_rate"
+    CITATION_PROPAGATION_RATE = "citation_propagation_rate"
+    VALIDATED_CLAIM_UTILIZATION_RATE = "validated_claim_utilization_rate"
+    RECOMMENDATION_CORRECTNESS = "recommendation_correctness"
+    AUTHORIZATION_GATE_CORRECTNESS = "authorization_gate_correctness"
+    RECOMMENDATION_WITH_PENDING_APPROVAL_CORRECTNESS = "recommendation_with_pending_approval_correctness"
+    SYNTHESIS_OMISSION_COUNT = "synthesis_omission_count"
 
 
 class Disagreement(ContractModel):

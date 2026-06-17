@@ -61,6 +61,7 @@ ROLE_CANONICAL_CLAIM_KEYS: dict[str, list[str]] = {
     AgentRole.SCHEDULE_EXPERT.value: SCHEDULE_CANONICAL_CLAIM_KEYS,
     AgentRole.COMMERCIAL_EXPERT.value: [
         "projected_milestone_slip_days",
+        "forecast_milestone_slip_days",
         "delay_exposure_usd_per_day",
         "unmitigated_exposure_usd",
         "mitigation_cost_usd",
@@ -71,12 +72,20 @@ ROLE_CANONICAL_CLAIM_KEYS: dict[str, list[str]] = {
         "contradiction",
         "unsupported_claim",
         "citation_validation",
+        "C-ONSITE-ASSERTION",
+        "C-MILESTONE-SLIP-13D",
+        "C-DELAY-EXPOSURE-15K-USD-PER-DAY",
+        "C-UNMITIGATED-EXPOSURE-195K-USD",
+        "C-ACCEL-COST-48K-USD",
     ],
     AgentRole.RISK_EXPERT.value: [
         "risk",
         "human_escalation_required",
         "contradiction_risk",
         "schedule_risk",
+        "onsite_status_conflict",
+        "recovery_approval_risk",
+        "milestone_slip_impact",
     ],
     AgentRole.RECOVERY_PLANNER.value: [
         "preferred_option_id",
@@ -106,12 +115,19 @@ ROLE_CLAIM_ALIASES: dict[str, dict[str, str]] = {
         "remaining_float_days": "installation_total_float_remaining_days",
         "remaining_total_float_days": "installation_total_float_remaining_days",
         "remaining_float_after_delivery_shift_days": "installation_total_float_remaining_days",
+        "remaining_total_float_after_delivery_shift_days": "installation_total_float_remaining_days",
         "projected_milestone_slip_days": "forecast_milestone_slip_days",
+        "baseline_milestone_date": "milestone_baseline_date",
+        "forecast_milestone_date_without_intervention": "milestone_forecast_date_without_intervention",
         "contractual_milestone_baseline_date": "milestone_baseline_date",
         "contractual_milestone_forecast_without_intervention": (
             "milestone_forecast_date_without_intervention"
         ),
         "successor_dependency_effects": "successor_dependency_effect",
+    },
+    AgentRole.COMMERCIAL_EXPERT.value: {
+        "contractual_delay_exposure_usd_per_day": "delay_exposure_usd_per_day",
+        "unmitigated_delay_exposure_usd": "unmitigated_exposure_usd",
     }
 }
 

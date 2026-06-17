@@ -234,6 +234,42 @@ def evaluation_metric_catalog() -> list[EvaluationMetric]:
             description="Count of canonical claim keys with conflicting raw alias values.",
             higher_is_better=False,
         ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.SPECIALIST_FINDING_RETENTION_RATE,
+            name="Specialist finding retention rate",
+            description="Share of normalized specialist claims retained as synthesis-eligible findings.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.CITATION_PROPAGATION_RATE,
+            name="Citation propagation rate",
+            description="Share of synthesis-eligible findings that preserve claim-attached citations.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.VALIDATED_CLAIM_UTILIZATION_RATE,
+            name="Validated claim utilization rate",
+            description="Share of required final recommendation fields supported by eligible specialist findings.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.RECOMMENDATION_CORRECTNESS,
+            name="Recommendation correctness",
+            description="Whether the final recommendation selects the expected recovery option.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.AUTHORIZATION_GATE_CORRECTNESS,
+            name="Authorization gate correctness",
+            description="Whether pending or blocked authorization is preserved when human confirmation is required.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.RECOMMENDATION_WITH_PENDING_APPROVAL_CORRECTNESS,
+            name="Recommendation with pending approval correctness",
+            description="Whether the recommendation is completed while approval remains subject to the unresolved human gate.",
+        ),
+        EvaluationMetric(
+            metric_id=EvaluationMetricId.SYNTHESIS_OMISSION_COUNT,
+            name="Synthesis omission count",
+            description="Count of final recommendation fields omitted despite eligible specialist findings.",
+            higher_is_better=False,
+        ),
     ]
 
 

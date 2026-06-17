@@ -1,0 +1,123 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-17T00:00:00Z",
+  "run_label": "validated-findings-synthesis-handoff",
+  "repository": "project-recovery-council-qwen",
+  "git_commit": "c332c42",
+  "dirty_working_tree": true,
+  "status": "complete",
+  "objectives": [
+    "Create a compact validated-findings envelope for synthesis",
+    "Propagate canonical specialist claims and claim-attached citations",
+    "Distinguish recovery recommendation from final authorization",
+    "Correct role policies and normalization for CommercialExpert, EvidenceAuditor, RiskExpert, and ScheduleExpert live shapes",
+    "Make RecoveryPlanner consume validated findings rather than verbose raw provider responses",
+    "Add synthesis handoff artifacts and metrics",
+    "Avoid live network calls"
+  ],
+  "created_files": [
+    "decisions/ADR-0013-validated-findings-synthesis-handoff.md",
+    "docs/VALIDATED_FINDINGS_HANDOFF.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_17_VALIDATED_FINDINGS_HANDOFF.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_17_VALIDATED_FINDINGS_HANDOFF.json",
+    "src/project_recovery_council/synthesis_handoff.py",
+    "tests/test_validated_findings_handoff.py"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/CLAIM_NORMALIZATION.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_COMPARISON_RUNBOOK.md",
+    "docs/METRICS.md",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "src/project_recovery_council/claim_normalization.py",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/live_variant_runner.py",
+    "src/project_recovery_council/redaction.py",
+    "src/project_recovery_council/role_scope.py"
+  ],
+  "new_artifacts": [
+    "validated-findings-envelope.json",
+    "excluded-findings.json",
+    "synthesis-input.json",
+    "recommendation-authorization-state.json",
+    "synthesis-metrics.json"
+  ],
+  "role_policy_updates": {
+    "ScheduleExpert": [
+      "remaining_total_float_after_delivery_shift_days -> installation_total_float_remaining_days",
+      "baseline_milestone_date -> milestone_baseline_date",
+      "forecast_milestone_date_without_intervention -> milestone_forecast_date_without_intervention"
+    ],
+    "CommercialExpert": [
+      "contractual_delay_exposure_usd_per_day -> delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "unmitigated_delay_exposure_usd -> unmitigated_exposure_usd",
+      "mitigation_cost_usd",
+      "gross_avoided_exposure_usd"
+    ],
+    "EvidenceAuditor": [
+      "C-ONSITE-ASSERTION",
+      "C-MILESTONE-SLIP-13D",
+      "C-DELAY-EXPOSURE-15K-USD-PER-DAY",
+      "C-UNMITIGATED-EXPOSURE-195K-USD",
+      "C-ACCEL-COST-48K-USD"
+    ],
+    "RiskExpert": [
+      "onsite_status_conflict",
+      "recovery_approval_risk",
+      "milestone_slip_impact"
+    ]
+  },
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_validated_findings_handoff.py tests/test_live_variant_runner.py tests/test_role_scope_policy.py tests/test_claim_normalization.py tests/test_schedule_semantics.py",
+      "exit_code": 0,
+      "result": "62 passed in 0.76s"
+    },
+    {
+      "command": "python -m pytest tests/test_qwen_artifacts_and_cli.py tests/test_qwen_evaluation.py",
+      "exit_code": 0,
+      "result": "11 passed in 0.87s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "136 passed, 1 skipped in 6.74s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    }
+  ],
+  "test_results": {
+    "focused_pytest": {
+      "command": "python -m pytest tests/test_validated_findings_handoff.py tests/test_live_variant_runner.py tests/test_role_scope_policy.py tests/test_claim_normalization.py tests/test_schedule_semantics.py",
+      "exit_code": 0,
+      "summary": "62 passed in 0.76s"
+    },
+    "full_pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "136 passed, 1 skipped in 6.74s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_command_executed": false
+  },
+  "known_limitations": [
+    "Prior live artifacts are untouched",
+    "Only ScheduleExpert has a specialized domain semantic validator",
+    "The handoff excludes invalid findings but does not rewrite model output"
+  ],
+  "recommended_next_fixed_chain_live_command": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-variant --variant fixed_expert_chain --model qwen-plus --allow-network"
+}

@@ -47,6 +47,13 @@ Required deterministic checks:
 - alias application count
 - unknown claim key count
 - claim alias conflict count
+- specialist finding retention rate
+- citation propagation rate
+- validated claim utilization rate
+- recommendation correctness
+- authorization gate correctness
+- recommendation with pending approval correctness
+- synthesis omission count
 
 Provider pricing is never invented. Offline fixtures leave provider token,
 latency, and cost values null unless a fixture or provider explicitly supplies
@@ -138,3 +145,27 @@ rather than an AI competitor.
 Comparison reports distinguish `passed`, `failed`, `not_applicable`, and
 `unavailable` for role-scope and specialized semantic validation. Markdown
 renders `not_applicable` as `N/A`.
+
+## Synthesis Handoff Metrics
+
+Fixed-chain and dynamic-council runs compute synthesis handoff metrics after the
+validated-findings envelope is built:
+
+- `specialist_finding_retention_rate`: eligible findings divided by all
+  normalized specialist findings.
+- `citation_propagation_rate`: eligible findings that carry citations divided
+  by all eligible findings.
+- `validated_claim_utilization_rate`: required final recommendation fields that
+  were populated when eligible specialist findings supported them.
+- `recommendation_correctness`: whether the final recommendation selected
+  `REC-ACCEL-LOGISTICS`.
+- `authorization_gate_correctness`: whether pending or blocked authorization is
+  preserved when human confirmation is required.
+- `recommendation_with_pending_approval_correctness`: whether the planner
+  completed a recommendation while keeping approval subject to the unresolved
+  human gate.
+- `synthesis_omission_count`: final recommendation fields omitted despite
+  eligible specialist findings.
+
+Pending authorization is not counted as recommendation failure. It is a
+separate governance state.

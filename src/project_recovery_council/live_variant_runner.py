@@ -65,6 +65,12 @@ from project_recovery_council.schedule_semantics import (
     validate_schedule_semantics,
 )
 from project_recovery_council.serialization import read_json, sha256_file, to_jsonable, write_json
+from project_recovery_council.synthesis_handoff import (
+    SynthesisHandoff,
+    SynthesisInput,
+    build_synthesis_handoff,
+    synthesis_metrics,
+)
 from project_recovery_council.workflow import DEFAULT_CASE_PATH
 
 
@@ -167,6 +173,13 @@ class LiveComparisonVariantRow(ContractModel):
     semantic_validation_compliance: MetricApplicability = Field(
         default_factory=lambda: _metric_unavailable("specialized semantic validation was not recorded")
     )
+    specialist_finding_retention_rate: float | None = None
+    citation_propagation_rate: float | None = None
+    validated_claim_utilization_rate: float | None = None
+    recommendation_correctness: float | None = None
+    authorization_gate_correctness: float | None = None
+    recommendation_with_pending_approval_correctness: float | None = None
+    synthesis_omission_count: float | None = None
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
@@ -216,6 +229,8 @@ class LiveVariantRun:
         self.domain_results: list[DomainSemanticValidationResult] = []
         self.routing_decisions: list[dict[str, Any]] = []
         self.disagreements: list[dict[str, Any]] = []
+        self.synthesis_handoffs: list[SynthesisHandoff] = []
+        self.synthesis_inputs: list[SynthesisInput] = []
         self.final_result: ModelResult | None = None
         self.final_invocation_id: str | None = None
         self.evaluation_report: EvaluationReport | None = None
@@ -261,10 +276,11 @@ class LiveVariantRun:
             specialist_context.append(self._context_for_last_invocation())
             if self._should_stop_after_last_invocation():
                 return
+        handoff = self._build_synthesis_handoff(target_agent=AgentRole.RECOVERY_PLANNER.value)
         prompt = self._render_synthesis_prompt(
             role=AgentRole.RECOVERY_PLANNER.value,
             schema_id=RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
-            specialist_context=specialist_context,
+            synthesis_input=handoff.synthesis_input,
             routing_context=[],
             arbitration_context=[],
         )
@@ -310,10 +326,11 @@ class LiveVariantRun:
         if self._should_stop_after_last_invocation():
             return
         arbitration_context = self._validation_issues()
+        arbiter_handoff = self._build_synthesis_handoff(target_agent=AgentRole.ARBITER.value)
         arbiter_prompt = self._render_synthesis_prompt(
             role=AgentRole.ARBITER.value,
             schema_id=ARBITER_RESPONSE_SCHEMA,
-            specialist_context=specialist_context,
+            synthesis_input=arbiter_handoff.synthesis_input,
             routing_context=self.routing_decisions,
             arbitration_context=arbitration_context,
         )
@@ -330,10 +347,11 @@ class LiveVariantRun:
             self.disagreements.extend(arbiter_result.parsed_response.get("unresolved_disagreements", []))
         if self._should_stop_after_last_invocation():
             return
+        planner_handoff = self._build_synthesis_handoff(target_agent=AgentRole.RECOVERY_PLANNER.value)
         final_prompt = self._render_synthesis_prompt(
             role=AgentRole.RECOVERY_PLANNER.value,
             schema_id=RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
-            specialist_context=specialist_context,
+            synthesis_input=planner_handoff.synthesis_input,
             routing_context=self.routing_decisions,
             arbitration_context=[arbiter_result.parsed_response],
         )
@@ -626,7 +644,7 @@ class LiveVariantRun:
         *,
         role: str,
         schema_id: str,
-        specialist_context: list[dict[str, Any]],
+        synthesis_input: SynthesisInput,
         routing_context: list[dict[str, Any]],
         arbitration_context: list[Any],
     ) -> str:
@@ -641,10 +659,15 @@ class LiveVariantRun:
             "prompt_version": PROMPT_VERSION,
             "selected_evidence_record_ids": [],
             "expected_response_schema": schema_id,
-            "evidence_policy": "Use validated specialist findings and validation records; complete raw evidence is intentionally omitted.",
+            "evidence_policy": "Use only the compact validated-findings envelope; complete raw evidence and raw provider responses are intentionally omitted.",
             "routing_decisions": routing_context,
-            "validated_specialist_findings": specialist_context,
+            "synthesis_input": synthesis_input,
             "arbitration_context": arbitration_context,
+            "recommendation_authorization_instruction": (
+                "Recommend REC-ACCEL-LOGISTICS when validated schedule and commercial findings support it. "
+                "Human confirmation blocks authorization, not the recommendation. Return completed recommendation "
+                "with human_confirmation_required=true and preferred_option_subject_to_approval=true when approval is pending."
+            ),
             "expected_output_json_schema": schema_model.model_json_schema(),
         }
         return (
@@ -664,6 +687,21 @@ class LiveVariantRun:
             "role_validation": _last_for_invocation(self.role_results, invocation.invocation_id),
             "domain_semantic_validation": _last_for_invocation(self.domain_results, invocation.invocation_id),
         }
+
+    def _build_synthesis_handoff(self, *, target_agent: str) -> SynthesisHandoff:
+        handoff = build_synthesis_handoff(
+            bundle=self.bundle,
+            invocation_purpose=self.variant.value,
+            target_agent=target_agent,
+            invocations=self.invocations,
+            normalized_responses=self.normalized_responses,
+            normalization_results=self.normalization_results,
+            role_results=self.role_results,
+            domain_results=self.domain_results,
+        )
+        self.synthesis_handoffs.append(handoff)
+        self.synthesis_inputs.append(handoff.synthesis_input)
+        return handoff
 
     def _validation_issues(self) -> list[dict[str, Any]]:
         issues = []
@@ -763,6 +801,18 @@ def write_live_variant_artifacts(
     root.mkdir(parents=True, exist_ok=False)
 
     summary = run.summary()
+    latest_handoff = run.synthesis_handoffs[-1] if run.synthesis_handoffs else None
+    synthesis_metric_payload = (
+        synthesis_metrics(
+            bundle=run.bundle,
+            validated_findings=latest_handoff.validated_findings,
+            excluded_findings=latest_handoff.excluded_findings,
+            recommendation_state=latest_handoff.recommendation_authorization_state,
+            final_result=run.final_result,
+        )
+        if latest_handoff
+        else {}
+    )
     evaluation_payload = {
         "available": run.evaluation_report is not None,
         "report": run.evaluation_report.model_dump(mode="json") if run.evaluation_report else None,
@@ -788,6 +838,25 @@ def write_live_variant_artifacts(
         ("role-validation-results", "role-validation-results.json", run.role_results, bool(run.role_results)),
         ("schedule-semantic-validation", "schedule-semantic-validation.json", run.schedule_results, bool(run.schedule_results)),
         ("domain-semantic-validation-results", "domain-semantic-validation-results.json", run.domain_results, bool(run.domain_results)),
+        (
+            "validated-findings-envelope",
+            "validated-findings-envelope.json",
+            latest_handoff.validated_findings if latest_handoff else [],
+            bool(latest_handoff),
+        ),
+        (
+            "excluded-findings",
+            "excluded-findings.json",
+            latest_handoff.excluded_findings if latest_handoff else [],
+            bool(latest_handoff),
+        ),
+        ("synthesis-input", "synthesis-input.json", run.synthesis_inputs, bool(run.synthesis_inputs)),
+        (
+            "recommendation-authorization-state",
+            "recommendation-authorization-state.json",
+            latest_handoff.recommendation_authorization_state if latest_handoff else {},
+            bool(latest_handoff),
+        ),
         ("invocation-records", "invocation-records.json", run.invocations, True),
         ("raw-provider-responses", "raw-provider-responses.json", _raw_provider_responses(run.invocations), True),
         ("parsed-structured-responses", "parsed-structured-responses.json", _parsed_responses(run.invocations), True),
@@ -811,6 +880,7 @@ def write_live_variant_artifacts(
             _schedule_semantic_payload(run.schedule_results),
             bool(run.schedule_results),
         ),
+        ("synthesis-metrics", "synthesis-metrics.json", synthesis_metric_payload, bool(latest_handoff)),
         ("reproducibility", "reproducibility.json", _reproducibility(run), True),
     ]
 
@@ -945,6 +1015,9 @@ def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariant
         generalist_reason="specialized semantic validation is not applicable to full-scope GeneralistAgent outputs",
         legacy_metric_key="schedule_semantic_compliance_rate",
     )
+    synthesis_payload = read_json(path / "synthesis-metrics.json")
+    if not isinstance(synthesis_payload, dict):
+        synthesis_payload = {}
     return LiveComparisonVariantRow(
         variant=variant,
         experiment_id=summary.experiment_id,
@@ -964,6 +1037,15 @@ def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariant
         schema_valid_response_rate=metrics.get("schema_valid_response_rate"),
         role_scope_compliance=role_applicability,
         semantic_validation_compliance=semantic_applicability,
+        specialist_finding_retention_rate=synthesis_payload.get("specialist_finding_retention_rate"),
+        citation_propagation_rate=synthesis_payload.get("citation_propagation_rate"),
+        validated_claim_utilization_rate=synthesis_payload.get("validated_claim_utilization_rate"),
+        recommendation_correctness=synthesis_payload.get("recommendation_correctness"),
+        authorization_gate_correctness=synthesis_payload.get("authorization_gate_correctness"),
+        recommendation_with_pending_approval_correctness=synthesis_payload.get(
+            "recommendation_with_pending_approval_correctness"
+        ),
+        synthesis_omission_count=synthesis_payload.get("synthesis_omission_count"),
         input_tokens=summary.input_tokens,
         output_tokens=summary.output_tokens,
         total_tokens=summary.total_tokens,
@@ -1261,6 +1343,12 @@ def _live_variant_schema_id_for(filename: str) -> str:
         "normalized-structured-responses.json": "project-recovery-council.qwen.live-normalized-structured-responses.v1",
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
         "domain-semantic-validation-results.json": "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
+        "validated-findings-envelope.json": "project-recovery-council.qwen.live-validated-findings-envelope.v1",
+        "excluded-findings.json": "project-recovery-council.qwen.live-excluded-findings.v1",
+        "synthesis-input.json": "project-recovery-council.qwen.live-synthesis-input.v1",
+        "recommendation-authorization-state.json": (
+            "project-recovery-council.qwen.live-recommendation-authorization-state.v1"
+        ),
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
@@ -1273,6 +1361,7 @@ def _live_variant_schema_id_for(filename: str) -> str:
         "evaluation-results.json": "project-recovery-council.qwen.live-evaluation-results.v1",
         "role-compliance-metrics.json": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
         "claim-normalization-metrics.json": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
+        "synthesis-metrics.json": "project-recovery-council.qwen.live-synthesis-metrics.v1",
         "reproducibility.json": "project-recovery-council.qwen.live-reproducibility.v1",
     }[filename]
 

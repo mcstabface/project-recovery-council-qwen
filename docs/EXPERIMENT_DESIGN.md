@@ -119,9 +119,25 @@ Specialist live artifacts additionally include:
 - `normalized-structured-responses.json`
 - `role-validation-results.json`
 - `domain-semantic-validation-results.json`
+- `validated-findings-envelope.json`
+- `excluded-findings.json`
+- `synthesis-input.json`
+- `recommendation-authorization-state.json`
 - `claim-normalization-metrics.json`
+- `synthesis-metrics.json`
 
 Raw parsed provider output remains in `parsed-structured-responses.json`.
+
+Before RecoveryPlanner synthesis, fixed-chain and dynamic-council runs build a
+validated-findings envelope. The envelope contains canonical claims, attached
+citations, validation status, warnings, contradiction status, and an
+eligibility flag. Invalid findings remain visible in `excluded-findings.json`
+with an exclusion reason, but normal synthesis receives only eligible findings.
+
+The synthesis payload explicitly separates recommendation from authorization.
+Validated evidence may support recommending `REC-ACCEL-LOGISTICS` while
+authorization remains `blocked_pending_human_confirmation` until the onsite
+status contradiction is resolved by a human gate.
 
 Live `ScheduleExpert` invocations also run deterministic schedule-semantic
 validation. Future artifacts for those invocations include

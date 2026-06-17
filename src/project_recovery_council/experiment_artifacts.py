@@ -63,7 +63,12 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-normalized-structured-responses.v1",
     "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
     "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
+    "project-recovery-council.qwen.live-validated-findings-envelope.v1",
+    "project-recovery-council.qwen.live-excluded-findings.v1",
+    "project-recovery-council.qwen.live-synthesis-input.v1",
+    "project-recovery-council.qwen.live-recommendation-authorization-state.v1",
     "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
+    "project-recovery-council.qwen.live-synthesis-metrics.v1",
     "project-recovery-council.qwen.live-raw-provider-responses.v1",
     "project-recovery-council.qwen.live-parsed-structured-responses.v1",
     "project-recovery-council.qwen.live-validation-results.v1",
@@ -166,6 +171,7 @@ def validate_experiment_artifacts(path: Path | str) -> ArtifactInspectionResult:
         except (ValidationError, ValueError) as exc:
             errors.append(f"schema validation failed for {entry.relative_path}: {exc}")
     errors.extend(_validate_live_specialist_artifacts(loaded_payloads))
+    errors.extend(_validate_live_synthesis_handoff_artifacts(loaded_payloads))
     return ArtifactInspectionResult(run_path=root.as_posix(), passed=not errors, errors=errors)
 
 
@@ -207,7 +213,14 @@ def _schema_id_for(filename: str) -> str:
         "domain-semantic-validation-results.json": (
             "project-recovery-council.qwen.live-domain-semantic-validation-results.v1"
         ),
+        "validated-findings-envelope.json": "project-recovery-council.qwen.live-validated-findings-envelope.v1",
+        "excluded-findings.json": "project-recovery-council.qwen.live-excluded-findings.v1",
+        "synthesis-input.json": "project-recovery-council.qwen.live-synthesis-input.v1",
+        "recommendation-authorization-state.json": (
+            "project-recovery-council.qwen.live-recommendation-authorization-state.v1"
+        ),
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
+        "synthesis-metrics.json": "project-recovery-council.qwen.live-synthesis-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
         "validation-results.json": "project-recovery-council.qwen.live-validation-results.v1",
@@ -365,6 +378,72 @@ def _validate_claim_normalization_artifacts(
                 errors.append(
                     f"applied alias {raw_key} does not trace to normalized claim {canonical_key} for {invocation_id}"
                 )
+    return errors
+
+
+def _validate_live_synthesis_handoff_artifacts(loaded_payloads: dict[str, Any]) -> list[str]:
+    invocations = loaded_payloads.get("invocation-records.json")
+    if not isinstance(invocations, list):
+        return []
+    has_specialists = any(
+        isinstance(invocation, dict)
+        and invocation.get("agent_role")
+        in {"ScheduleExpert", "CommercialExpert", "EvidenceAuditor", "RiskExpert"}
+        for invocation in invocations
+    )
+    has_synthesis = any(
+        isinstance(invocation, dict)
+        and invocation.get("agent_role") in {"RecoveryPlanner", "ArbiterAgent"}
+        for invocation in invocations
+    )
+    if not (has_specialists and has_synthesis):
+        return []
+    errors: list[str] = []
+    envelope = loaded_payloads.get("validated-findings-envelope.json")
+    excluded = loaded_payloads.get("excluded-findings.json")
+    synthesis_inputs = loaded_payloads.get("synthesis-input.json")
+    recommendation_state = loaded_payloads.get("recommendation-authorization-state.json")
+    for filename, payload, expected_type in [
+        ("validated-findings-envelope.json", envelope, list),
+        ("excluded-findings.json", excluded, list),
+        ("synthesis-input.json", synthesis_inputs, list),
+        ("recommendation-authorization-state.json", recommendation_state, dict),
+    ]:
+        if not isinstance(payload, expected_type):
+            errors.append(f"live specialist synthesis artifacts require {filename}")
+    if not isinstance(envelope, list) or not isinstance(excluded, list):
+        return errors
+    specialist_invocation_ids = {
+        invocation.get("invocation_id")
+        for invocation in invocations
+        if isinstance(invocation, dict)
+        and invocation.get("agent_role")
+        in {"ScheduleExpert", "CommercialExpert", "EvidenceAuditor", "RiskExpert"}
+    }
+    for item in envelope:
+        if not isinstance(item, dict):
+            continue
+        if item.get("invocation_id") not in specialist_invocation_ids:
+            errors.append(f"validated finding references unknown specialist invocation {item.get('invocation_id')}")
+        if item.get("eligible_for_synthesis") is not True:
+            errors.append(f"validated finding must be eligible for synthesis: {item.get('canonical_claim_key')}")
+        if not item.get("canonical_claim_key"):
+            errors.append("validated finding missing canonical_claim_key")
+    for item in excluded:
+        if not isinstance(item, dict):
+            continue
+        if item.get("eligible_for_synthesis") is not False:
+            errors.append(f"excluded finding must not be eligible for synthesis: {item.get('canonical_claim_key')}")
+        if not item.get("exclusion_reason"):
+            errors.append(f"excluded finding missing exclusion_reason: {item.get('canonical_claim_key')}")
+    if isinstance(synthesis_inputs, list) and synthesis_inputs:
+        latest_input = synthesis_inputs[-1]
+        if isinstance(latest_input, dict) and isinstance(recommendation_state, dict):
+            input_state = latest_input.get("recommendation_authorization_state")
+            if isinstance(input_state, dict) and input_state != recommendation_state:
+                errors.append("recommendation-authorization-state.json does not match latest synthesis input")
+            if recommendation_state.get("recommendation_available") is True and not recommendation_state.get("recommended_option_id"):
+                errors.append("available recommendation requires recommended_option_id")
     return errors
 
 

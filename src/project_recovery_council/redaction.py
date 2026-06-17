@@ -21,6 +21,10 @@ SECRET_KEY_FRAGMENTS = (
 NON_SECRET_KEY_NAMES = {
     "api_key_env_var",
     "api_key_present",
+    "authorization_gate_correctness",
+    "authorization_status",
+    "recommendation_authorization_semantics",
+    "recommendation_authorization_state",
 }
 
 

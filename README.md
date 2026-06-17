@@ -288,6 +288,15 @@ produces a 13-day net milestone slip with `float_consumption_status` of
 `schedule-semantic-validation.json` and `schedule-semantic-metrics.json`; prior
 live artifacts are not retroactively modified.
 
+Fixed-chain and dynamic-council synthesis now use a compact validated-findings
+handoff. Canonical specialist claims, claim-attached citations, validation
+status, warnings, unresolved contradictions, and human gates are passed to
+RecoveryPlanner through `synthesis-input.json`; verbose raw provider responses
+remain preserved for diagnostics but are not used as the planner handoff.
+RecoveryPlanner is instructed to distinguish recommendation from
+authorization: accelerated logistics can be recommended while final
+authorization remains blocked pending human confirmation.
+
 Controlled live variant artifacts are written under
 `experiment-artifacts/live/<experiment-id>/` and include execution plans,
 selected evidence record IDs, prompt hashes, invocation records, parsed and raw
