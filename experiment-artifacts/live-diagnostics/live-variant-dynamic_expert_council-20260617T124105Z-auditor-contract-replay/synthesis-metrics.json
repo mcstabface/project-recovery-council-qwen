@@ -1,0 +1,9 @@
+{
+  "authorization_gate_correctness": 0.0,
+  "citation_propagation_rate": 1.0,
+  "recommendation_correctness": 0.0,
+  "recommendation_with_pending_approval_correctness": 0.0,
+  "specialist_finding_retention_rate": 0.5294117647058824,
+  "synthesis_omission_count": 8.0,
+  "validated_claim_utilization_rate": 0.0
+}

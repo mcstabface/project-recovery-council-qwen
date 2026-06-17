@@ -1,0 +1,353 @@
+[
+  {
+    "applied_aliases": [
+      {
+        "canonical_key": "delay_exposure_usd_per_day",
+        "raw_key": "contractual_delay_exposure_usd_per_day",
+        "raw_value": 15000
+      },
+      {
+        "canonical_key": "unmitigated_exposure_usd",
+        "raw_key": "unmitigated_delay_exposure_usd",
+        "raw_value": 195000
+      }
+    ],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "normalized_claims": {
+      "delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 147000,
+      "mitigation_cost_usd": 48000,
+      "unmitigated_exposure_usd": 195000
+    },
+    "raw_claims": {
+      "contractual_delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 147000,
+      "mitigation_cost_usd": 48000,
+      "unmitigated_delay_exposure_usd": 195000
+    },
+    "role": "CommercialExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  },
+  {
+    "applied_aliases": [],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "normalized_claims": {
+      "milestone_slip_forecast": "MS-COMMISSIONING-READY is forecast to slip by 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery delay and insufficient float (8 days) to absorb the shift.",
+      "onsite_status_conflict": "Conflicting claims exist: progress report (PRG-ONSITE-001) asserts EQ-GEN-SKID-01 is onsite and released; supplier correspondence (SUP-NOT-ARRIVED-001) and logistics status (LOG-STATUS-001) confirm it remains in transit and has not arrived.",
+      "recovery_approval_risk": "Recovery option REC-ACCEL-LOGISTICS cannot be authorized without resolving the onsite conflict, as misalignment invalidates installation readiness assumptions and jeopardizes approval of time-critical interventions."
+    },
+    "raw_claims": {
+      "milestone_slip_forecast": "MS-COMMISSIONING-READY is forecast to slip by 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery delay and insufficient float (8 days) to absorb the shift.",
+      "onsite_status_conflict": "Conflicting claims exist: progress report (PRG-ONSITE-001) asserts EQ-GEN-SKID-01 is onsite and released; supplier correspondence (SUP-NOT-ARRIVED-001) and logistics status (LOG-STATUS-001) confirm it remains in transit and has not arrived.",
+      "recovery_approval_risk": "Recovery option REC-ACCEL-LOGISTICS cannot be authorized without resolving the onsite conflict, as misalignment invalidates installation readiness assumptions and jeopardizes approval of time-critical interventions."
+    },
+    "role": "RiskExpert",
+    "unknown_claim_keys": [
+      "milestone_slip_forecast"
+    ],
+    "valid": true
+  },
+  {
+    "applied_aliases": [
+      {
+        "canonical_key": "delivery_baseline_date",
+        "raw_key": "baseline_delivery_date",
+        "raw_value": "2026-07-01"
+      },
+      {
+        "canonical_key": "milestone_baseline_date",
+        "raw_key": "baseline_milestone_date",
+        "raw_value": "2026-08-15"
+      },
+      {
+        "canonical_key": "delivery_forecast_date",
+        "raw_key": "forecast_delivery_date",
+        "raw_value": "2026-07-22"
+      },
+      {
+        "canonical_key": "milestone_forecast_date_without_intervention",
+        "raw_key": "forecast_milestone_date",
+        "raw_value": "2026-08-28"
+      }
+    ],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalized_claims": {
+      "contractual_milestone_id": "MS-COMMISSIONING-READY",
+      "delivery_baseline_date": "2026-07-01",
+      "delivery_forecast_date": "2026-07-22",
+      "delivery_movement_days": 21,
+      "forecast_milestone_slip_days": 13,
+      "installation_activity_id": "A-4200",
+      "installation_total_float_consumed_days": 13,
+      "installation_total_float_remaining_days": -5,
+      "milestone_baseline_date": "2026-08-15",
+      "milestone_forecast_date_without_intervention": "2026-08-28"
+    },
+    "raw_claims": {
+      "baseline_delivery_date": "2026-07-01",
+      "baseline_milestone_date": "2026-08-15",
+      "contractual_milestone_id": "MS-COMMISSIONING-READY",
+      "delivery_movement_days": 21,
+      "forecast_delivery_date": "2026-07-22",
+      "forecast_milestone_date": "2026-08-28",
+      "forecast_milestone_slip_days": 13,
+      "installation_activity_id": "A-4200",
+      "installation_total_float_consumed_days": 13,
+      "installation_total_float_remaining_days": -5
+    },
+    "role": "ScheduleExpert",
+    "unknown_claim_keys": [
+      "contractual_milestone_id",
+      "installation_activity_id"
+    ],
+    "valid": true
+  },
+  {
+    "applied_aliases": [],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "normalized_claims": {
+      "CommercialExpert.delay_exposure_usd_per_day": {
+        "audited_agent": "CommercialExpert",
+        "audited_claim_key": "delay_exposure_usd_per_day",
+        "canonical_claim_key": "delay_exposure_usd_per_day",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "CommercialExpert.forecast_milestone_slip_days": {
+        "audited_agent": "CommercialExpert",
+        "audited_claim_key": "forecast_milestone_slip_days",
+        "canonical_claim_key": "forecast_milestone_slip_days",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "CommercialExpert.gross_avoided_exposure_usd": {
+        "audited_agent": "CommercialExpert",
+        "audited_claim_key": "gross_avoided_exposure_usd",
+        "canonical_claim_key": "gross_avoided_exposure_usd",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "CommercialExpert.mitigation_cost_usd": {
+        "audited_agent": "CommercialExpert",
+        "audited_claim_key": "mitigation_cost_usd",
+        "canonical_claim_key": "mitigation_cost_usd",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "CommercialExpert.unmitigated_exposure_usd": {
+        "audited_agent": "CommercialExpert",
+        "audited_claim_key": "unmitigated_exposure_usd",
+        "canonical_claim_key": "unmitigated_exposure_usd",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "RiskExpert.milestone_slip_forecast": {
+        "audited_agent": "RiskExpert",
+        "audited_claim_key": "milestone_slip_forecast",
+        "canonical_claim_key": "milestone_slip_forecast",
+        "eligible_for_synthesis": false,
+        "exclusion_reason": "audit support status unsupported",
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+        "rationale": null,
+        "support_status": "unsupported",
+        "validation_reference": null
+      },
+      "RiskExpert.onsite_status_conflict": {
+        "audited_agent": "RiskExpert",
+        "audited_claim_key": "onsite_status_conflict",
+        "canonical_claim_key": "onsite_status_conflict",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "RiskExpert.recovery_approval_risk": {
+        "audited_agent": "RiskExpert",
+        "audited_claim_key": "recovery_approval_risk",
+        "canonical_claim_key": "recovery_approval_risk",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "ScheduleExpert.delivery_baseline_date": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "delivery_baseline_date",
+        "canonical_claim_key": "delivery_baseline_date",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "ScheduleExpert.delivery_forecast_date": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "delivery_forecast_date",
+        "canonical_claim_key": "delivery_forecast_date",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "ScheduleExpert.delivery_movement_days": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "delivery_movement_days",
+        "canonical_claim_key": "delivery_movement_days",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "ScheduleExpert.forecast_milestone_slip_days": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "forecast_milestone_slip_days",
+        "canonical_claim_key": "forecast_milestone_slip_days",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "ScheduleExpert.installation_total_float_consumed_days": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "installation_total_float_consumed_days",
+        "canonical_claim_key": "installation_total_float_consumed_days",
+        "eligible_for_synthesis": false,
+        "exclusion_reason": "audit support status contradicted",
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "contradicted",
+        "validation_reference": null
+      },
+      "ScheduleExpert.installation_total_float_remaining_days": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "installation_total_float_remaining_days",
+        "canonical_claim_key": "installation_total_float_remaining_days",
+        "eligible_for_synthesis": false,
+        "exclusion_reason": "audit support status contradicted",
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "contradicted",
+        "validation_reference": null
+      },
+      "ScheduleExpert.milestone_baseline_date": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "milestone_baseline_date",
+        "canonical_claim_key": "milestone_baseline_date",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      },
+      "ScheduleExpert.milestone_forecast_date_without_intervention": {
+        "audited_agent": "ScheduleExpert",
+        "audited_claim_key": "milestone_forecast_date_without_intervention",
+        "canonical_claim_key": "milestone_forecast_date_without_intervention",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "expected_value": null,
+        "observed_value": null,
+        "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+        "rationale": null,
+        "support_status": "supported",
+        "validation_reference": null
+      }
+    },
+    "raw_claims": {
+      "CommercialExpert": {
+        "delay_exposure_usd_per_day": "supported",
+        "forecast_milestone_slip_days": "supported",
+        "gross_avoided_exposure_usd": "supported",
+        "mitigation_cost_usd": "supported",
+        "unmitigated_exposure_usd": "supported"
+      },
+      "RiskExpert": {
+        "milestone_slip_forecast": "unsupported",
+        "onsite_status_conflict": "supported",
+        "recovery_approval_risk": "supported"
+      },
+      "ScheduleExpert": {
+        "delivery_baseline_date": "supported",
+        "delivery_forecast_date": "supported",
+        "delivery_movement_days": "supported",
+        "forecast_milestone_slip_days": "supported",
+        "installation_total_float_consumed_days": "contradicted",
+        "installation_total_float_remaining_days": "contradicted",
+        "milestone_baseline_date": "supported",
+        "milestone_forecast_date_without_intervention": "supported"
+      }
+    },
+    "role": "EvidenceAuditor",
+    "unknown_claim_keys": [],
+    "valid": true
+  }
+]

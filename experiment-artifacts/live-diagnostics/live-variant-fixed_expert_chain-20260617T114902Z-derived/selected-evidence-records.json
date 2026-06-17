@@ -1,0 +1,51 @@
+[
+  {
+    "agent_role": "ScheduleExpert",
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001"
+    ]
+  },
+  {
+    "agent_role": "CommercialExpert",
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001"
+    ]
+  },
+  {
+    "agent_role": "EvidenceAuditor",
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-03-evidenceauditor",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001",
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001",
+      "RISK-001"
+    ]
+  },
+  {
+    "agent_role": "RiskExpert",
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-04-riskexpert",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001",
+      "RISK-001"
+    ]
+  },
+  {
+    "agent_role": "RecoveryPlanner",
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-05-recoveryplanner",
+    "record_ids": []
+  }
+]

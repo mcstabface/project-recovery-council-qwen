@@ -1,0 +1,31 @@
+[
+  {
+    "checked_fields": [
+      "delivery_movement_days",
+      "installation_total_float_consumed_days",
+      "delivery_movement_direction",
+      "forecast_milestone_slip_days"
+    ],
+    "concise_findings": [
+      "schedule semantic validation passed"
+    ],
+    "expected_values": {
+      "delivery_movement_days": 21,
+      "delivery_movement_direction": "late",
+      "float_consumption_status": "fully_consumed",
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 8,
+      "installation_total_float_remaining_days": 0,
+      "milestone_forecast_date_without_intervention": "2026-08-28"
+    },
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+    "observed_values": {
+      "delivery_movement_days": 21,
+      "delivery_movement_direction": "late",
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 8
+    },
+    "semantic_violations": [],
+    "valid": true
+  }
+]

@@ -1,0 +1,42 @@
+[
+  {
+    "checked_fields": [
+      "delivery_movement_days",
+      "installation_total_float_consumed_days",
+      "installation_total_float_remaining_days",
+      "forecast_milestone_slip_days",
+      "delivery_date_arithmetic",
+      "milestone_forecast_date_without_intervention"
+    ],
+    "concise_findings": [
+      "schedule semantic violations: 4"
+    ],
+    "expected_values": {
+      "delivery_movement_days": 21,
+      "delivery_movement_direction": "late",
+      "float_consumption_status": "fully_consumed",
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 8,
+      "installation_total_float_remaining_days": 0,
+      "milestone_forecast_date_without_intervention": "2026-08-28"
+    },
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "observed_values": {
+      "delivery_baseline_date": "2026-07-01",
+      "delivery_forecast_date": "2026-07-22",
+      "delivery_movement_days": 21,
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 13,
+      "installation_total_float_remaining_days": -5,
+      "milestone_baseline_date": "2026-08-15",
+      "milestone_forecast_date_without_intervention": "2026-08-28"
+    },
+    "semantic_violations": [
+      "installation_total_float_consumed_days expected 8, observed 13",
+      "installation_total_float_consumed_days must not exceed available float (8), observed 13",
+      "installation_total_float_remaining_days expected 0, observed -5",
+      "installation_total_float_remaining_days must never be negative, observed -5"
+    ],
+    "valid": false
+  }
+]

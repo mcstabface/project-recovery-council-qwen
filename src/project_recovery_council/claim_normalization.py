@@ -49,6 +49,7 @@ SCHEDULE_CANONICAL_CLAIM_KEYS = [
     "installation_total_float_remaining_days",
     "float_consumption_status",
     "delivery_movement_direction",
+    "installation_activity_id",
     "milestone_baseline_date",
     "milestone_forecast_date_without_intervention",
     "forecast_milestone_slip_days",
@@ -133,6 +134,7 @@ ROLE_CLAIM_ALIASES: dict[str, dict[str, str]] = {
         "projected_milestone_slip_days": "forecast_milestone_slip_days",
         "forecast_milestone_date": "milestone_forecast_date_without_intervention",
         "baseline_milestone_date": "milestone_baseline_date",
+        "contractual_milestone_id": "milestone_id",
         "forecast_milestone_date_without_intervention": "milestone_forecast_date_without_intervention",
         "contractual_milestone_baseline_date": "milestone_baseline_date",
         "contractual_milestone_forecast_without_intervention": (

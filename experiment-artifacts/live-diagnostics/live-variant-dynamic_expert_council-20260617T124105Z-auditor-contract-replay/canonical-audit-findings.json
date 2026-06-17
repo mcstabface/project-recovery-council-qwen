@@ -1,0 +1,276 @@
+[
+  {
+    "audited_agent": "CommercialExpert",
+    "audited_claim_key": "delay_exposure_usd_per_day",
+    "canonical_claim_key": "delay_exposure_usd_per_day",
+    "citations": [
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "CommercialExpert",
+    "audited_claim_key": "forecast_milestone_slip_days",
+    "canonical_claim_key": "forecast_milestone_slip_days",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "CommercialExpert",
+    "audited_claim_key": "gross_avoided_exposure_usd",
+    "canonical_claim_key": "gross_avoided_exposure_usd",
+    "citations": [
+      "COST-SUMMARY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "CommercialExpert",
+    "audited_claim_key": "mitigation_cost_usd",
+    "canonical_claim_key": "mitigation_cost_usd",
+    "citations": [
+      "COST-SUMMARY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "CommercialExpert",
+    "audited_claim_key": "unmitigated_exposure_usd",
+    "canonical_claim_key": "unmitigated_exposure_usd",
+    "citations": [
+      "COST-SUMMARY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "RiskExpert",
+    "audited_claim_key": "milestone_slip_forecast",
+    "canonical_claim_key": "milestone_slip_forecast",
+    "citations": [],
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "audit support status unsupported",
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "rationale": null,
+    "support_status": "unsupported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "RiskExpert",
+    "audited_claim_key": "onsite_status_conflict",
+    "canonical_claim_key": "onsite_status_conflict",
+    "citations": [
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "RiskExpert",
+    "audited_claim_key": "recovery_approval_risk",
+    "canonical_claim_key": "recovery_approval_risk",
+    "citations": [
+      "RISK-001",
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "delivery_baseline_date",
+    "canonical_claim_key": "delivery_baseline_date",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "delivery_forecast_date",
+    "canonical_claim_key": "delivery_forecast_date",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "delivery_movement_days",
+    "canonical_claim_key": "delivery_movement_days",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "forecast_milestone_slip_days",
+    "canonical_claim_key": "forecast_milestone_slip_days",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "installation_total_float_consumed_days",
+    "canonical_claim_key": "installation_total_float_consumed_days",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "audit support status contradicted",
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "contradicted",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "installation_total_float_remaining_days",
+    "canonical_claim_key": "installation_total_float_remaining_days",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "audit support status contradicted",
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "contradicted",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "milestone_baseline_date",
+    "canonical_claim_key": "milestone_baseline_date",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  },
+  {
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "milestone_forecast_date_without_intervention",
+    "canonical_claim_key": "milestone_forecast_date_without_intervention",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "eligible_for_synthesis": true,
+    "exclusion_reason": null,
+    "expected_value": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "observed_value": null,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "rationale": null,
+    "support_status": "supported",
+    "validation_reference": null
+  }
+]

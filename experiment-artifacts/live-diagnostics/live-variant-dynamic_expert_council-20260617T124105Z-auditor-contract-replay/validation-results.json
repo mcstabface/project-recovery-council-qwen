@@ -1,0 +1,46 @@
+[
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-01-directoragent",
+    "schema_id": "project-recovery-council.qwen.director-routing-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": {
+      "error_type": "ValidationError",
+      "kind": "schema_error",
+      "message": "Qwen response failed expected schema validation",
+      "retryable": false
+    },
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": false,
+    "validation_errors": [
+      "{'type': 'list_type', 'loc': ('citations', 'CommercialExpert'), 'msg': 'Input should be a valid list', 'input': {'delay_exposure_usd_per_day': ['COST-SUMMARY-001', 'CTR-DELAY-001'], 'forecast_milestone_slip_days': ['SCH-DELIVERY-001'], 'gross_avoided_exposure_usd': ['COST-SUMMARY-001'], 'mitigation_cost_usd': ['COST-SUMMARY-001'], 'unmitigated_exposure_usd': ['COST-SUMMARY-001']}, 'url': 'https://errors.pydantic.dev/2.13/v/list_type'}",
+      "{'type': 'list_type', 'loc': ('citations', 'RiskExpert'), 'msg': 'Input should be a valid list', 'input': {'onsite_status_conflict': ['PRG-ONSITE-001', 'SUP-NOT-ARRIVED-001', 'LOG-STATUS-001'], 'recovery_approval_risk': ['RISK-001', 'SCH-DELIVERY-001'], 'milestone_slip_forecast': []}, 'url': 'https://errors.pydantic.dev/2.13/v/list_type'}",
+      "{'type': 'list_type', 'loc': ('citations', 'ScheduleExpert'), 'msg': 'Input should be a valid list', 'input': {'delivery_movement_days': ['SCH-DELIVERY-001'], 'forecast_milestone_slip_days': ['SCH-DELIVERY-001'], 'installation_total_float_consumed_days': ['SCH-DELIVERY-001'], 'installation_total_float_remaining_days': ['SCH-DELIVERY-001'], 'milestone_baseline_date': ['SCH-DELIVERY-001'], 'milestone_forecast_date_without_intervention': ['SCH-DELIVERY-001'], 'delivery_baseline_date': ['SCH-DELIVERY-001'], 'delivery_forecast_date': ['SCH-DELIVERY-001']}, 'url': 'https://errors.pydantic.dev/2.13/v/list_type'}"
+    ]
+  }
+]

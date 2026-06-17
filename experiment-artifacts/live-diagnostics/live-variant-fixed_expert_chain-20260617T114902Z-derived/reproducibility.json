@@ -1,0 +1,57 @@
+{
+  "case_id": "PRC-EQ-DELAY-001",
+  "configuration_excluding_secrets": "[REDACTED]",
+  "endpoint_host": "dashscope-intl.aliyuncs.com",
+  "evidence_bundle_hash": "5b8b44da0167c80f5cb757af5de93e13ff635e2dd7ff94b0325d334966775698",
+  "execution_timestamp": "2026-06-17T13:25:29+00:00",
+  "git_commit": "72a2a43e974058ed64f29f00573587e244b17392",
+  "git_dirty": true,
+  "hosted_model_reproducibility_note": "Hosted model outputs may be nondeterministic; this metadata supports auditability but does not claim perfect reproducibility.",
+  "model_identifier": "qwen-plus",
+  "package_version": "editable-or-uninstalled",
+  "prompt_records": [
+    {
+      "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+      "prompt_id": "ScheduleExpert.v1",
+      "prompt_sha256": "895acda8e20034b270412d048566c7d69874cff73c216511fd3e034a08bb1055",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+      "prompt_id": "CommercialExpert.v1",
+      "prompt_sha256": "97e28bd9c6062c6634795cc846a76c6c28e2ce3689c9369b6428a08fca1cd2d1",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-03-evidenceauditor",
+      "prompt_id": "EvidenceAuditor.v1",
+      "prompt_sha256": "d2dcb827ca89f78ef5766fcc630c764823cb5cc7d6e29e9e07a4609bda08eb58",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-04-riskexpert",
+      "prompt_id": "RiskExpert.v1",
+      "prompt_sha256": "ef213cb4332ec8b8dbf7a6419fe635b77ddd3f9848640542a4097153fcbfc205",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-05-recoveryplanner",
+      "prompt_id": "RecoveryPlanner.v1",
+      "prompt_sha256": "053aa2cf07815ef2632371a60e5e55267a6f7bfc1354bad457544b0a8ca4f2c9",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.recovery-analysis-response.v1",
+      "schema_sha256": "918fa6d0846a5cbcd7986f1203173653a4bf155a96348b820fd522fe9339c734"
+    }
+  ],
+  "seed": null,
+  "temperature": 0.0,
+  "variant": "fixed_expert_chain"
+}

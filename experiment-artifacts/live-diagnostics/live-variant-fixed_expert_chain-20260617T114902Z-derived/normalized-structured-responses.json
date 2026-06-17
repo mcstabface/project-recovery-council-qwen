@@ -1,0 +1,128 @@
+[
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+    "normalization_valid": true,
+    "normalized_response": {
+      "abstention_reason": null,
+      "agent_role": "ScheduleExpert",
+      "citations": {
+        "delivery_movement_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "equipment_id": [
+          "SCH-DELIVERY-001",
+          "CASE-INTAKE-001"
+        ],
+        "float_consumed_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "forecast_milestone_slip_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "milestone_id": [
+          "SCH-DELIVERY-001",
+          "CASE-INTAKE-001"
+        ]
+      },
+      "claims": {
+        "delivery_movement_days": 21,
+        "delivery_movement_direction": "late",
+        "equipment_id": "EQ-GEN-SKID-01",
+        "forecast_milestone_slip_days": 13,
+        "installation_total_float_consumed_days": 8,
+        "milestone_id": "MS-COMMISSIONING-READY"
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": []
+    }
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+    "normalization_valid": true,
+    "normalized_response": {
+      "abstention_reason": null,
+      "agent_role": "CommercialExpert",
+      "citations": {
+        "contractual_delay_exposure_usd_per_day": [
+          "COST-SUMMARY-001",
+          "CTR-DELAY-001"
+        ],
+        "forecast_milestone_slip_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "gross_avoided_exposure_usd": [
+          "COST-SUMMARY-001"
+        ],
+        "mitigation_cost_usd": [
+          "COST-SUMMARY-001"
+        ],
+        "unmitigated_delay_exposure_usd": [
+          "COST-SUMMARY-001"
+        ]
+      },
+      "claims": {
+        "delay_exposure_usd_per_day": 15000,
+        "forecast_milestone_slip_days": 13,
+        "gross_avoided_exposure_usd": 147000,
+        "mitigation_cost_usd": 48000,
+        "unmitigated_exposure_usd": 195000
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": []
+    }
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-03-evidenceauditor",
+    "normalization_valid": false,
+    "normalized_response": {
+      "abstention_reason": null,
+      "agent_role": "EvidenceAuditor",
+      "citations": {},
+      "claims": {},
+      "evidence_auditor_schema_valid": false,
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": []
+    }
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-04-riskexpert",
+    "normalization_valid": true,
+    "normalized_response": {
+      "abstention_reason": null,
+      "agent_role": "RiskExpert",
+      "citations": {
+        "conflicting_onsite_status_requires_human_confirmation": [
+          "PRG-ONSITE-001",
+          "SUP-NOT-ARRIVED-001",
+          "LOG-STATUS-001"
+        ],
+        "escalation_required_for_milestone_integrity": [
+          "RISK-001",
+          "CASE-INTAKE-001"
+        ],
+        "recovery_option_approval_blocked": [
+          "RISK-001",
+          "SCH-DELIVERY-001"
+        ]
+      },
+      "claims": {
+        "conflicting_onsite_status_requires_human_confirmation": "Progress report PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released to installation, but supplier correspondence SUP-NOT-ARRIVED-001 and logistics record LOG-STATUS-001 confirm it remains in transit and has not arrived \u2014 creating an unresolved evidence conflict that blocks recovery authorization.",
+        "escalation_required_for_milestone_integrity": "Human escalation is required before any schedule compression or resource re-allocation to prevent misalignment between physical progress and contractual milestone tracking.",
+        "recovery_option_approval_blocked": "Approved recovery option REC-ACCEL-LOGISTICS cannot be activated without human confirmation of onsite status due to contradictory claims; absence of resolution risks milestone MS-COMMISSIONING-READY slipping 13 days (SCH-DELIVERY-001)."
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": [
+        "No human-confirmed source resolves the onsite status conflict \u2014 onsite claim in PRG-ONSITE-001 is unsupported by logistics or supplier records and must be verified before recovery execution.",
+        "Unresolved conflict invalidates assumption of installation readiness (A-4200) and may invalidate successor testing constraints (A-4300), risking cascade delays beyond MS-COMMISSIONING-READY."
+      ]
+    }
+  }
+]

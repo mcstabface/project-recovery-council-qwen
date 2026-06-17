@@ -26,14 +26,16 @@ decisions are stored in `claim-normalization-results.json`.
 | `projected_milestone_slip_days` | `forecast_milestone_slip_days` |
 | `baseline_milestone_date` | `milestone_baseline_date` |
 | `forecast_milestone_date` | `milestone_forecast_date_without_intervention` |
+| `contractual_milestone_id` | `milestone_id` |
 | `forecast_milestone_date_without_intervention` | `milestone_forecast_date_without_intervention` |
 | `contractual_milestone_baseline_date` | `milestone_baseline_date` |
 | `contractual_milestone_forecast_without_intervention` | `milestone_forecast_date_without_intervention` |
 | `successor_dependency_effects` | `successor_dependency_effect` |
 
 Already canonical keys are retained unchanged.
-`float_consumption_status`, `delivery_movement_direction`, and `equipment_id`
-are canonical ScheduleExpert claim keys, not aliases.
+`float_consumption_status`, `delivery_movement_direction`,
+`installation_activity_id`, and `equipment_id` are canonical ScheduleExpert
+claim keys, not aliases.
 
 ## CommercialExpert v1 Aliases
 

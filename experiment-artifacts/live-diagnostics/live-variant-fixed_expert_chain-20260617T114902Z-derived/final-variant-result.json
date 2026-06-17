@@ -1,0 +1,38 @@
+{
+  "artifact_validation_errors": [],
+  "case_id": "PRC-EQ-DELAY-001",
+  "completed": true,
+  "derived_artifact_validation_failed": false,
+  "diagnostic_replay": true,
+  "empirical_result_usable_for_comparison": false,
+  "evaluation_available": true,
+  "experiment_id": "live-variant-fixed_expert_chain-20260617T114902Z-derived",
+  "failure_reason": null,
+  "final_invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-05-recoveryplanner",
+  "final_response_available": true,
+  "input_tokens": 12464,
+  "latency_seconds": 49.95237088602153,
+  "output_tokens": 2351,
+  "provider_execution_completed": true,
+  "retry_count": 0,
+  "role_scope_compliance": {
+    "applicable": true,
+    "reason": null,
+    "score": 0.75,
+    "status": "failed"
+  },
+  "role_scope_compliance_rate": 0.75,
+  "semantic_validation_compliance": {
+    "applicable": true,
+    "reason": null,
+    "score": 1.0,
+    "status": "passed"
+  },
+  "semantic_validation_compliance_rate": 1.0,
+  "source_run_id": "live-variant-fixed_expert_chain-20260617T114902Z",
+  "status": "completed",
+  "stopped_by_limit": null,
+  "total_invocation_count": 5,
+  "total_tokens": 14815,
+  "variant": "fixed_expert_chain"
+}

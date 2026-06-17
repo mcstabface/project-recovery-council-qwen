@@ -1,0 +1,89 @@
+{
+  "manifest_id": "RUN_MANIFEST_2026_06_17_SUBMISSION_PACKAGE",
+  "created_on": "2026-06-17",
+  "created_at_utc": "2026-06-17T13:56:02Z",
+  "repository": "project-recovery-council-qwen",
+  "git_base": "72a2a43e974058ed64f29f00573587e244b17392",
+  "live_network_requests_made": false,
+  "scope": [
+    "remaining dynamic role-scope analysis",
+    "minimal ScheduleExpert identifier policy correction",
+    "submission empirical result catalog",
+    "judge-facing Markdown and HTML reports",
+    "report-ready SVG charts",
+    "Devpost draft",
+    "three-minute demo storyboard and narration",
+    "architecture diagram specification",
+    "token and latency optimization plan",
+    "submission checklist"
+  ],
+  "selected_empirical_runs": [
+    "live-variant-single_generalist-20260617T111645Z",
+    "live-variant-fixed_expert_chain-20260617T132617Z",
+    "live-variant-dynamic_expert_council-20260617T132007Z"
+  ],
+  "source_changes": [
+    "src/project_recovery_council/claim_normalization.py",
+    "src/project_recovery_council/role_scope.py"
+  ],
+  "test_changes": [
+    "tests/fixtures/dynamic_schedule_scope_drift_response.json",
+    "tests/test_role_scope_policy.py",
+    "tests/test_submission_artifacts.py"
+  ],
+  "documentation_changes": [
+    "README.md",
+    "docs/CLAIM_NORMALIZATION.md",
+    "docs/REMAINING_ROLE_SCOPE_ANALYSIS.md",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "decisions/ADR-0017-competition-evidence-and-submission-framing.md",
+    "submission-artifacts/ARCHITECTURE_DIAGRAM_SPEC.md",
+    "submission-artifacts/DEMO_NARRATION.md",
+    "submission-artifacts/DEMO_STORYBOARD.md",
+    "submission-artifacts/DEVPOST_DRAFT.md",
+    "submission-artifacts/QWEN_AGENT_SOCIETY_RESULTS.html",
+    "submission-artifacts/QWEN_AGENT_SOCIETY_RESULTS.md",
+    "submission-artifacts/SUBMISSION_CHECKLIST.md",
+    "submission-artifacts/TOKEN_LATENCY_OPTIMIZATION_PLAN.md",
+    "submission-artifacts/empirical-result-catalog.json"
+  ],
+  "chart_artifacts": [
+    "submission-artifacts/charts/required_fact_accuracy.svg",
+    "submission-artifacts/charts/citation_recall.svg",
+    "submission-artifacts/charts/total_tokens.svg",
+    "submission-artifacts/charts/latency.svg"
+  ],
+  "process_artifacts": [
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_17_SUBMISSION_PACKAGE.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_17_SUBMISSION_PACKAGE.json"
+  ],
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_role_scope_policy.py tests/test_claim_normalization.py tests/test_submission_artifacts.py",
+      "result": "37 passed in 0.26s"
+    },
+    {
+      "command": "python -m pytest",
+      "result": "174 passed, 1 skipped in 8.38s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "result": "prompt validation passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed with no output"
+    }
+  ],
+  "limitations": [
+    "No live network request was made in this build.",
+    "Prior empirical artifacts were not modified.",
+    "Frozen schemas/v1 and the deterministic oracle were not modified.",
+    "The selected dynamic empirical artifact still records role-scope compliance of 0.75.",
+    "The submission package does not claim statistical significance, production readiness, or dynamic-council computational efficiency over the generalist."
+  ]
+}

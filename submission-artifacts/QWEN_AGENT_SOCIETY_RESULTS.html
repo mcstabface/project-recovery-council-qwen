@@ -1,0 +1,95 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Qwen Agent Society Results</title>
+  <style>
+    body { font-family: Arial, sans-serif; line-height: 1.5; margin: 2rem; color: #172033; }
+    main { max-width: 980px; margin: 0 auto; }
+    h1, h2, h3 { line-height: 1.2; }
+    table { border-collapse: collapse; width: 100%; margin: 1rem 0; }
+    th, td { border: 1px solid #cbd5e1; padding: 0.55rem; text-align: left; }
+    th { background: #f1f5f9; }
+    td.number, th.number { text-align: right; }
+    .note { background: #fff7ed; border-left: 4px solid #f97316; padding: 0.75rem 1rem; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 1rem; }
+    .grid img { max-width: 100%; border: 1px solid #e2e8f0; }
+    code { background: #f8fafc; padding: 0.1rem 0.25rem; }
+  </style>
+</head>
+<body>
+<main>
+  <h1>Qwen Agent Society Results</h1>
+  <section>
+    <h2>Executive Summary</h2>
+    <p>Project Recovery Council tests whether a dynamically routed modular expert council can produce a higher-assurance enterprise decision than a single general-purpose agent on a synthetic equipment-delay recovery case.</p>
+    <p>The generalist was fastest and cheapest. The dynamic council produced the most complete, cited, and governable decision, but it used substantially more tokens and latency. The value proposition is higher assurance for consequential decisions, not universal efficiency.</p>
+    <p class="note">These are single empirical runs. The report does not claim statistical significance.</p>
+  </section>
+
+  <section>
+    <h2>Experiment Design</h2>
+    <p>All three AI variants used the same synthetic case, same expected-result oracle, same Qwen model, and same evaluation rules.</p>
+    <ul>
+      <li>Generalist: <code>live-variant-single_generalist-20260617T111645Z</code></li>
+      <li>Fixed chain: <code>live-variant-fixed_expert_chain-20260617T132617Z</code></li>
+      <li>Dynamic council: <code>live-variant-dynamic_expert_council-20260617T132007Z</code></li>
+    </ul>
+    <p>Catalog: <a href="empirical-result-catalog.json">empirical-result-catalog.json</a></p>
+  </section>
+
+  <section>
+    <h2>Results Table</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Variant</th>
+          <th class="number">Facts</th>
+          <th class="number">Citation Precision</th>
+          <th class="number">Citation Recall</th>
+          <th>Human Gate</th>
+          <th>Recommendation</th>
+          <th class="number">Invocations</th>
+          <th class="number">Tokens</th>
+          <th class="number">Latency</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Generalist</td><td class="number">100%</td><td class="number">75%</td><td class="number">54.2%</td><td>Correct</td><td>Correct</td><td class="number">1</td><td class="number">4298</td><td class="number">15.0s</td></tr>
+        <tr><td>Fixed chain</td><td class="number">20%</td><td class="number">0%</td><td class="number">0%</td><td>Failed</td><td>Missing</td><td class="number">5</td><td class="number">15090</td><td class="number">37.0s</td></tr>
+        <tr><td>Dynamic council</td><td class="number">100%</td><td class="number">100%</td><td class="number">100%</td><td>Correct</td><td>Correct</td><td class="number">6</td><td class="number">25785</td><td class="number">66.5s</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section>
+    <h2>Charts</h2>
+    <div class="grid">
+      <img src="charts/required_fact_accuracy.svg" alt="Required fact accuracy by variant">
+      <img src="charts/citation_recall.svg" alt="Citation recall by variant">
+      <img src="charts/total_tokens.svg" alt="Total tokens by variant">
+      <img src="charts/latency.svg" alt="Latency by variant">
+    </div>
+  </section>
+
+  <section>
+    <h2>Interpretation</h2>
+    <p>The generalist produced a factually strong answer with one invocation, 4298 tokens, and 15.0 seconds. Its main gap was provenance: citation recall was 54.2%.</p>
+    <p>The fixed chain shows that adding agents without governed handoff can degrade results. It was not intentionally weakened; the synthesis failed to retain and use validated findings.</p>
+    <p>The dynamic council produced the highest quality result, including 100% citation precision and recall, correct human escalation, correct preferred option, and correct blocked authorization state. It also cost more in tokens and time.</p>
+    <p>Recorded dynamic role-scope compliance was 0.75. Post-run offline analysis identified the remaining failure as policy drift on schedule identifier keys, not a substantive role violation. See <a href="../docs/REMAINING_ROLE_SCOPE_ANALYSIS.md">remaining role-scope analysis</a>.</p>
+  </section>
+
+  <section>
+    <h2>Reproducibility</h2>
+    <p>Raw provider responses are not copied into <code>submission-artifacts/</code>. The catalog records source run IDs, artifact paths, metrics, and manifest checksums.</p>
+    <ul>
+      <li>Generalist manifest checksum: <code>f6b9e9e79b694477b1b0972fcb7cb8bd43bbb935247088990beec998540590d2</code></li>
+      <li>Fixed chain manifest checksum: <code>55633c0ed915b28ff96f27b0fa120927df54a02fcbd5496115c099ed011a840c</code></li>
+      <li>Dynamic council manifest checksum: <code>8367e9998e903c884c3f4999daedaf1e6e0a8bec8cd5880637dcddc904ee4107</code></li>
+    </ul>
+  </section>
+</main>
+</body>
+</html>

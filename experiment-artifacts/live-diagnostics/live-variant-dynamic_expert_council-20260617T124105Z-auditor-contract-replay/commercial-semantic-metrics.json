@@ -1,0 +1,13 @@
+{
+  "applicability": {
+    "applicable": true,
+    "reason": null,
+    "score": 1.0,
+    "status": "passed"
+  },
+  "avoided_exposure_correctness": 1.0,
+  "commercial_semantic_compliance_rate": 1.0,
+  "delay_exposure_rate_correctness": 1.0,
+  "mitigation_cost_correctness": 1.0,
+  "unmitigated_exposure_correctness": 1.0
+}

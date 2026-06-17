@@ -1,0 +1,47 @@
+[
+  {
+    "input_tokens": 1443,
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+    "latency_seconds": 6.093602025997825,
+    "output_tokens": 256,
+    "provider_request_id": "9fd93484-1016-9aea-a5aa-54b801830afb",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 1699
+  },
+  {
+    "input_tokens": 1892,
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+    "latency_seconds": 6.101979395985836,
+    "output_tokens": 275,
+    "provider_request_id": "09481430-d0e7-943f-9827-e70073611c30",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 2167
+  },
+  {
+    "input_tokens": 2576,
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-03-evidenceauditor",
+    "latency_seconds": 17.341649252019124,
+    "output_tokens": 878,
+    "provider_request_id": "0da276fd-83a8-9b86-9baf-a26f9b17365a",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 3454
+  },
+  {
+    "input_tokens": 2125,
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-04-riskexpert",
+    "latency_seconds": 9.414095462008845,
+    "output_tokens": 445,
+    "provider_request_id": "f1c7f575-aacb-9ba6-913d-305455c72ce8",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 2570
+  },
+  {
+    "input_tokens": 4428,
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-05-recoveryplanner",
+    "latency_seconds": 11.001044750009896,
+    "output_tokens": 497,
+    "provider_request_id": "6be7e3c7-21b2-9a88-a051-6201208b23a6",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 4925
+  }
+]

@@ -1,0 +1,11 @@
+{
+  "arbiter_input_tokens": null,
+  "arbiter_required": false,
+  "arbiter_skipped": false,
+  "director_selected_specialist_count": 0,
+  "dynamic_routing_savings_vs_fixed_specialist_set": 0,
+  "evidence_auditor_input_tokens": 2576,
+  "governance_invocation_count": 1,
+  "planner_input_tokens": 4428,
+  "total_overhead_tokens_beyond_selected_specialists": null
+}

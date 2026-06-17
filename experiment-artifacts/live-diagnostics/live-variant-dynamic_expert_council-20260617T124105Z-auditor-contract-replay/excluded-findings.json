@@ -1,0 +1,475 @@
+[
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "milestone_slip_forecast",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "milestone_slip_forecast",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; EvidenceAuditor marked claim unsupported",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "not_applicable",
+    "source_agent": "RiskExpert",
+    "support_status": null,
+    "value": "MS-COMMISSIONING-READY is forecast to slip by 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery delay and insufficient float (8 days) to absorb the shift.",
+    "warnings": [
+      "Human confirmation required to resolve contradictory onsite status before approving any recovery action \u2014 per RISK-001 mitigation directive.",
+      "Unresolved conflict invalidates progress-based schedule logic (e.g., installation start assumptions); no automated reconciliation is permitted per protocol."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "onsite_status_conflict",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "LOG-STATUS-001",
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001"
+    ],
+    "claim_id": "onsite_status_conflict",
+    "contradiction_status": "identified",
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "not_applicable",
+    "source_agent": "RiskExpert",
+    "support_status": null,
+    "value": "Conflicting claims exist: progress report (PRG-ONSITE-001) asserts EQ-GEN-SKID-01 is onsite and released; supplier correspondence (SUP-NOT-ARRIVED-001) and logistics status (LOG-STATUS-001) confirm it remains in transit and has not arrived.",
+    "warnings": [
+      "Human confirmation required to resolve contradictory onsite status before approving any recovery action \u2014 per RISK-001 mitigation directive.",
+      "Unresolved conflict invalidates progress-based schedule logic (e.g., installation start assumptions); no automated reconciliation is permitted per protocol."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "recovery_approval_risk",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "RISK-001",
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "recovery_approval_risk",
+    "contradiction_status": "identified",
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "not_applicable",
+    "source_agent": "RiskExpert",
+    "support_status": null,
+    "value": "Recovery option REC-ACCEL-LOGISTICS cannot be authorized without resolving the onsite conflict, as misalignment invalidates installation readiness assumptions and jeopardizes approval of time-critical interventions.",
+    "warnings": [
+      "Human confirmation required to resolve contradictory onsite status before approving any recovery action \u2014 per RISK-001 mitigation directive.",
+      "Unresolved conflict invalidates progress-based schedule logic (e.g., installation start assumptions); no automated reconciliation is permitted per protocol."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "delivery_baseline_date",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "delivery_baseline_date",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": "2026-07-01",
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "milestone_baseline_date",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "milestone_baseline_date",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": "2026-08-15",
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "contractual_milestone_id",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "contractual_milestone_id",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": "MS-COMMISSIONING-READY",
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "delivery_movement_days",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "delivery_movement_days",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": 21,
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "delivery_forecast_date",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "delivery_forecast_date",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": "2026-07-22",
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "milestone_forecast_date_without_intervention",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "milestone_forecast_date_without_intervention",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": "2026-08-28",
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "forecast_milestone_slip_days",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "forecast_milestone_slip_days",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": 13,
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "installation_activity_id",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "installation_activity_id",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": "A-4200",
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "installation_total_float_consumed_days",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "installation_total_float_consumed_days",
+    "contradiction_status": "identified",
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed; EvidenceAuditor marked claim contradicted",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": 13,
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": null,
+    "audited_claim_key": null,
+    "canonical_claim_key": "installation_total_float_remaining_days",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "installation_total_float_remaining_days",
+    "contradiction_status": "identified",
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "role scope invalid; semantic validation failed; EvidenceAuditor marked claim contradicted",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "normalization_valid": true,
+    "original_invocation_id": null,
+    "role_scope_valid": false,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "ScheduleExpert",
+    "support_status": null,
+    "value": -5,
+    "warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": "RiskExpert",
+    "audited_claim_key": "milestone_slip_forecast",
+    "canonical_claim_key": "milestone_slip_forecast",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [],
+    "claim_id": "RiskExpert.milestone_slip_forecast",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "audit support status unsupported",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "normalization_valid": true,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "role_scope_valid": true,
+    "schema_valid": true,
+    "semantic_validation_status": "not_applicable",
+    "source_agent": "EvidenceAuditor",
+    "support_status": "unsupported",
+    "value": {
+      "audited_agent": "RiskExpert",
+      "audited_claim_key": "milestone_slip_forecast",
+      "canonical_claim_key": "milestone_slip_forecast",
+      "eligible_for_synthesis": false,
+      "exclusion_reason": "audit support status unsupported",
+      "expected_value": null,
+      "observed_value": null,
+      "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+      "rationale": null,
+      "support_status": "unsupported",
+      "validation_reference": null
+    },
+    "warnings": [
+      "ScheduleExpert.installation_total_float_consumed_days (13) contradicts SCH-DELIVERY-001: installation_total_float_days = 8; consumption cannot exceed available float.",
+      "ScheduleExpert.installation_total_float_remaining_days (-5) contradicts SCH-DELIVERY-001: remaining float must be non-negative; observed value violates schedule semantics.",
+      "RiskExpert.milestone_slip_forecast is unsupported because it repeats a quantitative schedule claim already validated by ScheduleExpert and falls outside RiskExpert's permitted claim set per role policy."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "installation_total_float_consumed_days",
+    "canonical_claim_key": "installation_total_float_consumed_days",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "ScheduleExpert.installation_total_float_consumed_days",
+    "contradiction_status": "identified",
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "audit support status contradicted",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "normalization_valid": true,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "role_scope_valid": true,
+    "schema_valid": true,
+    "semantic_validation_status": "not_applicable",
+    "source_agent": "EvidenceAuditor",
+    "support_status": "contradicted",
+    "value": {
+      "audited_agent": "ScheduleExpert",
+      "audited_claim_key": "installation_total_float_consumed_days",
+      "canonical_claim_key": "installation_total_float_consumed_days",
+      "eligible_for_synthesis": false,
+      "exclusion_reason": "audit support status contradicted",
+      "expected_value": null,
+      "observed_value": null,
+      "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+      "rationale": null,
+      "support_status": "contradicted",
+      "validation_reference": null
+    },
+    "warnings": [
+      "ScheduleExpert.installation_total_float_consumed_days (13) contradicts SCH-DELIVERY-001: installation_total_float_days = 8; consumption cannot exceed available float.",
+      "ScheduleExpert.installation_total_float_remaining_days (-5) contradicts SCH-DELIVERY-001: remaining float must be non-negative; observed value violates schedule semantics.",
+      "RiskExpert.milestone_slip_forecast is unsupported because it repeats a quantitative schedule claim already validated by ScheduleExpert and falls outside RiskExpert's permitted claim set per role policy."
+    ]
+  },
+  {
+    "assumptions": [],
+    "audited_agent": "ScheduleExpert",
+    "audited_claim_key": "installation_total_float_remaining_days",
+    "canonical_claim_key": "installation_total_float_remaining_days",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "SCH-DELIVERY-001"
+    ],
+    "claim_id": "ScheduleExpert.installation_total_float_remaining_days",
+    "contradiction_status": "identified",
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "audit support status contradicted",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "normalization_valid": true,
+    "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "role_scope_valid": true,
+    "schema_valid": true,
+    "semantic_validation_status": "not_applicable",
+    "source_agent": "EvidenceAuditor",
+    "support_status": "contradicted",
+    "value": {
+      "audited_agent": "ScheduleExpert",
+      "audited_claim_key": "installation_total_float_remaining_days",
+      "canonical_claim_key": "installation_total_float_remaining_days",
+      "eligible_for_synthesis": false,
+      "exclusion_reason": "audit support status contradicted",
+      "expected_value": null,
+      "observed_value": null,
+      "original_invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+      "rationale": null,
+      "support_status": "contradicted",
+      "validation_reference": null
+    },
+    "warnings": [
+      "ScheduleExpert.installation_total_float_consumed_days (13) contradicts SCH-DELIVERY-001: installation_total_float_days = 8; consumption cannot exceed available float.",
+      "ScheduleExpert.installation_total_float_remaining_days (-5) contradicts SCH-DELIVERY-001: remaining float must be non-negative; observed value violates schedule semantics.",
+      "RiskExpert.milestone_slip_forecast is unsupported because it repeats a quantitative schedule claim already validated by ScheduleExpert and falls outside RiskExpert's permitted claim set per role policy."
+    ]
+  }
+]

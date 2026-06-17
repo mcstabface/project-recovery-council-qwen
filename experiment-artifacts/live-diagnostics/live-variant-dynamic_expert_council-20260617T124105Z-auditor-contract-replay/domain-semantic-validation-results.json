@@ -1,0 +1,84 @@
+[
+  {
+    "checked_fields": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "unmitigated_exposure_usd",
+      "mitigation_cost_usd",
+      "gross_avoided_exposure_usd",
+      "unmitigated_exposure_arithmetic",
+      "avoided_exposure_arithmetic"
+    ],
+    "concise_findings": [
+      "commercial semantic validation passed"
+    ],
+    "implemented": true,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "role": "CommercialExpert",
+    "semantic_violations": [],
+    "valid": true,
+    "valid_claim_keys": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "gross_avoided_exposure_usd",
+      "mitigation_cost_usd",
+      "unmitigated_exposure_usd"
+    ],
+    "validator": "CommercialExpertSemanticValidator.v1"
+  },
+  {
+    "checked_fields": [],
+    "concise_findings": [
+      "no specialized semantic validator implemented for this role"
+    ],
+    "implemented": false,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "role": "RiskExpert",
+    "semantic_violations": [],
+    "valid": null,
+    "valid_claim_keys": [],
+    "validator": "not_implemented"
+  },
+  {
+    "checked_fields": [
+      "delivery_movement_days",
+      "installation_total_float_consumed_days",
+      "installation_total_float_remaining_days",
+      "forecast_milestone_slip_days",
+      "delivery_date_arithmetic",
+      "milestone_forecast_date_without_intervention"
+    ],
+    "concise_findings": [
+      "schedule semantic violations: 4"
+    ],
+    "implemented": true,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "role": "ScheduleExpert",
+    "semantic_violations": [
+      "installation_total_float_consumed_days expected 8, observed 13",
+      "installation_total_float_consumed_days must not exceed available float (8), observed 13",
+      "installation_total_float_remaining_days expected 0, observed -5",
+      "installation_total_float_remaining_days must never be negative, observed -5"
+    ],
+    "valid": false,
+    "valid_claim_keys": [],
+    "validator": "ScheduleExpertSemanticValidator.v1"
+  },
+  {
+    "checked_fields": [],
+    "concise_findings": [
+      "dedicated evidence-auditor response contract validated separately"
+    ],
+    "implemented": false,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "role": "EvidenceAuditor",
+    "semantic_violations": [],
+    "valid": null,
+    "valid_claim_keys": [],
+    "validator": "EvidenceAuditorResponseContract.v1"
+  }
+]

@@ -1,0 +1,47 @@
+[
+  {
+    "input_tokens": 1464,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-01-directoragent",
+    "latency_seconds": 6.218436778988689,
+    "output_tokens": 250,
+    "provider_request_id": "012f95e9-407e-96fc-b306-d02fded092f0",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 1714
+  },
+  {
+    "input_tokens": 1896,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "latency_seconds": 6.143526178988395,
+    "output_tokens": 275,
+    "provider_request_id": "45c79803-76c0-9091-b53b-d544887a4164",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 2171
+  },
+  {
+    "input_tokens": 2129,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "latency_seconds": 8.368022262991872,
+    "output_tokens": 400,
+    "provider_request_id": "d169bdc4-c73e-9618-94fd-d63f31559379",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 2529
+  },
+  {
+    "input_tokens": 1447,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "latency_seconds": 9.556402536982205,
+    "output_tokens": 462,
+    "provider_request_id": "ca009b50-bf61-9b48-b1b8-c55304193b3f",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 1909
+  },
+  {
+    "input_tokens": 6243,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "latency_seconds": 15.647062842006562,
+    "output_tokens": 772,
+    "provider_request_id": "53a11cf9-aabd-99d1-908e-1b6d464f4554",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 7015
+  }
+]

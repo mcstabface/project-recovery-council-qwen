@@ -1,0 +1,27 @@
+[
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-03-evidenceauditor",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-04-riskexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-05-recoveryplanner",
+    "retry_count": 0,
+    "retry_history": []
+  }
+]

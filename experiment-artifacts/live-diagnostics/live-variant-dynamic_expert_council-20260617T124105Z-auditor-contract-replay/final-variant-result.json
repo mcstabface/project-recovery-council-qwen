@@ -1,0 +1,38 @@
+{
+  "artifact_validation_errors": [],
+  "case_id": "PRC-EQ-DELAY-001",
+  "completed": false,
+  "derived_artifact_validation_failed": false,
+  "diagnostic_replay": true,
+  "empirical_result_usable_for_comparison": false,
+  "evaluation_available": false,
+  "experiment_id": "live-variant-dynamic_expert_council-20260617T124105Z-auditor-contract-replay",
+  "failure_reason": null,
+  "final_invocation_id": null,
+  "final_response_available": false,
+  "input_tokens": 13179,
+  "latency_seconds": 45.93345059995772,
+  "output_tokens": 2159,
+  "provider_execution_completed": false,
+  "retry_count": 0,
+  "role_scope_compliance": {
+    "applicable": true,
+    "reason": null,
+    "score": 0.5,
+    "status": "failed"
+  },
+  "role_scope_compliance_rate": 0.5,
+  "semantic_validation_compliance": {
+    "applicable": true,
+    "reason": null,
+    "score": 0.5,
+    "status": "failed"
+  },
+  "semantic_validation_compliance_rate": 0.5,
+  "source_run_id": "live-variant-dynamic_expert_council-20260617T124105Z",
+  "status": "incomplete",
+  "stopped_by_limit": null,
+  "total_invocation_count": 5,
+  "total_tokens": 15338,
+  "variant": "dynamic_expert_council"
+}

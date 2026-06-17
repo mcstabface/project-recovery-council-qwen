@@ -1,0 +1,160 @@
+{
+  "schema_version": "project-recovery-council.qwen.submission.empirical-result-catalog.v1",
+  "created_on": "2026-06-17",
+  "case_id": "PRC-EQ-DELAY-001",
+  "model_configuration": {
+    "provider": "qwen",
+    "model_identifier": "qwen-plus",
+    "endpoint_host": "dashscope-intl.aliyuncs.com",
+    "provider_region_label": "intl-compatible",
+    "temperature": 0.0,
+    "seed": null,
+    "structured_output_mode": "prompted_json"
+  },
+  "single_run_limitation": "Each variant is represented by one empirical live run; results are descriptive and not statistically significant.",
+  "raw_provider_responses_copied": false,
+  "runs": [
+    {
+      "label": "generalist",
+      "experiment_id": "live-variant-single_generalist-20260617T111645Z",
+      "variant": "single_generalist",
+      "empirical_status": "completed",
+      "empirical_result_usable_for_comparison": true,
+      "artifact_path": "experiment-artifacts/live/live-variant-single_generalist-20260617T111645Z",
+      "artifact_manifest_sha256": "f6b9e9e79b694477b1b0972fcb7cb8bd43bbb935247088990beec998540590d2",
+      "model_identifier": "qwen-plus",
+      "invocation_count": 1,
+      "input_tokens": 3566,
+      "output_tokens": 732,
+      "total_tokens": 4298,
+      "latency_seconds": 15.010511255997699,
+      "retry_count": 0,
+      "factual_metrics": {
+        "required_fact_accuracy": 1.0,
+        "monetary_calculation_accuracy": 1.0,
+        "schedule_impact_accuracy": 1.0,
+        "contradiction_detection": 1.0,
+        "correct_human_escalation": 1.0,
+        "preferred_recovery_option": 1.0
+      },
+      "citation_metrics": {
+        "evidence_citation_precision": 0.75,
+        "evidence_citation_recall": 0.5416666666666666
+      },
+      "governance_metrics": {
+        "schema_valid_response_rate": 1.0,
+        "role_scope_compliance": {
+          "status": "not_applicable",
+          "score": null,
+          "reason": "GeneralistAgent receives full evidence by design."
+        },
+        "semantic_validation_compliance": {
+          "status": "not_applicable",
+          "score": null,
+          "reason": "Specialized semantic validators apply to specialist invocations."
+        }
+      },
+      "known_limitations": [
+        "Fastest and lowest-token run, but citation recall was 0.5416666667.",
+        "Full-scope generalist role compliance is not applicable.",
+        "Single run only; no statistical significance is claimed."
+      ]
+    },
+    {
+      "label": "fixed_chain",
+      "experiment_id": "live-variant-fixed_expert_chain-20260617T132617Z",
+      "variant": "fixed_expert_chain",
+      "empirical_status": "completed_with_poor_final_synthesis",
+      "empirical_result_usable_for_comparison": true,
+      "artifact_path": "experiment-artifacts/live/live-variant-fixed_expert_chain-20260617T132617Z",
+      "artifact_manifest_sha256": "55633c0ed915b28ff96f27b0fa120927df54a02fcbd5496115c099ed011a840c",
+      "model_identifier": "qwen-plus",
+      "invocation_count": 5,
+      "input_tokens": 13407,
+      "output_tokens": 1683,
+      "total_tokens": 15090,
+      "latency_seconds": 36.99587711994536,
+      "retry_count": 0,
+      "factual_metrics": {
+        "required_fact_accuracy": 0.2,
+        "monetary_calculation_accuracy": 0.0,
+        "schedule_impact_accuracy": 0.0,
+        "contradiction_detection": 0.0,
+        "correct_human_escalation": 0.0,
+        "preferred_recovery_option": 0.0
+      },
+      "citation_metrics": {
+        "evidence_citation_precision": 0.0,
+        "evidence_citation_recall": 0.0
+      },
+      "governance_metrics": {
+        "schema_valid_response_rate": 1.0,
+        "role_scope_compliance_rate": 0.25,
+        "semantic_validation_compliance_rate": 0.5,
+        "specialist_finding_retention_rate": 0.1,
+        "validated_claim_utilization_rate": 0.0,
+        "authorization_gate_correctness": 0.0,
+        "recommendation_with_pending_approval_correctness": 0.0
+      },
+      "known_limitations": [
+        "The fixed sequential chain did not produce a useful final recommendation in this run.",
+        "Validated findings were excluded or not used effectively by synthesis.",
+        "This variant was not intentionally weakened; it demonstrates the risk of adding agents without governed handoff.",
+        "Single run only; no statistical significance is claimed."
+      ]
+    },
+    {
+      "label": "dynamic_council",
+      "experiment_id": "live-variant-dynamic_expert_council-20260617T132007Z",
+      "variant": "dynamic_expert_council",
+      "empirical_status": "completed",
+      "empirical_result_usable_for_comparison": true,
+      "artifact_path": "experiment-artifacts/live/live-variant-dynamic_expert_council-20260617T132007Z",
+      "artifact_manifest_sha256": "8367e9998e903c884c3f4999daedaf1e6e0a8bec8cd5880637dcddc904ee4107",
+      "model_identifier": "qwen-plus",
+      "invocation_count": 6,
+      "input_tokens": 22583,
+      "output_tokens": 3202,
+      "total_tokens": 25785,
+      "latency_seconds": 66.5382855309872,
+      "retry_count": 0,
+      "factual_metrics": {
+        "required_fact_accuracy": 1.0,
+        "monetary_calculation_accuracy": 1.0,
+        "schedule_impact_accuracy": 1.0,
+        "contradiction_detection": 1.0,
+        "correct_human_escalation": 1.0,
+        "preferred_recovery_option": 1.0
+      },
+      "citation_metrics": {
+        "evidence_citation_precision": 1.0,
+        "evidence_citation_recall": 1.0
+      },
+      "governance_metrics": {
+        "schema_valid_response_rate": 1.0,
+        "role_scope_compliance_rate": 0.75,
+        "semantic_validation_compliance_rate": 1.0,
+        "specialist_finding_retention_rate": 0.5714285714285714,
+        "validated_claim_utilization_rate": 1.0,
+        "authorization_gate_correctness": 1.0,
+        "recommendation_with_pending_approval_correctness": 1.0
+      },
+      "known_limitations": [
+        "Highest-quality and most governable result, but used 25785 total tokens and 66.54 seconds.",
+        "Recorded role-scope compliance was 0.75 because ScheduleExpert identifier claims were rejected by the then-current policy.",
+        "Post-run offline analysis classifies the identifier rejection as policy drift, not a genuine commercial or onsite role violation.",
+        "Single run only; no statistical significance is claimed."
+      ]
+    }
+  ],
+  "excluded_runs": [
+    {
+      "experiment_id": "live-variant-dynamic_expert_council-20260617T120357Z",
+      "reason": "failed empirical dynamic run preserved as failed and excluded from normal comparison"
+    },
+    {
+      "path_prefix": "experiment-artifacts/live-diagnostics/",
+      "reason": "diagnostic rebuilds are non-empirical and excluded from submission comparison"
+    }
+  ]
+}

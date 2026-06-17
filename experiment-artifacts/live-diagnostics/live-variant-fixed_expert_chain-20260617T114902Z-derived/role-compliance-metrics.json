@@ -1,0 +1,13 @@
+{
+  "applicability": {
+    "applicable": true,
+    "reason": null,
+    "score": 0.75,
+    "status": "failed"
+  },
+  "evidence_overexposure_count": 0.0,
+  "prohibited_citation_count": 0.0,
+  "prohibited_claim_count": 1.0,
+  "prohibited_warning_count": 0.0,
+  "scope_compliance_rate": 0.75
+}

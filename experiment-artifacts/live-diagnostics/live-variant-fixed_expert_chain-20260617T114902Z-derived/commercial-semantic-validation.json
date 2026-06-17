@@ -1,0 +1,42 @@
+[
+  {
+    "checked_fields": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "unmitigated_exposure_usd",
+      "mitigation_cost_usd",
+      "gross_avoided_exposure_usd",
+      "unmitigated_exposure_arithmetic",
+      "avoided_exposure_arithmetic"
+    ],
+    "concise_findings": [
+      "commercial semantic validation passed"
+    ],
+    "expected_values": {
+      "avoided_exposure_usd": 147000,
+      "delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 147000,
+      "mitigation_cost_usd": 48000,
+      "unmitigated_exposure_usd": 195000
+    },
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+    "observed_values": {
+      "delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 147000,
+      "mitigation_cost_usd": 48000,
+      "unmitigated_exposure_usd": 195000
+    },
+    "semantic_violations": [],
+    "valid": true,
+    "valid_claim_keys": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "gross_avoided_exposure_usd",
+      "mitigation_cost_usd",
+      "unmitigated_exposure_usd"
+    ]
+  }
+]

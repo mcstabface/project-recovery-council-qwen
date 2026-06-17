@@ -4,6 +4,7 @@ from typing import Any
 
 import pytest
 
+from project_recovery_council.claim_normalization import normalize_claim_keys, normalize_response_payload
 from project_recovery_council.evaluation import role_scope_metric_results
 from project_recovery_council.experiment_artifacts import validate_experiment_artifacts
 from project_recovery_council.experiment_contracts import (
@@ -155,6 +156,30 @@ def test_schedule_expert_valid_schedule_only_response_is_role_valid() -> None:
     assert "delivery_movement_days" in result.allowed_claims
     assert result.prohibited_claims == []
     assert result.prohibited_warnings == []
+
+
+def test_dynamic_schedule_identifier_scope_drift_fixture_is_role_valid() -> None:
+    bundle = load_equipment_delay_case(FIXTURE_PATH)
+    payload = read_json(Path(__file__).parent / "fixtures" / "dynamic_schedule_scope_drift_response.json")
+    normalization = normalize_claim_keys(
+        invocation_id="INV-DYNAMIC-SCHEDULE-SCOPE-DRIFT",
+        role=AgentRole.SCHEDULE_EXPERT.value,
+        response_payload=payload,
+    )
+    normalized = normalize_response_payload(payload, normalization)
+    result = validate_role_scope(
+        role=AgentRole.SCHEDULE_EXPERT.value,
+        invocation_id="INV-DYNAMIC-SCHEDULE-SCOPE-DRIFT",
+        response_payload=normalized,
+        selected_record_ids=["CASE-INTAKE-001", "SCH-DELIVERY-001"],
+        bundle=bundle,
+    )
+
+    assert normalization.valid is True
+    assert normalization.normalized_claims["milestone_id"] == "MS-COMMISSIONING-READY"
+    assert normalization.normalized_claims["installation_activity_id"] == "A-4200"
+    assert result.valid is True
+    assert result.prohibited_claims == []
 
 
 def test_schedule_expert_onsite_warning_detected_as_scope_violation() -> None:

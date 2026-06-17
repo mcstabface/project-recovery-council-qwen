@@ -335,6 +335,19 @@ warnings. Role-scope compliance and specialized semantic validation are marked
 `not_applicable` for full-scope `GeneralistAgent` outputs; they are scored only
 for specialist invocations where those validation layers actually ran.
 
+## Submission Package
+
+Judge-facing submission materials live under `submission-artifacts/`. They
+catalog the selected three empirical runs, summarize quality-versus-cost
+results, include report-ready SVG charts, draft the Devpost narrative, and
+provide a three-minute demo storyboard and narration.
+
+The selected dynamic council empirical artifact still records
+`role_scope_compliance_rate: 0.75`. Post-run offline analysis in
+`docs/REMAINING_ROLE_SCOPE_ANALYSIS.md` identifies the remaining failure as
+policy drift on legitimate schedule identifier keys, not a substantive role
+violation. Prior empirical artifacts are not rewritten.
+
 Offline experiment outputs use:
 
 ```text

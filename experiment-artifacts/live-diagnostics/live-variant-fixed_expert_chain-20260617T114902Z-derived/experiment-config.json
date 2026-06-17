@@ -1,0 +1,86 @@
+{
+  "case_id": "PRC-EQ-DELAY-001",
+  "execution_plan": {
+    "ai_competitor": true,
+    "description": "All specialists run in a fixed sequence with no dynamic routing; the final synthesis combines findings.",
+    "plan_id": "fixed_expert_chain.v1",
+    "steps": [
+      {
+        "agent_role": "ScheduleExpert",
+        "depends_on": [],
+        "description": "Fixed-sequence expert step with no dynamic routing.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.specialist-finding-response.v1",
+        "model_identifier": "qwen-plus",
+        "prompt_id": "ScheduleExpert.v1",
+        "required": true,
+        "sequence": 1,
+        "step_id": "fixed_ScheduleExpert"
+      },
+      {
+        "agent_role": "CommercialExpert",
+        "depends_on": [
+          "fixed_ScheduleExpert"
+        ],
+        "description": "Fixed-sequence expert step with no dynamic routing.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.specialist-finding-response.v1",
+        "model_identifier": "qwen-plus",
+        "prompt_id": "CommercialExpert.v1",
+        "required": true,
+        "sequence": 2,
+        "step_id": "fixed_CommercialExpert"
+      },
+      {
+        "agent_role": "EvidenceAuditor",
+        "depends_on": [
+          "fixed_CommercialExpert"
+        ],
+        "description": "Fixed-sequence expert step with no dynamic routing.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.evidence-auditor-response.v1",
+        "model_identifier": "qwen-plus",
+        "prompt_id": "EvidenceAuditor.v1",
+        "required": true,
+        "sequence": 3,
+        "step_id": "fixed_EvidenceAuditor"
+      },
+      {
+        "agent_role": "RiskExpert",
+        "depends_on": [
+          "fixed_EvidenceAuditor"
+        ],
+        "description": "Fixed-sequence expert step with no dynamic routing.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.specialist-finding-response.v1",
+        "model_identifier": "qwen-plus",
+        "prompt_id": "RiskExpert.v1",
+        "required": true,
+        "sequence": 4,
+        "step_id": "fixed_RiskExpert"
+      },
+      {
+        "agent_role": "RecoveryPlanner",
+        "depends_on": [
+          "fixed_RiskExpert"
+        ],
+        "description": "Fixed-sequence expert step with no dynamic routing.",
+        "dynamic": false,
+        "expected_response_schema": "project-recovery-council.qwen.recovery-analysis-response.v1",
+        "model_identifier": "qwen-plus",
+        "prompt_id": "RecoveryPlanner.v1",
+        "required": true,
+        "sequence": 5,
+        "step_id": "fixed_RecoveryPlanner"
+      }
+    ],
+    "variant": "fixed_expert_chain"
+  },
+  "experiment_id": "live-variant-fixed_expert_chain-20260617T114902Z-derived",
+  "fixture_id": "live-provider",
+  "invocation_purpose": "fixed_expert_chain",
+  "live_provider_enabled": true,
+  "schema_version": "project-recovery-council.qwen.experiment-config.v1",
+  "simulated_outputs": false,
+  "variant": "fixed_expert_chain"
+}

@@ -32,6 +32,7 @@ Allowed claim keys include:
 - `installation_total_float_remaining_days`
 - `float_consumption_status`
 - `delivery_movement_direction`
+- `installation_activity_id`
 - `milestone_baseline_date`
 - `milestone_forecast_date_without_intervention`
 - `forecast_milestone_slip_days`
@@ -44,12 +45,15 @@ installation float, float consumed, remaining float, projected milestone slip,
 qualitative float consumption status, and successor dependency effects.
 `delivery_movement_direction` must be one of `early`, `on_time`, or `late`
 and is checked by schedule-semantic validation.
+`installation_activity_id` is allowed as a schedule identifier from
+`SCH-DELIVERY-001`.
 
 Supported aliases, such as `baseline_delivery_date`,
 `forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
 `remaining_total_float_days`,
 `remaining_total_float_after_delivery_shift_days`, `float_consumed_days`,
-`forecast_milestone_date`, `contractual_milestone_baseline_date`, and
+`forecast_milestone_date`, `contractual_milestone_id`,
+`contractual_milestone_baseline_date`, and
 `contractual_milestone_forecast_without_intervention`, are normalized before
 role validation. They are not role-policy keys themselves.
 

@@ -1,0 +1,264 @@
+[
+  {
+    "finish_status": "completed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-01-directoragent",
+    "parsed_response": {
+      "agent_role": "DirectorAgent",
+      "citations": {
+        "CommercialExpert": [
+          "COST-SUMMARY-001",
+          "CTR-DELAY-001"
+        ],
+        "RiskExpert": [
+          "PRG-ONSITE-001",
+          "SUP-NOT-ARRIVED-001",
+          "LOG-STATUS-001",
+          "RISK-001"
+        ],
+        "ScheduleExpert": [
+          "SCH-DELIVERY-001",
+          "CASE-INTAKE-001"
+        ]
+      },
+      "routing_rationale": "CommercialExpert needed for delay exposure quantification (15k/day) and accelerated logistics cost (48k); RiskExpert required to resolve conflicting onsite assertions between progress report and supplier/logistics records; ScheduleExpert required to assess float, forecast slippage (13 days), and baseline deviation (21 days). All three experts are evidence-supported and within executable scope.",
+      "schema_version": "project-recovery-council.qwen.director-routing-response.v1",
+      "selected_experts": [
+        "CommercialExpert",
+        "RiskExpert",
+        "ScheduleExpert"
+      ],
+      "skipped_experts": {},
+      "status": "completed"
+    }
+  },
+  {
+    "finish_status": "completed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "parsed_response": {
+      "abstention_reason": null,
+      "agent_role": "CommercialExpert",
+      "citations": {
+        "contractual_delay_exposure_usd_per_day": [
+          "COST-SUMMARY-001",
+          "CTR-DELAY-001"
+        ],
+        "forecast_milestone_slip_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "gross_avoided_exposure_usd": [
+          "COST-SUMMARY-001"
+        ],
+        "mitigation_cost_usd": [
+          "COST-SUMMARY-001"
+        ],
+        "unmitigated_delay_exposure_usd": [
+          "COST-SUMMARY-001"
+        ]
+      },
+      "claims": {
+        "contractual_delay_exposure_usd_per_day": 15000,
+        "forecast_milestone_slip_days": 13,
+        "gross_avoided_exposure_usd": 147000,
+        "mitigation_cost_usd": 48000,
+        "unmitigated_delay_exposure_usd": 195000
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": []
+    }
+  },
+  {
+    "finish_status": "completed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "parsed_response": {
+      "abstention_reason": null,
+      "agent_role": "RiskExpert",
+      "citations": {
+        "milestone_slip_forecast": [
+          "SCH-DELIVERY-001"
+        ],
+        "onsite_status_conflict": [
+          "PRG-ONSITE-001",
+          "SUP-NOT-ARRIVED-001",
+          "LOG-STATUS-001"
+        ],
+        "recovery_approval_risk": [
+          "RISK-001",
+          "SCH-DELIVERY-001"
+        ]
+      },
+      "claims": {
+        "milestone_slip_forecast": "MS-COMMISSIONING-READY is forecast to slip by 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery delay and insufficient float (8 days) to absorb the shift.",
+        "onsite_status_conflict": "Conflicting claims exist: progress report (PRG-ONSITE-001) asserts EQ-GEN-SKID-01 is onsite and released; supplier correspondence (SUP-NOT-ARRIVED-001) and logistics status (LOG-STATUS-001) confirm it remains in transit and has not arrived.",
+        "recovery_approval_risk": "Recovery option REC-ACCEL-LOGISTICS cannot be authorized without resolving the onsite conflict, as misalignment invalidates installation readiness assumptions and jeopardizes approval of time-critical interventions."
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": [
+        "Human confirmation required to resolve contradictory onsite status before approving any recovery action \u2014 per RISK-001 mitigation directive.",
+        "Unresolved conflict invalidates progress-based schedule logic (e.g., installation start assumptions); no automated reconciliation is permitted per protocol."
+      ]
+    }
+  },
+  {
+    "finish_status": "completed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "parsed_response": {
+      "abstention_reason": null,
+      "agent_role": "ScheduleExpert",
+      "citations": {
+        "baseline_delivery_date": [
+          "SCH-DELIVERY-001"
+        ],
+        "baseline_milestone_date": [
+          "SCH-DELIVERY-001"
+        ],
+        "contractual_milestone_id": [
+          "SCH-DELIVERY-001",
+          "CASE-INTAKE-001"
+        ],
+        "delivery_movement_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "forecast_delivery_date": [
+          "SCH-DELIVERY-001"
+        ],
+        "forecast_milestone_date": [
+          "SCH-DELIVERY-001"
+        ],
+        "forecast_milestone_slip_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "installation_activity_id": [
+          "SCH-DELIVERY-001"
+        ],
+        "installation_total_float_consumed_days": [
+          "SCH-DELIVERY-001"
+        ],
+        "installation_total_float_remaining_days": [
+          "SCH-DELIVERY-001"
+        ]
+      },
+      "claims": {
+        "baseline_delivery_date": "2026-07-01",
+        "baseline_milestone_date": "2026-08-15",
+        "contractual_milestone_id": "MS-COMMISSIONING-READY",
+        "delivery_movement_days": 21,
+        "forecast_delivery_date": "2026-07-22",
+        "forecast_milestone_date": "2026-08-28",
+        "forecast_milestone_slip_days": 13,
+        "installation_activity_id": "A-4200",
+        "installation_total_float_consumed_days": 13,
+        "installation_total_float_remaining_days": -5
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [],
+      "warnings": [
+        "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+        "Float consumption exceeds available total float (8 days), confirming critical path impact."
+      ]
+    }
+  },
+  {
+    "finish_status": "validation_error",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "parsed_response": {
+      "agent_role": "EvidenceAuditor",
+      "citations": {
+        "CommercialExpert": {
+          "delay_exposure_usd_per_day": [
+            "COST-SUMMARY-001",
+            "CTR-DELAY-001"
+          ],
+          "forecast_milestone_slip_days": [
+            "SCH-DELIVERY-001"
+          ],
+          "gross_avoided_exposure_usd": [
+            "COST-SUMMARY-001"
+          ],
+          "mitigation_cost_usd": [
+            "COST-SUMMARY-001"
+          ],
+          "unmitigated_exposure_usd": [
+            "COST-SUMMARY-001"
+          ]
+        },
+        "RiskExpert": {
+          "milestone_slip_forecast": [],
+          "onsite_status_conflict": [
+            "PRG-ONSITE-001",
+            "SUP-NOT-ARRIVED-001",
+            "LOG-STATUS-001"
+          ],
+          "recovery_approval_risk": [
+            "RISK-001",
+            "SCH-DELIVERY-001"
+          ]
+        },
+        "ScheduleExpert": {
+          "delivery_baseline_date": [
+            "SCH-DELIVERY-001"
+          ],
+          "delivery_forecast_date": [
+            "SCH-DELIVERY-001"
+          ],
+          "delivery_movement_days": [
+            "SCH-DELIVERY-001"
+          ],
+          "forecast_milestone_slip_days": [
+            "SCH-DELIVERY-001"
+          ],
+          "installation_total_float_consumed_days": [
+            "SCH-DELIVERY-001"
+          ],
+          "installation_total_float_remaining_days": [
+            "SCH-DELIVERY-001"
+          ],
+          "milestone_baseline_date": [
+            "SCH-DELIVERY-001"
+          ],
+          "milestone_forecast_date_without_intervention": [
+            "SCH-DELIVERY-001"
+          ]
+        }
+      },
+      "claims": {
+        "CommercialExpert": {
+          "delay_exposure_usd_per_day": "supported",
+          "forecast_milestone_slip_days": "supported",
+          "gross_avoided_exposure_usd": "supported",
+          "mitigation_cost_usd": "supported",
+          "unmitigated_exposure_usd": "supported"
+        },
+        "RiskExpert": {
+          "milestone_slip_forecast": "unsupported",
+          "onsite_status_conflict": "supported",
+          "recovery_approval_risk": "supported"
+        },
+        "ScheduleExpert": {
+          "delivery_baseline_date": "supported",
+          "delivery_forecast_date": "supported",
+          "delivery_movement_days": "supported",
+          "forecast_milestone_slip_days": "supported",
+          "installation_total_float_consumed_days": "contradicted",
+          "installation_total_float_remaining_days": "contradicted",
+          "milestone_baseline_date": "supported",
+          "milestone_forecast_date_without_intervention": "supported"
+        }
+      },
+      "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "status": "completed",
+      "unsupported_claims": [
+        "RiskExpert.milestone_slip_forecast"
+      ],
+      "warnings": [
+        "ScheduleExpert.installation_total_float_consumed_days (13) contradicts SCH-DELIVERY-001: installation_total_float_days = 8; consumption cannot exceed available float.",
+        "ScheduleExpert.installation_total_float_remaining_days (-5) contradicts SCH-DELIVERY-001: remaining float must be non-negative; observed value violates schedule semantics.",
+        "RiskExpert.milestone_slip_forecast is unsupported because it repeats a quantitative schedule claim already validated by ScheduleExpert and falls outside RiskExpert's permitted claim set per role policy."
+      ]
+    }
+  }
+]

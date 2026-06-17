@@ -1,0 +1,30 @@
+{
+  "schema_version": "project-recovery-council.qwen.specialist-finding-response.v1",
+  "agent_role": "ScheduleExpert",
+  "status": "completed",
+  "claims": {
+    "baseline_delivery_date": "2026-07-01",
+    "baseline_milestone_date": "2026-08-15",
+    "contractual_milestone_id": "MS-COMMISSIONING-READY",
+    "delivery_movement_days": 21,
+    "forecast_delivery_date": "2026-07-22",
+    "forecast_milestone_date": "2026-08-28",
+    "forecast_milestone_slip_days": 13,
+    "installation_activity_id": "A-4200",
+    "installation_total_float_consumed_days": 8,
+    "remaining_float_after_delivery_shift_days": 0
+  },
+  "citations": {
+    "baseline_delivery_date": ["SCH-DELIVERY-001"],
+    "baseline_milestone_date": ["SCH-DELIVERY-001"],
+    "contractual_milestone_id": ["SCH-DELIVERY-001", "CASE-INTAKE-001"],
+    "delivery_movement_days": ["SCH-DELIVERY-001"],
+    "forecast_delivery_date": ["SCH-DELIVERY-001"],
+    "forecast_milestone_date": ["SCH-DELIVERY-001"],
+    "forecast_milestone_slip_days": ["SCH-DELIVERY-001"],
+    "installation_activity_id": ["SCH-DELIVERY-001"],
+    "installation_total_float_consumed_days": ["SCH-DELIVERY-001"]
+  },
+  "unsupported_claims": [],
+  "warnings": []
+}

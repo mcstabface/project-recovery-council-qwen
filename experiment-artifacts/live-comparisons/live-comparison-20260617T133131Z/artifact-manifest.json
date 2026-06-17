@@ -1,0 +1,17 @@
+{
+  "artifact_contract_version": "project-recovery-council.qwen.experiment-artifacts.v1",
+  "artifacts": [
+    {
+      "generated_at": "2026-06-17T13:31:31+00:00",
+      "media_type": "application/json",
+      "name": "live-comparison-report",
+      "relative_path": "live-comparison-report.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-comparison-report.v1",
+      "sha256": "0295849a45763a54d0b621f2a9189eb03d9ce7f9deb39f69f60596ece20782bf"
+    }
+  ],
+  "case_id": "PRC-EQ-DELAY-001",
+  "experiment_id": "live-comparison-20260617T133131Z",
+  "generated_at": "2026-06-17T13:31:31+00:00"
+}

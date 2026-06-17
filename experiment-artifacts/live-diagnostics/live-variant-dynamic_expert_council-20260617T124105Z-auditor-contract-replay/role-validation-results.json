@@ -1,0 +1,104 @@
+[
+  {
+    "allowed_claims": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "gross_avoided_exposure_usd",
+      "mitigation_cost_usd",
+      "unmitigated_exposure_usd"
+    ],
+    "allowed_warnings": [],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "role scope compliant"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "prohibited_claims": [],
+    "prohibited_warnings": [],
+    "role": "CommercialExpert",
+    "valid": true
+  },
+  {
+    "allowed_claims": [
+      "onsite_status_conflict",
+      "recovery_approval_risk"
+    ],
+    "allowed_warnings": [
+      "Human confirmation required to resolve contradictory onsite status before approving any recovery action \u2014 per RISK-001 mitigation directive.",
+      "Unresolved conflict invalidates progress-based schedule logic (e.g., installation start assumptions); no automated reconciliation is permitted per protocol."
+    ],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "prohibited claims: 1"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "prohibited_claims": [
+      "milestone_slip_forecast: claim key outside role policy"
+    ],
+    "prohibited_warnings": [],
+    "role": "RiskExpert",
+    "valid": false
+  },
+  {
+    "allowed_claims": [
+      "delivery_baseline_date",
+      "milestone_baseline_date",
+      "delivery_movement_days",
+      "delivery_forecast_date",
+      "milestone_forecast_date_without_intervention",
+      "forecast_milestone_slip_days",
+      "installation_total_float_consumed_days",
+      "installation_total_float_remaining_days"
+    ],
+    "allowed_warnings": [
+      "Installation total float is fully consumed and overspent by 5 days; milestone slip is unavoidable without recovery action.",
+      "Float consumption exceeds available total float (8 days), confirming critical path impact."
+    ],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "prohibited claims: 2"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "prohibited_claims": [
+      "contractual_milestone_id: claim key outside role policy",
+      "installation_activity_id: claim key outside role policy"
+    ],
+    "prohibited_warnings": [],
+    "role": "ScheduleExpert",
+    "valid": false
+  },
+  {
+    "allowed_claims": [
+      "CommercialExpert.delay_exposure_usd_per_day",
+      "CommercialExpert.forecast_milestone_slip_days",
+      "CommercialExpert.gross_avoided_exposure_usd",
+      "CommercialExpert.mitigation_cost_usd",
+      "CommercialExpert.unmitigated_exposure_usd",
+      "RiskExpert.milestone_slip_forecast",
+      "RiskExpert.onsite_status_conflict",
+      "RiskExpert.recovery_approval_risk",
+      "ScheduleExpert.delivery_baseline_date",
+      "ScheduleExpert.delivery_forecast_date",
+      "ScheduleExpert.delivery_movement_days",
+      "ScheduleExpert.forecast_milestone_slip_days",
+      "ScheduleExpert.installation_total_float_consumed_days",
+      "ScheduleExpert.installation_total_float_remaining_days",
+      "ScheduleExpert.milestone_baseline_date",
+      "ScheduleExpert.milestone_forecast_date_without_intervention"
+    ],
+    "allowed_warnings": [],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "evidence auditor response contract valid"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "prohibited_claims": [],
+    "prohibited_warnings": [],
+    "role": "EvidenceAuditor",
+    "valid": true
+  }
+]

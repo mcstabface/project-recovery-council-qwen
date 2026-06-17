@@ -1,0 +1,14 @@
+{
+  "applicability": {
+    "applicable": true,
+    "reason": null,
+    "score": 1.0,
+    "status": "passed"
+  },
+  "delivery_movement_correctness": 1.0,
+  "float_consumed_correctness": 1.0,
+  "milestone_date_arithmetic_correctness": 1.0,
+  "milestone_slip_correctness": 1.0,
+  "remaining_float_correctness": 1.0,
+  "schedule_semantic_compliance_rate": 1.0
+}

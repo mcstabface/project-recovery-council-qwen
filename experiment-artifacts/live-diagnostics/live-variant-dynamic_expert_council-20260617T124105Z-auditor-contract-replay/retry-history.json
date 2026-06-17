@@ -1,0 +1,27 @@
+[
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-01-directoragent",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-02-commercialexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-03-riskexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-04-scheduleexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T124105Z-05-evidenceauditor",
+    "retry_count": 0,
+    "retry_history": []
+  }
+]

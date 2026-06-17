@@ -1,0 +1,134 @@
+[
+  {
+    "applied_aliases": [
+      {
+        "canonical_key": "installation_total_float_consumed_days",
+        "raw_key": "float_consumed_days",
+        "raw_value": 8
+      }
+    ],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-01-scheduleexpert",
+    "normalized_claims": {
+      "delivery_movement_days": 21,
+      "delivery_movement_direction": "late",
+      "equipment_id": "EQ-GEN-SKID-01",
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 8,
+      "milestone_id": "MS-COMMISSIONING-READY"
+    },
+    "raw_claims": {
+      "delivery_movement_days": 21,
+      "delivery_movement_direction": "late",
+      "equipment_id": "EQ-GEN-SKID-01",
+      "float_consumed_days": 8,
+      "forecast_milestone_slip_days": 13,
+      "milestone_id": "MS-COMMISSIONING-READY"
+    },
+    "role": "ScheduleExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  },
+  {
+    "applied_aliases": [
+      {
+        "canonical_key": "delay_exposure_usd_per_day",
+        "raw_key": "contractual_delay_exposure_usd_per_day",
+        "raw_value": 15000
+      },
+      {
+        "canonical_key": "unmitigated_exposure_usd",
+        "raw_key": "unmitigated_delay_exposure_usd",
+        "raw_value": 195000
+      }
+    ],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-02-commercialexpert",
+    "normalized_claims": {
+      "delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 147000,
+      "mitigation_cost_usd": 48000,
+      "unmitigated_exposure_usd": 195000
+    },
+    "raw_claims": {
+      "contractual_delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 147000,
+      "mitigation_cost_usd": 48000,
+      "unmitigated_delay_exposure_usd": 195000
+    },
+    "role": "CommercialExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  },
+  {
+    "applied_aliases": [],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-03-evidenceauditor",
+    "normalized_claims": {},
+    "raw_claims": {
+      "claim-accelerated-logistics-cost-48000": {
+        "cited_record_ids": [
+          "COST-SUMMARY-001"
+        ],
+        "rationale": "COST-SUMMARY-001 explicitly lists 'accelerated_logistics_cost_usd': 48000.",
+        "support_status": "supported"
+      },
+      "claim-delay-exposure-15000-per-day": {
+        "cited_record_ids": [
+          "COST-SUMMARY-001",
+          "CTR-DELAY-001"
+        ],
+        "rationale": "Both COST-SUMMARY-001 and CTR-DELAY-001 state delay exposure is 15000 USD per calendar day. CTR-DELAY-001 is a contract excerpt dated 2026-01-15; COST-SUMMARY-001 reaffirms it on 2026-06-29.",
+        "support_status": "supported"
+      },
+      "claim-milestone-slip-13-days": {
+        "cited_record_ids": [
+          "SCH-DELIVERY-001",
+          "COST-SUMMARY-001"
+        ],
+        "rationale": "SCH-DELIVERY-001 explicitly states 'milestone is forecast to slip 13 days without intervention' and cites contractual_milestone_forecast_without_intervention = '2026-08-28' against baseline_date = '2026-08-15', confirming 13 calendar days. COST-SUMMARY-001 independently references 'unmitigated_delay_days': 13.",
+        "support_status": "supported"
+      },
+      "claim-onsite-assertion": {
+        "cited_record_ids": [
+          "PRG-ONSITE-001",
+          "SUP-NOT-ARRIVED-001",
+          "LOG-STATUS-001",
+          "RISK-001"
+        ],
+        "rationale": "Progress report PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released to installation, but supplier correspondence SUP-NOT-ARRIVED-001, logistics status LOG-STATUS-001, and risk register RISK-001 all confirm the equipment has not arrived. No record supports the onsite claim.",
+        "support_status": "contradicted"
+      },
+      "claim-unmitigated-exposure-195000": {
+        "cited_record_ids": [
+          "COST-SUMMARY-001"
+        ],
+        "rationale": "COST-SUMMARY-001 states 'unmitigated_exposure_usd': 195000. This equals 13 days \u00d7 15000 USD/day, consistent with supported claims for slip duration and daily exposure.",
+        "support_status": "supported"
+      }
+    },
+    "role": "EvidenceAuditor",
+    "unknown_claim_keys": [],
+    "valid": false
+  },
+  {
+    "applied_aliases": [],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-fixed_expert_chain-20260617T114902Z-04-riskexpert",
+    "normalized_claims": {
+      "conflicting_onsite_status_requires_human_confirmation": "Progress report PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released to installation, but supplier correspondence SUP-NOT-ARRIVED-001 and logistics record LOG-STATUS-001 confirm it remains in transit and has not arrived \u2014 creating an unresolved evidence conflict that blocks recovery authorization.",
+      "escalation_required_for_milestone_integrity": "Human escalation is required before any schedule compression or resource re-allocation to prevent misalignment between physical progress and contractual milestone tracking.",
+      "recovery_option_approval_blocked": "Approved recovery option REC-ACCEL-LOGISTICS cannot be activated without human confirmation of onsite status due to contradictory claims; absence of resolution risks milestone MS-COMMISSIONING-READY slipping 13 days (SCH-DELIVERY-001)."
+    },
+    "raw_claims": {
+      "conflicting_onsite_status_requires_human_confirmation": "Progress report PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released to installation, but supplier correspondence SUP-NOT-ARRIVED-001 and logistics record LOG-STATUS-001 confirm it remains in transit and has not arrived \u2014 creating an unresolved evidence conflict that blocks recovery authorization.",
+      "escalation_required_for_milestone_integrity": "Human escalation is required before any schedule compression or resource re-allocation to prevent misalignment between physical progress and contractual milestone tracking.",
+      "recovery_option_approval_blocked": "Approved recovery option REC-ACCEL-LOGISTICS cannot be activated without human confirmation of onsite status due to contradictory claims; absence of resolution risks milestone MS-COMMISSIONING-READY slipping 13 days (SCH-DELIVERY-001)."
+    },
+    "role": "RiskExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  }
+]

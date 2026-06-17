@@ -1,0 +1,341 @@
+{
+  "artifact_contract_version": "project-recovery-council.qwen.experiment-artifacts.v1",
+  "artifacts": [
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "sanitized-provider-config",
+      "relative_path": "sanitized-provider-config.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-sanitized-provider-config.v1",
+      "sha256": "d911b4abcbb0d33b7aa4da5a70b0c9a1c16d6a259f3d65b3c41db0cb72b6313e"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "experiment-config",
+      "relative_path": "experiment-config.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.experiment-config.v1",
+      "sha256": "291c87fec8f9ddf4a432c44b9477d065c2e6864d7d6a4f211dc94450eb4c8020"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "execution-plan",
+      "relative_path": "execution-plan.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-execution-plan.v1",
+      "sha256": "5eed1176cdfac3bbcba0d42d61c1afc67bf697bc1c903a78388a6d353642e8bb"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "rendered-prompt-hashes",
+      "relative_path": "rendered-prompt-hashes.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-rendered-prompt-hashes.v1",
+      "sha256": "9a66c033d2d62067c2ef5964c469f6cddaf577712c1a3aaececa6efa0fd86512"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "selected-evidence-records",
+      "relative_path": "selected-evidence-records.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-selected-evidence-records.v1",
+      "sha256": "b5009d139de8c69341008e166ba6c4296906672f801169259fd79ec06a74b521"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "claim-normalization-results",
+      "relative_path": "claim-normalization-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-claim-normalization-results.v1",
+      "sha256": "340483bac6201f842b1e34e6d20188fa80eaaae06cffa019cb14f00143c1ef43"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "normalized-structured-responses",
+      "relative_path": "normalized-structured-responses.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-normalized-structured-responses.v1",
+      "sha256": "98d7984233f2d237dcf7896ae5cfe7d880da648bf6fe22f1baf41cf848401884"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "role-validation-results",
+      "relative_path": "role-validation-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-role-validation-results.v1",
+      "sha256": "83ae6d43386a2f898af9883d5b2f16fec2dcf62f2ae926a89ba75310f3abf56d"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "schedule-semantic-validation",
+      "relative_path": "schedule-semantic-validation.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+      "sha256": "a3eaead4c267fef19825a965f295e634b5623dbdc9693704abb2a3dd4fb29e53"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "commercial-semantic-validation",
+      "relative_path": "commercial-semantic-validation.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
+      "sha256": "3d0423d5283593b3d36c7ef3361a28edd5649093bd4a81b194c175b993082d26"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "evidence-auditor-validation-results",
+      "relative_path": "evidence-auditor-validation-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-evidence-auditor-validation-results.v1",
+      "sha256": "c718f223dbec7d67f33ef41836e9269f01b5aad09b235ab699e37d072a5c71f9"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "canonical-audit-findings",
+      "relative_path": "canonical-audit-findings.json",
+      "required": false,
+      "schema_id": "project-recovery-council.qwen.live-canonical-audit-findings.v1",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "domain-semantic-validation-results",
+      "relative_path": "domain-semantic-validation-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
+      "sha256": "4aa6d284546baa21781c77a03e8bf8f039e1b1d619237c40bae533b6cce70b36"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "validated-findings-envelope",
+      "relative_path": "validated-findings-envelope.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-validated-findings-envelope.v1",
+      "sha256": "20df33135a1d4154f3a266c5a9a2b3b8169c4c3c0ace730e7281b028705edeab"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "excluded-findings",
+      "relative_path": "excluded-findings.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-excluded-findings.v1",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "synthesis-input",
+      "relative_path": "synthesis-input.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-synthesis-input.v1",
+      "sha256": "0aa2a564bc433cd33c049c894ca21a692c14598f2a15c4c9b112908a5ceceaae"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "recommendation-authorization-state",
+      "relative_path": "recommendation-authorization-state.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-recommendation-authorization-state.v1",
+      "sha256": "e482e072804503eb93b31ea4e2838187d6d40555eddb12c20ff02e66283bcfaf"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "invocation-records",
+      "relative_path": "invocation-records.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.agent-invocations.v1",
+      "sha256": "07257ceb79f6f7694861d3add1792d39326e87025ab4540dcb803c814bacbd0c"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "raw-provider-responses",
+      "relative_path": "raw-provider-responses.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-raw-provider-responses.v1",
+      "sha256": "209ae350503e035439e50784175910a7f53deec2fb0de95b03022991787897fa"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "parsed-structured-responses",
+      "relative_path": "parsed-structured-responses.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-parsed-structured-responses.v1",
+      "sha256": "96e3909853d4e3f13b41b3f803681efb290da6a7e26964d60590db695f447241"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "validation-results",
+      "relative_path": "validation-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-validation-results.v1",
+      "sha256": "68a3d329e1f5d3ed3806f324a2ccd39c99da74ce02e927907162bbfd3abd3e24"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "token-usage",
+      "relative_path": "token-usage.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-token-usage.v1",
+      "sha256": "2cf5e20cc0549d3de4032b1f4075a43e0293f59973a9bdd75bc571fc19b92501"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "retry-history",
+      "relative_path": "retry-history.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-retry-history.v1",
+      "sha256": "ff4e9b43890d9a725cd6207dfe1254ed8bf36991249d8870aa3c154bfcb98ee5"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "routing-decisions",
+      "relative_path": "routing-decisions.json",
+      "required": false,
+      "schema_id": "project-recovery-council.qwen.live-routing-decisions.v1",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "arbitration-decisions",
+      "relative_path": "arbitration-decisions.json",
+      "required": false,
+      "schema_id": "project-recovery-council.qwen.live-arbitration-decisions.v1",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "governance-payloads",
+      "relative_path": "governance-payloads.json",
+      "required": false,
+      "schema_id": "project-recovery-council.qwen.live-governance-payloads.v1",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "disagreement-records",
+      "relative_path": "disagreement-records.json",
+      "required": false,
+      "schema_id": "project-recovery-council.qwen.live-disagreement-records.v1",
+      "sha256": "37517e5f3dc66819f61f5a7bb8ace1921282415f10551d2defa5c3eb0985b570"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "final-variant-result",
+      "relative_path": "final-variant-result.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-final-variant-result.v1",
+      "sha256": "56406abc13d96d4adb1dd21864ab4cac5a922ea4051363199170c50f17a020e2"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "evaluation-results",
+      "relative_path": "evaluation-results.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-evaluation-results.v1",
+      "sha256": "909b9dab162173c5b8bdbfa757288ee357f4785f2c120e154eebd14243d4e818"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "role-compliance-metrics",
+      "relative_path": "role-compliance-metrics.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-role-compliance-metrics.v1",
+      "sha256": "6b2bf463b97b702883a580792366985ba043277cba4f72b29aefea8e824be7e9"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "claim-normalization-metrics",
+      "relative_path": "claim-normalization-metrics.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-claim-normalization-metrics.v1",
+      "sha256": "68013f81034009b91c9942ff9ba67e6f217ac572456fc558fd05660c5a69950b"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "schedule-semantic-metrics",
+      "relative_path": "schedule-semantic-metrics.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
+      "sha256": "db278427a14a0e5e705237735593d7dd3c42acfcf22f4933b78a5e29a1618ad1"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "commercial-semantic-metrics",
+      "relative_path": "commercial-semantic-metrics.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-commercial-semantic-metrics.v1",
+      "sha256": "0ceb4615fa881a85eba0c2bc2cd7804b0bab2f0c5a4f1c9118a22fc9155f64d3"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "synthesis-metrics",
+      "relative_path": "synthesis-metrics.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-synthesis-metrics.v1",
+      "sha256": "b649acb393b1170f076f5aa8c261045d3a4a7b51d7ee4c3daae434f62367acab"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "efficiency-metrics",
+      "relative_path": "efficiency-metrics.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-efficiency-metrics.v1",
+      "sha256": "66def3101abc0951bc89d56afae8672a6a87954d62c8ab00b67a5c736c884735"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "reproducibility",
+      "relative_path": "reproducibility.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-reproducibility.v1",
+      "sha256": "c0ba9a74385c7ca0b50dd05842551f412a0b8b33c6004f51bc728cf58751d1b7"
+    },
+    {
+      "generated_at": "2026-06-17T13:25:29+00:00",
+      "media_type": "application/json",
+      "name": "diagnostic-rebuild-metadata",
+      "relative_path": "diagnostic-rebuild-metadata.json",
+      "required": true,
+      "schema_id": "project-recovery-council.qwen.live-diagnostic-rebuild-metadata.v1",
+      "sha256": "80cb203a8ea708fedfc44c2243513c8d5c0f48543df68d7446624745095e94af"
+    }
+  ],
+  "case_id": "PRC-EQ-DELAY-001",
+  "experiment_id": "live-variant-fixed_expert_chain-20260617T114902Z-derived",
+  "generated_at": "2026-06-17T13:25:29+00:00"
+}
