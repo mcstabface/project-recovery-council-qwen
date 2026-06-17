@@ -14,6 +14,7 @@ from project_recovery_council.experiment_contracts import AgentInvocation, Agent
 from project_recovery_council.fixtures import CaseBundle
 from project_recovery_council.model_client import FinishStatus, ModelResult
 from project_recovery_council.role_scope import RoleValidationResult
+from project_recovery_council.validation import detect_onsite_contradictions
 
 
 SemanticValidationStatus = Literal["passed", "failed", "not_applicable", "unavailable"]
@@ -34,6 +35,10 @@ class ValidatedFinding(ContractModel):
     assumptions: list[str] = Field(default_factory=list)
     warnings: list[str] = Field(default_factory=list)
     contradiction_status: str | None = None
+    audited_agent: str | None = None
+    audited_claim_key: str | None = None
+    support_status: str | None = None
+    original_invocation_id: str | None = None
     eligible_for_synthesis: bool
     exclusion_reason: str | None = None
 
@@ -142,6 +147,11 @@ def build_synthesis_handoff(
         role_result = role_by_id.get(invocation_id)
         domain_result = domain_by_id.get(invocation_id)
         schema_valid = _schema_valid(invocation.result)
+        if (
+            invocation.agent_role == AgentRole.EVIDENCE_AUDITOR.value
+            and normalized_payload.get("evidence_auditor_schema_valid") is True
+        ):
+            schema_valid = True
         normalization_valid = normalization.valid if normalization else False
         role_scope_valid = role_result.valid if role_result else False
         assumptions = _string_list(normalized_payload.get("assumptions", []))
@@ -153,6 +163,8 @@ def build_synthesis_handoff(
             normalization=normalization,
         )
         for canonical_key, value in claims.items():
+            audit_metadata = _audit_metadata(canonical_key, value, invocation.agent_role)
+            finding_key = audit_metadata.get("canonical_claim_key", canonical_key)
             semantic_status = _semantic_status_for_claim(domain_result, canonical_key)
             reasons = _exclusion_reasons(
                 schema_valid=schema_valid,
@@ -160,13 +172,16 @@ def build_synthesis_handoff(
                 role_scope_valid=role_scope_valid,
                 semantic_status=semantic_status,
             )
+            support_status = audit_metadata.get("support_status")
+            if support_status in {"contradicted", "unsupported", "insufficient_evidence"}:
+                reasons.append(f"audit support status {support_status}")
             findings.append(
                 ValidatedFinding(
                     case_id=bundle.case.case_id,
                     source_agent=invocation.agent_role,
                     invocation_id=invocation_id,
                     claim_id=canonical_key,
-                    canonical_claim_key=canonical_key,
+                    canonical_claim_key=finding_key,
                     value=value,
                     citations=citations_by_key.get(canonical_key, []),
                     schema_valid=schema_valid,
@@ -175,12 +190,18 @@ def build_synthesis_handoff(
                     semantic_validation_status=semantic_status,
                     assumptions=assumptions,
                     warnings=warnings,
-                    contradiction_status=_contradiction_status(canonical_key, value),
+                    contradiction_status=_contradiction_status(finding_key, value)
+                    or ("identified" if support_status == "contradicted" else None),
+                    audited_agent=audit_metadata.get("audited_agent"),
+                    audited_claim_key=audit_metadata.get("audited_claim_key"),
+                    support_status=support_status,
+                    original_invocation_id=audit_metadata.get("original_invocation_id"),
                     eligible_for_synthesis=not reasons,
                     exclusion_reason="; ".join(reasons) if reasons else None,
                 )
             )
 
+    findings = _apply_audit_assessment_exclusions(findings)
     eligible = [finding for finding in findings if finding.eligible_for_synthesis]
     excluded = [finding for finding in findings if not finding.eligible_for_synthesis]
     state = build_recommendation_authorization_state(bundle=bundle, validated_findings=eligible)
@@ -230,7 +251,7 @@ def build_recommendation_authorization_state(
         {"unmitigated_exposure_usd", "mitigation_cost_usd"}.issubset(keys)
         and ("gross_avoided_exposure_usd" in keys or "avoided_exposure_usd" in keys)
     )
-    contradiction = _onsite_contradiction_unresolved(validated_findings)
+    contradiction = _onsite_contradiction_unresolved(validated_findings) or bool(detect_onsite_contradictions(bundle))
     human_gate = _human_gate_required(validated_findings) or contradiction
     request_id = "HDR-ONSITE-001" if human_gate and contradiction else None
     resolved_request_ids = resolved_human_decision_request_ids or set()
@@ -391,6 +412,57 @@ def synthesis_metric_results(metrics: dict[str, float | None]) -> list[MetricRes
 
 def _schema_valid(result: ModelResult) -> bool:
     return result.finish_status == FinishStatus.COMPLETED and result.parsed_response is not None and not result.validation_errors
+
+
+def _audit_metadata(claim_id: str, value: Any, source_agent: str) -> dict[str, Any]:
+    if source_agent != AgentRole.EVIDENCE_AUDITOR.value or not isinstance(value, dict):
+        return {}
+    canonical_key = value.get("canonical_claim_key")
+    return {
+        "audited_agent": value.get("audited_agent"),
+        "audited_claim_key": value.get("audited_claim_key"),
+        "canonical_claim_key": str(canonical_key) if canonical_key else claim_id,
+        "support_status": value.get("support_status"),
+        "original_invocation_id": value.get("original_invocation_id"),
+    }
+
+
+def _apply_audit_assessment_exclusions(findings: list[ValidatedFinding]) -> list[ValidatedFinding]:
+    blocking_audits = [
+        finding
+        for finding in findings
+        if finding.source_agent == AgentRole.EVIDENCE_AUDITOR.value
+        and finding.support_status in {"contradicted", "unsupported"}
+        and finding.audited_agent
+        and finding.canonical_claim_key
+    ]
+    if not blocking_audits:
+        return findings
+    blocked: dict[tuple[str, str], ValidatedFinding] = {
+        (audit.audited_agent or "", audit.canonical_claim_key): audit
+        for audit in blocking_audits
+    }
+    updated: list[ValidatedFinding] = []
+    for finding in findings:
+        audit = blocked.get((finding.source_agent, finding.canonical_claim_key))
+        if audit is None or finding.source_agent == AgentRole.EVIDENCE_AUDITOR.value:
+            updated.append(finding)
+            continue
+        reason = f"EvidenceAuditor marked claim {audit.support_status}"
+        if finding.exclusion_reason:
+            reason = f"{finding.exclusion_reason}; {reason}"
+        updated.append(
+            finding.model_copy(
+                update={
+                    "eligible_for_synthesis": False,
+                    "exclusion_reason": reason,
+                    "contradiction_status": "identified"
+                    if audit.support_status == "contradicted"
+                    else finding.contradiction_status,
+                }
+            )
+        )
+    return updated
 
 
 def _semantic_status(result: Any) -> SemanticValidationStatus:
@@ -576,7 +648,7 @@ def _claim_domain(key: str) -> str:
 
 def _comparison_value(value: Any) -> Any:
     if isinstance(value, dict):
-        for key in ["value", "days", "amount_usd", "assessment", "status", "supported"]:
+        for key in ["value", "observed_value", "expected_value", "days", "amount_usd", "assessment", "status", "supported"]:
             if key in value:
                 if key in {"assessment", "status", "supported"} and str(value[key]).lower() in {
                     "supported",

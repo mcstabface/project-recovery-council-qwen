@@ -1,0 +1,37 @@
+[
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-01-directoragent",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-06-arbiteragent",
+    "retry_count": 0,
+    "retry_history": []
+  },
+  {
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-07-recoveryplanner",
+    "retry_count": 0,
+    "retry_history": []
+  }
+]

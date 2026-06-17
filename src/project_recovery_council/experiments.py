@@ -5,6 +5,7 @@ from __future__ import annotations
 from project_recovery_council.experiment_contracts import (
     ARBITER_RESPONSE_SCHEMA,
     DIRECTOR_ROUTING_RESPONSE_SCHEMA,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole,
@@ -81,6 +82,8 @@ def build_experiment_plan(
         previous_step = ""
         for index, role in enumerate(roles, start=1):
             schema = ARBITER_RESPONSE_SCHEMA if role == AgentRole.ARBITER else SPECIALIST_FINDING_RESPONSE_SCHEMA
+            if role == AgentRole.EVIDENCE_AUDITOR:
+                schema = EVIDENCE_AUDITOR_RESPONSE_SCHEMA
             if role == AgentRole.RECOVERY_PLANNER:
                 schema = RECOVERY_ANALYSIS_RESPONSE_SCHEMA
             step_id = f"fixed_{role.value}"
@@ -148,7 +151,7 @@ def build_experiment_plan(
                     step_id="evidence_audit",
                     agent_role=AgentRole.EVIDENCE_AUDITOR.value,
                     prompt_id="EvidenceAuditor.v1",
-                    expected_response_schema=SPECIALIST_FINDING_RESPONSE_SCHEMA,
+                    expected_response_schema=EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
                     model_identifier=model_identifier,
                     description="Check cited claims and unsupported assertions.",
                     depends_on=["selected_specialists"],

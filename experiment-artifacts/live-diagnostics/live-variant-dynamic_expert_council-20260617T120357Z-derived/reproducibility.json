@@ -1,0 +1,73 @@
+{
+  "case_id": "PRC-EQ-DELAY-001",
+  "configuration_excluding_secrets": "[REDACTED]",
+  "endpoint_host": "dashscope-intl.aliyuncs.com",
+  "evidence_bundle_hash": "5b8b44da0167c80f5cb757af5de93e13ff635e2dd7ff94b0325d334966775698",
+  "execution_timestamp": "2026-06-17T12:32:03+00:00",
+  "git_commit": "dffc2cc64618baa4e53732744605629a17cb9a52",
+  "git_dirty": false,
+  "hosted_model_reproducibility_note": "Hosted model outputs may be nondeterministic; this metadata supports auditability but does not claim perfect reproducibility.",
+  "model_identifier": "qwen-plus",
+  "package_version": "editable-or-uninstalled",
+  "prompt_records": [
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-01-directoragent",
+      "prompt_id": "DirectorAgent.v1",
+      "prompt_sha256": "4ea693d80e15e5e89f312620d978982316fee3d35430bb2763192d59e0e68682",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.director-routing-response.v1",
+      "schema_sha256": "609d9bc303af1d4262bbc216c035a9a675df11f08b2b9427d9dfa4ee43072f95"
+    },
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+      "prompt_id": "CommercialExpert.v1",
+      "prompt_sha256": "16cc406b2f1028f6578590a175730982c7353250e1a7b7b3326654128984af16",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+      "prompt_id": "RiskExpert.v1",
+      "prompt_sha256": "0f527b158cdb0cd6fd137a463fd3d9f5604c1c9072d7efea7003fe63bc18c2e4",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+      "prompt_id": "ScheduleExpert.v1",
+      "prompt_sha256": "97583cebc4e4ba75f3aac86f98aff38fd317c159ac3ac566e3529941e8979c47",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+      "prompt_id": "EvidenceAuditor.v1",
+      "prompt_sha256": "3d6b339e157459a21a7605e1fc83a723a38c714fdecac82ae6ac83411ca09b0b",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+      "schema_sha256": "b5c32b7682ab7c7d9dabb37dac86a460d8f3850a3bf87cd38bdb05d417ea1c35"
+    },
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-06-arbiteragent",
+      "prompt_id": "ArbiterAgent.v1",
+      "prompt_sha256": "c73d126c8cadc1941692d7885750a1e077412baf48ebf38f74fe9e508abd7dc3",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.arbiter-response.v1",
+      "schema_sha256": "6473e65d7ba8b26050b011afaa339be2f302064283d4c777d4c3885307f09470"
+    },
+    {
+      "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-07-recoveryplanner",
+      "prompt_id": "RecoveryPlanner.v1",
+      "prompt_sha256": "f542d44154e6102c126703d01428cf1277a538cbcb61ff7f1274a28629e041d3",
+      "prompt_version": "v1",
+      "schema_id": "project-recovery-council.qwen.recovery-analysis-response.v1",
+      "schema_sha256": "918fa6d0846a5cbcd7986f1203173653a4bf155a96348b820fd522fe9339c734"
+    }
+  ],
+  "seed": null,
+  "temperature": 0.0,
+  "variant": "dynamic_expert_council"
+}

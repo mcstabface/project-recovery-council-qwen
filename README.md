@@ -25,6 +25,8 @@ This edition establishes:
 - typed experiment variants and deterministic evaluation metrics
 - role-scoped evidence filtering, deterministic claim normalization, and
   specialist semantic validation
+- a dedicated nested EvidenceAuditor response contract for per-agent claim
+  assessments
 - tests and process artifacts
 
 ## Boundaries
@@ -291,6 +293,14 @@ produces a 13-day net milestone slip with `float_consumption_status` of
 `schedule-semantic-validation.json` and `schedule-semantic-metrics.json`; prior
 live artifacts are not retroactively modified.
 
+EvidenceAuditor uses
+`project-recovery-council.qwen.evidence-auditor-response.v1` instead of the
+generic specialist finding contract. The response is a nested audit matrix
+keyed by audited agent and claim key, with matching nested citations and
+support statuses of `supported`, `contradicted`, `unsupported`, or
+`insufficient_evidence`. Contradicted and unsupported assessments remain
+visible in artifacts but are not promoted into positive synthesis evidence.
+
 Fixed-chain and dynamic-council synthesis now use a compact validated-findings
 handoff. Canonical specialist claims, claim-attached citations, validation
 status, warnings, unresolved contradictions, and human gates are passed to
@@ -313,6 +323,12 @@ reproducibility metadata, and a checksum manifest. Completed live runs can be
 compared offline with `compare-live`; the comparison writes machine-readable
 JSON and concise Markdown and refuses incomplete or invalid runs unless a
 diagnostic override is supplied.
+
+`compare-live` is variant-aware. Specialist synthesis artifacts are required
+for completed fixed-chain and dynamic-council runs that reached synthesis, but
+they are not applicable to historical completed `single_generalist` runs.
+Missing specialist artifacts for a valid generalist run render as `N/A` rather
+than failing comparison input.
 
 Live evaluation reports use live-provider limitation text, not offline fixture
 warnings. Role-scope compliance and specialized semantic validation are marked

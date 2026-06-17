@@ -1,0 +1,65 @@
+[
+  {
+    "input_tokens": 1464,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-01-directoragent",
+    "latency_seconds": 5.96903107399703,
+    "output_tokens": 251,
+    "provider_request_id": "d5b7ccae-731a-9786-bce4-97b406edf2f6",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 1715
+  },
+  {
+    "input_tokens": 1896,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "latency_seconds": 6.0283567769802175,
+    "output_tokens": 275,
+    "provider_request_id": "372178db-4738-993c-98fa-bc8885c8051a",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 2171
+  },
+  {
+    "input_tokens": 2129,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "latency_seconds": 10.257745481998427,
+    "output_tokens": 507,
+    "provider_request_id": "9cfa1309-fab0-983b-8102-f79fd59a7cc4",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 2636
+  },
+  {
+    "input_tokens": 1447,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "latency_seconds": 8.382260556012625,
+    "output_tokens": 404,
+    "provider_request_id": "f31974cb-df5a-982e-a370-c521658f5bc1",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 1851
+  },
+  {
+    "input_tokens": 6638,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "latency_seconds": 12.25583899099729,
+    "output_tokens": 586,
+    "provider_request_id": "109128ca-56d5-97a4-86ce-09a9645ef3ff",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 7224
+  },
+  {
+    "input_tokens": 4818,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-06-arbiteragent",
+    "latency_seconds": 5.76932766099344,
+    "output_tokens": 237,
+    "provider_request_id": "7317d9fb-9cd0-9dfb-a138-495ae404ad31",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 5055
+  },
+  {
+    "input_tokens": 4617,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-07-recoveryplanner",
+    "latency_seconds": 9.426235830003861,
+    "output_tokens": 435,
+    "provider_request_id": "632d6cef-5397-922c-b5b4-66a0bf026a48",
+    "structured_output_mode": "prompted_json",
+    "total_tokens": 5052
+  }
+]

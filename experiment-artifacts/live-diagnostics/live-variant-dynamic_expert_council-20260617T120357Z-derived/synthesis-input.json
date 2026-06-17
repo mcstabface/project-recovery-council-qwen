@@ -1,0 +1,560 @@
+[
+  {
+    "case_id": "PRC-EQ-DELAY-001",
+    "citation_requirements": {
+      "gross_avoided_exposure_usd": [
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ],
+      "human_confirmation_required": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "mitigation_cost_usd": [
+        "COST-SUMMARY-001"
+      ],
+      "onsite_status_contradiction_detected": [
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "preferred_option_id": [
+        "COST-SUMMARY-001",
+        "SCH-DELIVERY-001",
+        "LOG-STATUS-001"
+      ],
+      "preferred_option_subject_to_approval": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001"
+      ],
+      "projected_slip_days": [
+        "SCH-DELIVERY-001"
+      ],
+      "unmitigated_exposure_usd": [
+        "SCH-DELIVERY-001",
+        "COST-SUMMARY-001",
+        "CTR-DELAY-001"
+      ]
+    },
+    "contradiction_status": "unresolved",
+    "excluded_findings_summary": [
+      {
+        "canonical_claim_key": "gross_avoided_exposure_usd",
+        "exclusion_reason": "semantic validation failed",
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+        "source_agent": "CommercialExpert"
+      }
+    ],
+    "invocation_purpose": "dynamic_expert_council",
+    "recommendation_authorization_semantics": [
+      "A recovery option may be recommended when validated evidence shows it is economically or operationally preferred.",
+      "Authorization may remain blocked by an unresolved human gate.",
+      "Human confirmation required does not require RecoveryPlanner abstention.",
+      "Abstain only when validated evidence is insufficient to form a recommendation."
+    ],
+    "recommendation_authorization_state": {
+      "approval_required": true,
+      "authorization_status": "blocked_pending_human_confirmation",
+      "blocking_human_request": "HDR-ONSITE-001",
+      "recommendation_available": false,
+      "recommendation_confidence": "none",
+      "recommended_option_id": null,
+      "unresolved_contradictions": [
+        "equipment_onsite_status"
+      ]
+    },
+    "target_agent": "RecoveryPlanner",
+    "unresolved_human_gates": [
+      "HDR-ONSITE-001"
+    ],
+    "validated_findings": [
+      {
+        "assumptions": [],
+        "canonical_claim_key": "delay_exposure_usd_per_day",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "COST-SUMMARY-001",
+          "CTR-DELAY-001"
+        ],
+        "claim_id": "delay_exposure_usd_per_day",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "CommercialExpert",
+        "value": 15000,
+        "warnings": []
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "forecast_milestone_slip_days",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "forecast_milestone_slip_days",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "CommercialExpert",
+        "value": 13,
+        "warnings": []
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "mitigation_cost_usd",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "COST-SUMMARY-001"
+        ],
+        "claim_id": "mitigation_cost_usd",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "CommercialExpert",
+        "value": 48000,
+        "warnings": []
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "avoided_exposure_usd",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "COST-SUMMARY-001"
+        ],
+        "claim_id": "avoided_exposure_usd",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "CommercialExpert",
+        "value": 147000,
+        "warnings": []
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "escalation_requirement",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "RISK-001"
+        ],
+        "claim_id": "escalation_requirement",
+        "contradiction_status": "identified",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "RiskExpert",
+        "value": "Human escalation is mandatory to reconcile conflicting onsite assertions and authorize recovery action; no automated resolution is permissible per RISK-001 mitigation directive.",
+        "warnings": [
+          "Unresolved contradiction invalidates any assumption of equipment availability for installation or testing; proceeding without human confirmation risks rework, contractual penalties, and safety noncompliance.",
+          "Forecast delivery date (2026-07-22) implies installation (A-4200) cannot start before that date, making the claimed 'onsite and released' status (PRG-ONSITE-001) factually inconsistent with all other evidence."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "milestone_slip_exposure",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "milestone_slip_exposure",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "RiskExpert",
+        "value": "Contractual milestone MS-COMMISSIONING-READY is forecast to slip 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery shift; installation float (8 days) is insufficient to absorb the delay without intervention.",
+        "warnings": [
+          "Unresolved contradiction invalidates any assumption of equipment availability for installation or testing; proceeding without human confirmation risks rework, contractual penalties, and safety noncompliance.",
+          "Forecast delivery date (2026-07-22) implies installation (A-4200) cannot start before that date, making the claimed 'onsite and released' status (PRG-ONSITE-001) factually inconsistent with all other evidence."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "onsite_status_conflict",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "LOG-STATUS-001",
+          "PRG-ONSITE-001",
+          "SUP-NOT-ARRIVED-001"
+        ],
+        "claim_id": "onsite_status_conflict",
+        "contradiction_status": "identified",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "RiskExpert",
+        "value": "High-severity conflict exists: progress report (PRG-ONSITE-001) claims EQ-GEN-SKID-01 is onsite and released, but supplier correspondence (SUP-NOT-ARRIVED-001) and carrier logistics (LOG-STATUS-001) confirm it remains in transit with forecast arrival 2026-07-22.",
+        "warnings": [
+          "Unresolved contradiction invalidates any assumption of equipment availability for installation or testing; proceeding without human confirmation risks rework, contractual penalties, and safety noncompliance.",
+          "Forecast delivery date (2026-07-22) implies installation (A-4200) cannot start before that date, making the claimed 'onsite and released' status (PRG-ONSITE-001) factually inconsistent with all other evidence."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "recovery_approval_risk",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "RISK-001"
+        ],
+        "claim_id": "recovery_approval_risk",
+        "contradiction_status": "unresolved",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "RiskExpert",
+        "value": "Approved recovery option REC-ACCEL-LOGISTICS is available subject to project approval (RISK-001), but human confirmation of actual onsite status is required before authorization \u2014 unresolved conflict blocks final approval.",
+        "warnings": [
+          "Unresolved contradiction invalidates any assumption of equipment availability for installation or testing; proceeding without human confirmation risks rework, contractual penalties, and safety noncompliance.",
+          "Forecast delivery date (2026-07-22) implies installation (A-4200) cannot start before that date, making the claimed 'onsite and released' status (PRG-ONSITE-001) factually inconsistent with all other evidence."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "delivery_baseline_date",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "delivery_baseline_date",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": "2026-07-01",
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "milestone_baseline_date",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "milestone_baseline_date",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": "2026-08-15",
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "delivery_movement_days",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "delivery_movement_days",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": 21,
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "delivery_forecast_date",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "delivery_forecast_date",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": "2026-07-22",
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "milestone_forecast_date_without_intervention",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "milestone_forecast_date_without_intervention",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": "2026-08-28",
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "forecast_milestone_slip_days",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "forecast_milestone_slip_days",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": 13,
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "installation_total_float_consumed_days",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "installation_total_float_consumed_days",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": 8,
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "installation_total_float_remaining_days",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [],
+        "claim_id": "installation_total_float_remaining_days",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "passed",
+        "source_agent": "ScheduleExpert",
+        "value": 0,
+        "warnings": [
+          "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+          "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "delay_exposure_usd_per_day_support",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "COST-SUMMARY-001",
+          "CTR-DELAY-001"
+        ],
+        "claim_id": "delay_exposure_usd_per_day_support",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "EvidenceAuditor",
+        "value": "Supported: COST-SUMMARY-001 and CTR-DELAY-001 both state delay_exposure_usd_per_day = 15000.",
+        "warnings": [
+          "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+          "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "delivery_shift_days_support",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "delivery_shift_days_support",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "EvidenceAuditor",
+        "value": "Supported: SCH-DELIVERY-001 states delivery_shift_days = 21.",
+        "warnings": [
+          "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+          "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "equipment_onsite_claim_conflict",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "LOG-STATUS-001",
+          "PRG-ONSITE-001",
+          "RISK-001",
+          "SUP-NOT-ARRIVED-001"
+        ],
+        "claim_id": "equipment_onsite_claim_conflict",
+        "contradiction_status": "identified",
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "EvidenceAuditor",
+        "value": "Contradiction confirmed: PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released; SUP-NOT-ARRIVED-001, LOG-STATUS-001, and RISK-001 uniformly confirm it has not arrived and remains in transit with forecast arrival 2026-07-22.",
+        "warnings": [
+          "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+          "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "forecast_milestone_slip_days_support",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "forecast_milestone_slip_days_support",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "EvidenceAuditor",
+        "value": "Supported: SCH-DELIVERY-001 explicitly states forecast_milestone_slip_days = 13.",
+        "warnings": [
+          "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+          "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe."
+        ]
+      },
+      {
+        "assumptions": [],
+        "canonical_claim_key": "installation_total_float_consumed_days_support",
+        "case_id": "PRC-EQ-DELAY-001",
+        "citations": [
+          "SCH-DELIVERY-001"
+        ],
+        "claim_id": "installation_total_float_consumed_days_support",
+        "contradiction_status": null,
+        "eligible_for_synthesis": true,
+        "exclusion_reason": null,
+        "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+        "normalization_valid": true,
+        "role_scope_valid": true,
+        "schema_valid": true,
+        "semantic_validation_status": "not_applicable",
+        "source_agent": "EvidenceAuditor",
+        "value": "Supported: SCH-DELIVERY-001 states installation_total_float_days = 8, and ScheduleExpert validation confirms full consumption (remaining = 0).",
+        "warnings": [
+          "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+          "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe."
+        ]
+      }
+    ],
+    "warnings": [
+      "Forecast delivery date (2026-07-22) implies installation (A-4200) cannot start before that date, making the claimed 'onsite and released' status (PRG-ONSITE-001) factually inconsistent with all other evidence.",
+      "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention.",
+      "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+      "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe.",
+      "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+      "Unresolved contradiction invalidates any assumption of equipment availability for installation or testing; proceeding without human confirmation risks rework, contractual penalties, and safety noncompliance."
+    ]
+  }
+]

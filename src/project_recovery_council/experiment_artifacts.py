@@ -63,6 +63,8 @@ GENERIC_JSON_SCHEMA_IDS = {
     "project-recovery-council.qwen.live-normalized-structured-responses.v1",
     "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
     "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
+    "project-recovery-council.qwen.live-evidence-auditor-validation-results.v1",
+    "project-recovery-council.qwen.live-canonical-audit-findings.v1",
     "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
     "project-recovery-council.qwen.live-validated-findings-envelope.v1",
     "project-recovery-council.qwen.live-excluded-findings.v1",
@@ -217,6 +219,10 @@ def _schema_id_for(filename: str) -> str:
         ),
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
         "commercial-semantic-validation.json": "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
+        "evidence-auditor-validation-results.json": (
+            "project-recovery-council.qwen.live-evidence-auditor-validation-results.v1"
+        ),
+        "canonical-audit-findings.json": "project-recovery-council.qwen.live-canonical-audit-findings.v1",
         "domain-semantic-validation-results.json": (
             "project-recovery-council.qwen.live-domain-semantic-validation-results.v1"
         ),
@@ -269,6 +275,8 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
     parsed_responses = loaded_payloads.get("parsed-structured-responses.json")
     schedule_results = loaded_payloads.get("schedule-semantic-validation.json")
     commercial_results = loaded_payloads.get("commercial-semantic-validation.json")
+    evidence_auditor_results = loaded_payloads.get("evidence-auditor-validation-results.json")
+    canonical_audit_findings = loaded_payloads.get("canonical-audit-findings.json")
     if not isinstance(selected, list) or not selected:
         errors.append("standalone specialist live artifacts require selected-evidence-records.json")
     if not isinstance(role_results, list) or not role_results:
@@ -293,6 +301,20 @@ def _validate_live_specialist_artifacts(loaded_payloads: dict[str, Any]) -> list
     ]
     if commercial_invocation_ids and (not isinstance(commercial_results, list) or not commercial_results):
         errors.append("CommercialExpert live artifacts require commercial-semantic-validation.json")
+    evidence_auditor_invocation_ids = [
+        invocation.get("invocation_id")
+        for invocation in invocations
+        if isinstance(invocation, dict)
+        and invocation.get("agent_role") == "EvidenceAuditor"
+    ]
+    if evidence_auditor_invocation_ids and (
+        not isinstance(evidence_auditor_results, list) or not evidence_auditor_results
+    ):
+        errors.append("EvidenceAuditor live artifacts require evidence-auditor-validation-results.json")
+    if evidence_auditor_invocation_ids and (
+        not isinstance(canonical_audit_findings, list)
+    ):
+        errors.append("EvidenceAuditor live artifacts require canonical-audit-findings.json")
     selected_ids = {
         item.get("invocation_id")
         for item in selected or []
@@ -371,6 +393,8 @@ def _validate_claim_normalization_artifacts(
         normalization = normalization_by_id.get(invocation_id)
         normalized = normalized_by_id.get(invocation_id)
         if not isinstance(parsed, dict) or not isinstance(normalization, dict) or not isinstance(normalized, dict):
+            continue
+        if parsed.get("agent_role") == "EvidenceAuditor" and _has_nested_auditor_claims(parsed):
             continue
         parsed_claims = parsed.get("claims", {})
         raw_claims = normalization.get("raw_claims", {})
@@ -493,6 +517,17 @@ def _latest_recovery_response(parsed_responses: Any) -> dict[str, Any] | None:
         if isinstance(response, dict) and response.get("schema_version") == "project-recovery-council.qwen.recovery-analysis-response.v1":
             return response
     return None
+
+
+def _has_nested_auditor_claims(payload: dict[str, Any]) -> bool:
+    claims = payload.get("claims")
+    citations = payload.get("citations")
+    return (
+        isinstance(claims, dict)
+        and isinstance(citations, dict)
+        and any(isinstance(value, dict) for value in claims.values())
+        and any(isinstance(value, dict) for value in citations.values())
+    )
 
 
 def _now() -> str:

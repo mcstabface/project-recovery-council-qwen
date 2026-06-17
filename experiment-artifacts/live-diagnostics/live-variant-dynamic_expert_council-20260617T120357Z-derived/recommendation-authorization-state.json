@@ -1,0 +1,11 @@
+{
+  "approval_required": true,
+  "authorization_status": "blocked_pending_human_confirmation",
+  "blocking_human_request": "HDR-ONSITE-001",
+  "recommendation_available": false,
+  "recommendation_confidence": "none",
+  "recommended_option_id": null,
+  "unresolved_contradictions": [
+    "equipment_onsite_status"
+  ]
+}

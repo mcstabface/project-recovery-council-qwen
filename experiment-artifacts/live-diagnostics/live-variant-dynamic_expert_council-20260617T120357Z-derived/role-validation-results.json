@@ -1,0 +1,93 @@
+[
+  {
+    "allowed_claims": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "gross_avoided_exposure_usd",
+      "mitigation_cost_usd",
+      "avoided_exposure_usd"
+    ],
+    "allowed_warnings": [],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "role scope compliant"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "prohibited_claims": [],
+    "prohibited_warnings": [],
+    "role": "CommercialExpert",
+    "valid": true
+  },
+  {
+    "allowed_claims": [
+      "escalation_requirement",
+      "milestone_slip_exposure",
+      "onsite_status_conflict",
+      "recovery_approval_risk"
+    ],
+    "allowed_warnings": [
+      "Unresolved contradiction invalidates any assumption of equipment availability for installation or testing; proceeding without human confirmation risks rework, contractual penalties, and safety noncompliance.",
+      "Forecast delivery date (2026-07-22) implies installation (A-4200) cannot start before that date, making the claimed 'onsite and released' status (PRG-ONSITE-001) factually inconsistent with all other evidence."
+    ],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "role scope compliant"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "prohibited_claims": [],
+    "prohibited_warnings": [],
+    "role": "RiskExpert",
+    "valid": true
+  },
+  {
+    "allowed_claims": [
+      "delivery_baseline_date",
+      "milestone_baseline_date",
+      "delivery_movement_days",
+      "delivery_forecast_date",
+      "milestone_forecast_date_without_intervention",
+      "forecast_milestone_slip_days",
+      "installation_total_float_consumed_days",
+      "installation_total_float_remaining_days"
+    ],
+    "allowed_warnings": [
+      "Installation total float (8 days) is fully consumed by the 21-day delivery shift; no float remains to absorb further delay without milestone slip.",
+      "Forecast milestone slip of 13 days is derived from direct schedule logic in SCH-DELIVERY-001 and aligns with the difference between contractual_milestone_baseline_date and contractual_milestone_forecast_without_intervention."
+    ],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "role scope compliant"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "prohibited_claims": [],
+    "prohibited_warnings": [],
+    "role": "ScheduleExpert",
+    "valid": true
+  },
+  {
+    "allowed_claims": [
+      "delay_exposure_usd_per_day_support",
+      "delivery_shift_days_support",
+      "equipment_onsite_claim_conflict",
+      "forecast_milestone_slip_days_support",
+      "installation_total_float_consumed_days_support"
+    ],
+    "allowed_warnings": [
+      "PRG-ONSITE-001's 'equipment_onsite_claim': true is directly contradicted by three independent contemporaneous records (SUP-NOT-ARRIVED-001, LOG-STATUS-001, RISK-001) and must be treated as invalid for scheduling, cost, and risk decisions.",
+      "No source record supports the claim that installation (A-4200) has commenced or can commence before 2026-07-22; any assertion of 'released to installation' is unsupported and operationally unsafe."
+    ],
+    "citation_policy_violations": [],
+    "concise_findings": [
+      "role scope compliant"
+    ],
+    "evidence_scope_violations": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "prohibited_claims": [],
+    "prohibited_warnings": [],
+    "role": "EvidenceAuditor",
+    "valid": true
+  }
+]

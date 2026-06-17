@@ -10,6 +10,7 @@ from project_recovery_council.experiment_artifacts import validate_experiment_ar
 from project_recovery_council.experiment_contracts import (
     ARBITER_RESPONSE_SCHEMA,
     DIRECTOR_ROUTING_RESPONSE_SCHEMA,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole,
@@ -150,23 +151,48 @@ def observed_dynamic_risk() -> dict[str, Any]:
 
 
 def observed_dynamic_auditor() -> dict[str, Any]:
-    return specialist_response(
-        AgentRole.EVIDENCE_AUDITOR.value,
-        {
-            "delay_exposure_usd_per_day_support": {"assessment": "supported", "citations": ["COST-SUMMARY-001"]},
-            "delivery_shift_days_support": {"assessment": "supported", "citations": ["SCH-DELIVERY-001"]},
-            "equipment_onsite_claim_conflict": {
-                "assessment": "conflict",
-                "citations": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+    return {
+        "schema_version": EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
+        "agent_role": AgentRole.EVIDENCE_AUDITOR.value,
+        "status": "completed",
+        "claims": {
+            AgentRole.COMMERCIAL_EXPERT.value: {
+                "delay_exposure_usd_per_day": {"support_status": "supported", "observed_value": 15000},
+                "unmitigated_exposure_usd": {"support_status": "supported", "observed_value": 195000},
+                "mitigation_cost_usd": {"support_status": "supported", "observed_value": 48000},
+                "avoided_exposure_usd": {"support_status": "supported", "observed_value": 147000},
             },
-            "forecast_milestone_slip_days_support": {"assessment": "supported", "citations": ["SCH-DELIVERY-001"]},
-            "installation_total_float_consumed_days_support": {
-                "assessment": "supported",
-                "citations": ["SCH-DELIVERY-001"],
+            AgentRole.RISK_EXPERT.value: {
+                "onsite_status_conflict": {"support_status": "supported"},
+                "recovery_approval_risk": {"support_status": "supported"},
+            },
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "delivery_movement_days": {"support_status": "supported", "observed_value": 21},
+                "forecast_milestone_slip_days": {"support_status": "supported", "observed_value": 13},
+                "installation_total_float_consumed_days": {"support_status": "supported", "observed_value": 8},
             },
         },
-        {},
-    )
+        "citations": {
+            AgentRole.COMMERCIAL_EXPERT.value: {
+                "delay_exposure_usd_per_day": ["COST-SUMMARY-001", "CTR-DELAY-001"],
+                "unmitigated_exposure_usd": ["SCH-DELIVERY-001", "COST-SUMMARY-001", "CTR-DELAY-001"],
+                "mitigation_cost_usd": ["COST-SUMMARY-001"],
+                "avoided_exposure_usd": ["COST-SUMMARY-001", "CTR-DELAY-001"],
+            },
+            AgentRole.RISK_EXPERT.value: {
+                "onsite_status_conflict": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+                "recovery_approval_risk": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+            },
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "delivery_movement_days": ["SCH-DELIVERY-001"],
+                "forecast_milestone_slip_days": ["SCH-DELIVERY-001"],
+                "installation_total_float_consumed_days": ["SCH-DELIVERY-001"],
+            },
+        },
+        "unsupported_claims": [],
+        "warnings": [],
+        "abstention_reason": None,
+    }
 
 
 def recovery_response() -> dict[str, Any]:
@@ -244,10 +270,17 @@ def assert_role_valid(role: str, payload: dict[str, Any]) -> dict[str, Any]:
     return normalized
 
 
+def scrub_invocation_ids(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {key: scrub_invocation_ids(item) for key, item in value.items() if key != "original_invocation_id"}
+    if isinstance(value, list):
+        return [scrub_invocation_ids(item) for item in value]
+    return value
+
+
 def test_observed_dynamic_specialist_outputs_are_role_valid() -> None:
     assert_role_valid(AgentRole.SCHEDULE_EXPERT.value, observed_dynamic_schedule())
     assert_role_valid(AgentRole.RISK_EXPERT.value, observed_dynamic_risk())
-    assert_role_valid(AgentRole.EVIDENCE_AUDITOR.value, observed_dynamic_auditor())
 
 
 def test_commercial_semantic_validation_rejects_bad_gross_but_preserves_valid_net() -> None:
@@ -308,7 +341,7 @@ def test_fixed_and_dynamic_specialists_share_validation_processing(tmp_path: Pat
         for item in read_json(dynamic_path / "normalized-structured-responses.json")
     }
 
-    assert fixed_normalized == dynamic_normalized
+    assert scrub_invocation_ids(fixed_normalized) == scrub_invocation_ids(dynamic_normalized)
 
 
 def test_arbiter_skipped_when_no_substantive_disagreement(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -353,10 +386,26 @@ def test_arbiter_skipped_when_all_findings_invalid(tmp_path: Path, monkeypatch: 
 
 
 def test_arbiter_invoked_for_genuine_eligible_disagreement(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    auditor_conflict = observed_dynamic_auditor()
-    auditor_conflict["claims"]["forecast_milestone_slip_days_support"] = {
-        "value": 14,
-        "citations": ["SCH-DELIVERY-001"],
+    auditor_conflict = {
+        "schema_version": EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
+        "agent_role": AgentRole.EVIDENCE_AUDITOR.value,
+        "status": "completed",
+        "claims": {
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "forecast_milestone_slip_days": {
+                    "support_status": "supported",
+                    "observed_value": 14,
+                }
+            }
+        },
+        "citations": {
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "forecast_milestone_slip_days": ["SCH-DELIVERY-001"],
+            }
+        },
+        "unsupported_claims": [],
+        "warnings": [],
+        "abstention_reason": None,
     }
     path, client = run_dynamic(
         tmp_path,
@@ -471,7 +520,7 @@ def test_compare_live_rejects_failed_or_diagnostic_dynamic_run(tmp_path: Path, m
         output_path=tmp_path / "derived" / "dynamic-diagnostic",
     )
 
-    with pytest.raises(ValueError, match="not usable"):
+    with pytest.raises(ValueError, match="not usable|not comparable"):
         compare_live_variant_runs(
             generalist_path=generalist,
             fixed_chain_path=fixed,
@@ -486,7 +535,7 @@ def test_compare_live_rejects_failed_or_diagnostic_dynamic_run(tmp_path: Path, m
     write_json(dynamic / "final-variant-result.json", final)
     _refresh_manifest(dynamic, "final-variant-result.json")
 
-    with pytest.raises(ValueError, match="not usable"):
+    with pytest.raises(ValueError, match="not usable|not comparable"):
         compare_live_variant_runs(
             generalist_path=generalist,
             fixed_chain_path=fixed,

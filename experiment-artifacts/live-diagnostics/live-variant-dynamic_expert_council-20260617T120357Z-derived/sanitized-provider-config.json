@@ -1,0 +1,19 @@
+{
+  "api_key_env_var": "DASHSCOPE_API_KEY",
+  "api_key_present": true,
+  "base_url": "https://dashscope-intl.aliyuncs.com/compatible-mode/v1",
+  "endpoint_host": "dashscope-intl.aliyuncs.com",
+  "experiment_metadata_tags": {},
+  "maximum_retries": 2,
+  "model_identifier": "qwen-plus",
+  "provider_region_label": "intl-compatible",
+  "request_timeout_seconds": 30.0,
+  "retry_backoff": {
+    "initial_seconds": 0.5,
+    "max_seconds": 8.0,
+    "multiplier": 2.0
+  },
+  "seed": null,
+  "structured_output_mode": "prompted_json",
+  "temperature": 0.0
+}

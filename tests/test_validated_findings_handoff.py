@@ -7,6 +7,8 @@ import pytest
 from project_recovery_council.claim_normalization import normalize_claim_keys, normalize_response_payload
 from project_recovery_council.experiment_artifacts import validate_experiment_artifacts
 from project_recovery_council.experiment_contracts import (
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
+    EvidenceAuditorResponse,
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole,
@@ -127,28 +129,34 @@ def observed_commercial_response() -> dict[str, Any]:
 
 
 def observed_auditor_response() -> dict[str, Any]:
-    return specialist_response(
-        AgentRole.EVIDENCE_AUDITOR.value,
-        {
-            "claim-onsite-assertion": {
-                "assessment": "contradicted",
-                "citations": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+    return {
+        "schema_version": EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
+        "agent_role": AgentRole.EVIDENCE_AUDITOR.value,
+        "status": "completed",
+        "claims": {
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "forecast_milestone_slip_days": {"support_status": "supported", "observed_value": 13},
             },
-            "claim-milestone-slip-13-days": {"assessment": "supported", "citations": ["SCH-DELIVERY-001"]},
-            "claim-delay-exposure-15000-per-day": {
-                "assessment": "supported",
-                "citations": ["COST-SUMMARY-001", "CTR-DELAY-001"],
-            },
-            "claim-unmitigated-exposure-195000": {
-                "assessment": "supported",
-                "citations": ["SCH-DELIVERY-001", "COST-SUMMARY-001", "CTR-DELAY-001"],
-            },
-            "claim-accelerated-logistics-cost-48000": {
-                "assessment": "supported",
-                "citations": ["COST-SUMMARY-001"],
+            AgentRole.COMMERCIAL_EXPERT.value: {
+                "delay_exposure_usd_per_day": {"support_status": "supported", "observed_value": 15000},
+                "unmitigated_exposure_usd": {"support_status": "supported", "observed_value": 195000},
+                "mitigation_cost_usd": {"support_status": "supported", "observed_value": 48000},
             },
         },
-    )
+        "citations": {
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "forecast_milestone_slip_days": ["SCH-DELIVERY-001"],
+            },
+            AgentRole.COMMERCIAL_EXPERT.value: {
+                "delay_exposure_usd_per_day": ["COST-SUMMARY-001", "CTR-DELAY-001"],
+                "unmitigated_exposure_usd": ["SCH-DELIVERY-001", "COST-SUMMARY-001", "CTR-DELAY-001"],
+                "mitigation_cost_usd": ["COST-SUMMARY-001"],
+            },
+        },
+        "unsupported_claims": [],
+        "warnings": [],
+        "abstention_reason": None,
+    }
 
 
 def observed_risk_response() -> dict[str, Any]:
@@ -265,7 +273,7 @@ def metric_score(report: dict[str, Any], metric_id: str) -> float | None:
 def test_observed_specialist_outputs_are_role_valid() -> None:
     schedule = assert_role_valid(AgentRole.SCHEDULE_EXPERT.value, observed_schedule_response())
     commercial = assert_role_valid(AgentRole.COMMERCIAL_EXPERT.value, observed_commercial_response())
-    auditor = assert_role_valid(AgentRole.EVIDENCE_AUDITOR.value, observed_auditor_response())
+    auditor = EvidenceAuditorResponse.model_validate(observed_auditor_response())
     risk = assert_role_valid(AgentRole.RISK_EXPERT.value, observed_risk_response())
 
     assert schedule["claims"]["installation_total_float_remaining_days"] == 0
@@ -276,7 +284,8 @@ def test_observed_specialist_outputs_are_role_valid() -> None:
     assert schedule["claims"]["milestone_forecast_date_without_intervention"] == "2026-08-28"
     assert commercial["claims"]["delay_exposure_usd_per_day"] == 15000
     assert commercial["claims"]["unmitigated_exposure_usd"] == 195000
-    assert "C-ONSITE-ASSERTION" in auditor["claims"]
+    assert auditor.schema_version == EVIDENCE_AUDITOR_RESPONSE_SCHEMA
+    assert AgentRole.SCHEDULE_EXPERT.value in auditor.assessments_by_agent
     assert "conflicting_onsite_status_requires_human_confirmation" in risk["claims"]
     assert "recovery_option_approval_blocked" in risk["claims"]
 
@@ -338,7 +347,6 @@ def test_validated_findings_envelope_retains_required_facts_and_citations(
         "unmitigated_exposure_usd",
         "mitigation_cost_usd",
         "gross_avoided_exposure_usd",
-        "C-ONSITE-ASSERTION",
         "conflicting_onsite_status_requires_human_confirmation",
         "recovery_option_approval_blocked",
     }.issubset(keys)

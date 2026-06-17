@@ -59,6 +59,8 @@ Required deterministic checks:
 - unmitigated exposure correctness
 - mitigation cost correctness
 - avoided exposure correctness
+- evidence-auditor contract validity
+- canonical audit finding count
 - Director-selected specialist count
 - governance invocation count
 - Arbiter required or skipped
@@ -182,6 +184,26 @@ rather than an AI competitor.
 Comparison reports distinguish `passed`, `failed`, `not_applicable`, and
 `unavailable` for role-scope and specialized semantic validation. Markdown
 renders `not_applicable` as `N/A`.
+
+Artifact availability is also variant-aware. Specialist synthesis metrics are
+`not_applicable` for `single_generalist`, including historical completed
+generalist runs that predate `synthesis-metrics.json`. They remain required for
+completed fixed-chain runs and for dynamic-council runs that reached synthesis.
+
+## EvidenceAuditor Metrics
+
+EvidenceAuditor responses are validated against a dedicated nested audit
+contract. Contract validity checks that audited agent names are known, support
+statuses are permitted, claim and citation keys align, and cited record IDs
+exist in the synthetic evidence bundle. Unsupported claims may carry empty
+citation lists, but the matching citation key must still be present.
+
+Canonical audit findings preserve audited agent, audited claim key, canonical
+claim key, support status, citations, observed and expected values, and the
+source EvidenceAuditor invocation ID. `supported` findings may reinforce
+validated specialist findings. `contradicted`, `unsupported`, and
+`insufficient_evidence` findings are counted and retained, but they are not
+eligible positive synthesis evidence.
 
 ## Synthesis Handoff Metrics
 

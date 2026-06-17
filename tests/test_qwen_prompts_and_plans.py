@@ -1,6 +1,7 @@
 from project_recovery_council.experiment_contracts import (
     ARBITER_RESPONSE_SCHEMA,
     DIRECTOR_ROUTING_RESPONSE_SCHEMA,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole,
@@ -20,6 +21,7 @@ def test_prompt_catalog_is_complete_versioned_and_schema_associated() -> None:
     assert catalog[AgentRole.GENERALIST.value].expected_response_schema == RECOVERY_ANALYSIS_RESPONSE_SCHEMA
     assert catalog[AgentRole.DIRECTOR.value].expected_response_schema == DIRECTOR_ROUTING_RESPONSE_SCHEMA
     assert catalog[AgentRole.SCHEDULE_EXPERT.value].expected_response_schema == SPECIALIST_FINDING_RESPONSE_SCHEMA
+    assert catalog[AgentRole.EVIDENCE_AUDITOR.value].expected_response_schema == EVIDENCE_AUDITOR_RESPONSE_SCHEMA
     assert catalog[AgentRole.ARBITER.value].expected_response_schema == ARBITER_RESPONSE_SCHEMA
 
 
@@ -39,4 +41,5 @@ def test_all_four_experiment_plans_are_explicit() -> None:
     dynamic = build_experiment_plan(ExperimentVariant.DYNAMIC_EXPERT_COUNCIL)
     assert dynamic.steps[0].agent_role == AgentRole.DIRECTOR.value
     assert dynamic.steps[0].dynamic is True
+    assert dynamic.steps[2].expected_response_schema == EVIDENCE_AUDITOR_RESPONSE_SCHEMA
     assert dynamic.steps[-1].agent_role == AgentRole.RECOVERY_PLANNER.value

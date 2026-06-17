@@ -1,0 +1,76 @@
+{
+  "manifest_id": "RUN_MANIFEST_2026_06_17_EVIDENCE_AUDITOR_CONTRACT",
+  "created_on": "2026-06-17",
+  "created_at_utc": "2026-06-17T13:15:09Z",
+  "repository": "project-recovery-council-qwen",
+  "git_base": "dffc2cc64618baa4e53732744605629a17cb9a52",
+  "live_network_requests_made": false,
+  "scope": [
+    "dedicated EvidenceAuditor response contract",
+    "nested per-agent audit assessment parsing",
+    "canonical audit finding conversion",
+    "EvidenceAuditor payload accounting",
+    "variant-aware compare-live compatibility",
+    "source-evidence authorization gate preservation"
+  ],
+  "source_changes": [
+    "src/project_recovery_council/evidence_auditor.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/experiment_contracts.py",
+    "src/project_recovery_council/experiments.py",
+    "src/project_recovery_council/live_experiments.py",
+    "src/project_recovery_council/live_variant_runner.py",
+    "src/project_recovery_council/prompt_catalog.py",
+    "src/project_recovery_council/synthesis_handoff.py",
+    "prompts/v1/evidence_auditor.md"
+  ],
+  "test_changes": [
+    "tests/test_evidence_auditor_contract.py",
+    "tests/test_dynamic_council_governance.py",
+    "tests/test_live_variant_runner.py",
+    "tests/test_qwen_prompts_and_plans.py",
+    "tests/test_validated_findings_handoff.py"
+  ],
+  "documentation_changes": [
+    "README.md",
+    "docs/DYNAMIC_COUNCIL_GOVERNANCE_POLICY.md",
+    "docs/EVIDENCE_AUDITOR_RESPONSE_CONTRACT.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_COMPARISON_RUNBOOK.md",
+    "docs/METRICS.md",
+    "docs/PROMPT_ARCHITECTURE.md",
+    "decisions/ADR-0016-dedicated-evidence-auditor-contract.md"
+  ],
+  "process_artifacts": [
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_17_EVIDENCE_AUDITOR_CONTRACT.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_17_EVIDENCE_AUDITOR_CONTRACT.json"
+  ],
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_evidence_auditor_contract.py tests/test_live_variant_runner.py tests/test_dynamic_council_governance.py tests/test_qwen_prompts_and_plans.py tests/test_validated_findings_handoff.py",
+      "result": "46 passed in 1.41s"
+    },
+    {
+      "command": "python -m pytest",
+      "result": "163 passed, 1 skipped in 7.28s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "result": "prompt validation passed"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed with no output"
+    }
+  ],
+  "limitations": [
+    "No live network request was made in this build.",
+    "Prior live artifacts were not modified or relabeled.",
+    "Frozen schemas/v1 and the deterministic oracle were not modified.",
+    "Diagnostic rebuilds remain non-empirical and are rejected by normal compare-live input."
+  ]
+}

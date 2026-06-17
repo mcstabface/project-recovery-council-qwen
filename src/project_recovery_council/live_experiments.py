@@ -16,6 +16,12 @@ from project_recovery_council.claim_normalization import (
     normalize_claim_keys,
     normalize_response_payload,
 )
+from project_recovery_council.evidence_auditor import (
+    CanonicalAuditFinding,
+    EvidenceAuditorValidationResult,
+    audit_findings_to_response_payload,
+    validate_and_convert_evidence_auditor_response,
+)
 from project_recovery_council.evaluation import evaluate_model_result
 from project_recovery_council.experiment_artifacts import (
     ExperimentArtifactEntry,
@@ -25,6 +31,7 @@ from project_recovery_council.experiment_artifacts import (
 from project_recovery_council.experiment_contracts import (
     AgentInvocation,
     AgentRole,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     EvaluationReport,
     ExperimentConfig,
     ExperimentVariant,
@@ -67,7 +74,7 @@ AGENT_RESPONSE_SCHEMAS = {
     AgentRole.GENERALIST.value: RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     AgentRole.SCHEDULE_EXPERT.value: SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole.COMMERCIAL_EXPERT.value: SPECIALIST_FINDING_RESPONSE_SCHEMA,
-    AgentRole.EVIDENCE_AUDITOR.value: SPECIALIST_FINDING_RESPONSE_SCHEMA,
+    AgentRole.EVIDENCE_AUDITOR.value: EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     AgentRole.RISK_EXPERT.value: SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole.RECOVERY_PLANNER.value: RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     AgentRole.DIRECTOR.value: "project-recovery-council.qwen.director-routing-response.v1",
@@ -190,19 +197,61 @@ def run_live_agent(
         request=request,
         result=result,
     )
-    normalization = normalize_claim_keys(
-        invocation_id=invocation.invocation_id,
-        role=agent_role,
-        response_payload=result.parsed_response,
-    )
-    normalized_payload = normalize_response_payload(result.parsed_response, normalization)
-    role_validation = validate_role_scope(
-        role=agent_role,
-        invocation_id=invocation.invocation_id,
-        response_payload=normalized_payload,
-        selected_record_ids=selected_record_ids,
-        bundle=bundle,
-    )
+    evidence_auditor_validation_results: list[EvidenceAuditorValidationResult] = []
+    canonical_audit_findings: list[CanonicalAuditFinding] = []
+    if agent_role == AgentRole.EVIDENCE_AUDITOR.value:
+        audit_result = validate_and_convert_evidence_auditor_response(
+            invocation_id=invocation.invocation_id,
+            response_payload=result.parsed_response,
+            bundle=bundle,
+        )
+        normalized_payload = audit_findings_to_response_payload(
+            response_payload=result.parsed_response,
+            validation=audit_result,
+        )
+        raw_claims = result.parsed_response.get("claims", {}) if isinstance(result.parsed_response, dict) else {}
+        normalized_claims = normalized_payload.get("claims", {}) if isinstance(normalized_payload, dict) else {}
+        normalization = ClaimNormalizationResult(
+            invocation_id=invocation.invocation_id,
+            role=agent_role,
+            raw_claims=raw_claims if isinstance(raw_claims, dict) else {},
+            normalized_claims=normalized_claims if isinstance(normalized_claims, dict) else {},
+            applied_aliases=[],
+            unknown_claim_keys=[],
+            conflicts=[],
+            valid=audit_result.valid,
+        )
+        role_validation = RoleValidationResult(
+            role=agent_role,
+            invocation_id=invocation.invocation_id,
+            valid=audit_result.valid,
+            allowed_claims=[
+                f"{finding.audited_agent}.{finding.audited_claim_key}"
+                for finding in audit_result.canonical_findings
+            ],
+            prohibited_claims=[] if audit_result.valid else list(audit_result.errors),
+            allowed_warnings=[],
+            prohibited_warnings=[],
+            citation_policy_violations=[],
+            evidence_scope_violations=[],
+            concise_findings=["evidence auditor response contract valid" if audit_result.valid else "evidence auditor response contract invalid"],
+        )
+        evidence_auditor_validation_results = [audit_result]
+        canonical_audit_findings = list(audit_result.canonical_findings)
+    else:
+        normalization = normalize_claim_keys(
+            invocation_id=invocation.invocation_id,
+            role=agent_role,
+            response_payload=result.parsed_response,
+        )
+        normalized_payload = normalize_response_payload(result.parsed_response, normalization)
+        role_validation = validate_role_scope(
+            role=agent_role,
+            invocation_id=invocation.invocation_id,
+            response_payload=normalized_payload,
+            selected_record_ids=selected_record_ids,
+            bundle=bundle,
+        )
     schedule_validation = (
         validate_schedule_semantics(
             invocation_id=invocation.invocation_id,
@@ -231,6 +280,8 @@ def run_live_agent(
                 "normalized_response": normalized_payload,
             }
         ],
+        evidence_auditor_validation_results=evidence_auditor_validation_results,
+        canonical_audit_findings=canonical_audit_findings,
         invocations=[invocation],
         results=[result],
         evaluation_report=report,
@@ -275,6 +326,8 @@ def write_live_artifacts(
     schedule_semantic_validation_results: list[ScheduleSemanticValidationResult] | None = None,
     claim_normalization_results: list[ClaimNormalizationResult] | None = None,
     normalized_structured_responses: list[dict[str, Any]] | None = None,
+    evidence_auditor_validation_results: list[EvidenceAuditorValidationResult] | None = None,
+    canonical_audit_findings: list[CanonicalAuditFinding] | None = None,
     invocations: list[AgentInvocation],
     results: list[ModelResult],
     evaluation_report: EvaluationReport | None,
@@ -340,6 +393,8 @@ def write_live_artifacts(
     schedule_results = schedule_semantic_validation_results or []
     normalization_results = claim_normalization_results or []
     normalized_responses = normalized_structured_responses or []
+    evidence_auditor_results = evidence_auditor_validation_results or []
+    audit_findings = canonical_audit_findings or []
     experiment_config = ExperimentConfig(
         experiment_id=experiment_id,
         case_id=case_id,
@@ -359,6 +414,12 @@ def write_live_artifacts(
         ("claim-normalization-results", "claim-normalization-results.json", normalization_results),
         ("normalized-structured-responses", "normalized-structured-responses.json", normalized_responses),
         ("schedule-semantic-validation", "schedule-semantic-validation.json", schedule_results),
+        (
+            "evidence-auditor-validation-results",
+            "evidence-auditor-validation-results.json",
+            evidence_auditor_results,
+        ),
+        ("canonical-audit-findings", "canonical-audit-findings.json", audit_findings),
         ("invocation-records", "invocation-records.json", invocations),
         ("raw-provider-responses", "raw-provider-responses.json", raw_provider_responses),
         ("parsed-structured-responses", "parsed-structured-responses.json", parsed),
@@ -536,6 +597,10 @@ def _live_schema_id_for(filename: str) -> str:
         "claim-normalization-results.json": "project-recovery-council.qwen.live-claim-normalization-results.v1",
         "normalized-structured-responses.json": "project-recovery-council.qwen.live-normalized-structured-responses.v1",
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
+        "evidence-auditor-validation-results.json": (
+            "project-recovery-council.qwen.live-evidence-auditor-validation-results.v1"
+        ),
+        "canonical-audit-findings.json": "project-recovery-council.qwen.live-canonical-audit-findings.v1",
         "schedule-semantic-metrics.json": "project-recovery-council.qwen.live-schedule-semantic-metrics.v1",
         "raw-provider-responses.json": "project-recovery-council.qwen.live-raw-provider-responses.v1",
         "parsed-structured-responses.json": "project-recovery-council.qwen.live-parsed-structured-responses.v1",

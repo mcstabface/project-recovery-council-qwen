@@ -8,6 +8,7 @@ from project_recovery_council.experiment_artifacts import validate_experiment_ar
 from project_recovery_council.experiment_contracts import (
     ARBITER_RESPONSE_SCHEMA,
     DIRECTOR_ROUTING_RESPONSE_SCHEMA,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole,
@@ -227,10 +228,54 @@ def commercial_response() -> dict[str, Any]:
 
 
 def auditor_response() -> dict[str, Any]:
-    return specialist_response(
-        AgentRole.EVIDENCE_AUDITOR.value,
-        {"claim_support": "citations checked", "contradiction": "onsite status unresolved"},
-    )
+    return {
+        "schema_version": EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
+        "agent_role": AgentRole.EVIDENCE_AUDITOR.value,
+        "status": "completed",
+        "claims": {
+            AgentRole.SCHEDULE_EXPERT.value: {
+                "forecast_milestone_slip_days": {
+                    "support_status": "supported",
+                    "rationale": "Schedule record supports the 13-day slip.",
+                    "observed_value": 13,
+                    "expected_value": 13,
+                }
+            },
+            AgentRole.COMMERCIAL_EXPERT.value: {
+                "delay_exposure_usd_per_day": {
+                    "support_status": "supported",
+                    "rationale": "Cost and contract records support the daily rate.",
+                    "observed_value": 15000,
+                    "expected_value": 15000,
+                }
+            },
+            AgentRole.RISK_EXPERT.value: {
+                "onsite_status_conflict": {
+                    "support_status": "supported",
+                    "rationale": "Progress, supplier, and logistics evidence conflict on onsite status.",
+                },
+                "human_escalation_required": {
+                    "support_status": "supported",
+                    "rationale": "Contradictory onsite status requires human confirmation.",
+                    "observed_value": True,
+                    "expected_value": True,
+                }
+            },
+        },
+        "citations": {
+            AgentRole.SCHEDULE_EXPERT.value: {"forecast_milestone_slip_days": ["SCH-DELIVERY-001"]},
+            AgentRole.COMMERCIAL_EXPERT.value: {
+                "delay_exposure_usd_per_day": ["COST-SUMMARY-001", "CTR-DELAY-001"]
+            },
+            AgentRole.RISK_EXPERT.value: {
+                "onsite_status_conflict": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
+                "human_escalation_required": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"]
+            },
+        },
+        "unsupported_claims": [],
+        "warnings": [],
+        "abstention_reason": None,
+    }
 
 
 def risk_response() -> dict[str, Any]:
@@ -686,6 +731,139 @@ def test_live_comparison_generation_and_incomplete_rejection(tmp_path: Path, mon
             dynamic_council_path=dynamic,
             output_root=tmp_path / "comparisons",
             comparison_id="comparison-reject",
+        )
+
+
+def test_compare_live_allows_historical_generalist_without_synthesis_metrics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    generalist, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.SINGLE_GENERALIST,
+        [recovery_response(AgentRole.GENERALIST.value)],
+        experiment_id="generalist-legacy-no-synthesis",
+    )
+    (generalist / "synthesis-metrics.json").unlink()
+    fixed, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.FIXED_EXPERT_CHAIN,
+        [schedule_response(), commercial_response(), auditor_response(), risk_response(), recovery_response()],
+        experiment_id="fixed-for-legacy-compare",
+    )
+    dynamic, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.DYNAMIC_EXPERT_COUNCIL,
+        [
+            director_response(selected=[AgentRole.SCHEDULE_EXPERT.value, AgentRole.COMMERCIAL_EXPERT.value]),
+            schedule_response(),
+            commercial_response(),
+            auditor_response(),
+            recovery_response(),
+        ],
+        experiment_id="dynamic-for-legacy-compare",
+    )
+
+    comparison = compare_live_variant_runs(
+        generalist_path=generalist,
+        fixed_chain_path=fixed,
+        dynamic_council_path=dynamic,
+        output_root=tmp_path / "comparisons",
+        comparison_id="legacy-generalist-ok",
+    )
+    report = read_json(comparison / "live-comparison-report.json")
+    markdown = (comparison / "live-comparison-report.md").read_text(encoding="utf-8")
+    generalist_row = next(row for row in report["rows"] if row["variant"] == "single_generalist")
+
+    assert generalist_row["specialist_finding_retention_rate"] is None
+    assert generalist_row["role_scope_compliance"]["status"] == "not_applicable"
+    assert "N/A" in markdown
+
+
+def test_compare_live_rejects_completed_fixed_missing_synthesis_metrics(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    generalist, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.SINGLE_GENERALIST,
+        [recovery_response(AgentRole.GENERALIST.value)],
+        experiment_id="generalist-for-fixed-missing",
+    )
+    fixed, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.FIXED_EXPERT_CHAIN,
+        [schedule_response(), commercial_response(), auditor_response(), risk_response(), recovery_response()],
+        experiment_id="fixed-missing-synthesis",
+    )
+    (fixed / "synthesis-metrics.json").unlink()
+    dynamic, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.DYNAMIC_EXPERT_COUNCIL,
+        [
+            director_response(selected=[AgentRole.SCHEDULE_EXPERT.value, AgentRole.COMMERCIAL_EXPERT.value]),
+            schedule_response(),
+            commercial_response(),
+            auditor_response(),
+            recovery_response(),
+        ],
+        experiment_id="dynamic-for-fixed-missing",
+    )
+
+    with pytest.raises(ValueError, match="invalid live run artifacts|missing required"):
+        compare_live_variant_runs(
+            generalist_path=generalist,
+            fixed_chain_path=fixed,
+            dynamic_council_path=dynamic,
+            output_root=tmp_path / "comparisons",
+        )
+
+
+def test_compare_live_rejects_missing_core_evaluation_artifact(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    generalist, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.SINGLE_GENERALIST,
+        [recovery_response(AgentRole.GENERALIST.value)],
+        experiment_id="generalist-missing-evaluation",
+    )
+    (generalist / "evaluation-results.json").unlink()
+    fixed, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.FIXED_EXPERT_CHAIN,
+        [schedule_response(), commercial_response(), auditor_response(), risk_response(), recovery_response()],
+        experiment_id="fixed-for-core-missing",
+    )
+    dynamic, _ = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.DYNAMIC_EXPERT_COUNCIL,
+        [
+            director_response(selected=[AgentRole.SCHEDULE_EXPERT.value, AgentRole.COMMERCIAL_EXPERT.value]),
+            schedule_response(),
+            commercial_response(),
+            auditor_response(),
+            recovery_response(),
+        ],
+        experiment_id="dynamic-for-core-missing",
+    )
+
+    with pytest.raises(ValueError, match="missing core|invalid live run artifacts"):
+        compare_live_variant_runs(
+            generalist_path=generalist,
+            fixed_chain_path=fixed,
+            dynamic_council_path=dynamic,
+            output_root=tmp_path / "comparisons",
         )
 
 

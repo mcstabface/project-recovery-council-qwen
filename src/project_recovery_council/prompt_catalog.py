@@ -10,6 +10,7 @@ from project_recovery_council.contracts import ContractModel
 from project_recovery_council.experiment_contracts import (
     ARBITER_RESPONSE_SCHEMA,
     DIRECTOR_ROUTING_RESPONSE_SCHEMA,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA,
     SPECIALIST_FINDING_RESPONSE_SCHEMA,
     AgentRole,
@@ -33,7 +34,7 @@ PROMPT_FILES: dict[str, tuple[str, str]] = {
     AgentRole.DIRECTOR.value: ("director_agent.md", DIRECTOR_ROUTING_RESPONSE_SCHEMA),
     AgentRole.SCHEDULE_EXPERT.value: ("schedule_expert.md", SPECIALIST_FINDING_RESPONSE_SCHEMA),
     AgentRole.COMMERCIAL_EXPERT.value: ("commercial_expert.md", SPECIALIST_FINDING_RESPONSE_SCHEMA),
-    AgentRole.EVIDENCE_AUDITOR.value: ("evidence_auditor.md", SPECIALIST_FINDING_RESPONSE_SCHEMA),
+    AgentRole.EVIDENCE_AUDITOR.value: ("evidence_auditor.md", EVIDENCE_AUDITOR_RESPONSE_SCHEMA),
     AgentRole.RISK_EXPERT.value: ("risk_expert.md", SPECIALIST_FINDING_RESPONSE_SCHEMA),
     AgentRole.RECOVERY_PLANNER.value: ("recovery_planner.md", RECOVERY_ANALYSIS_RESPONSE_SCHEMA),
     AgentRole.ARBITER.value: ("arbiter_agent.md", ARBITER_RESPONSE_SCHEMA),

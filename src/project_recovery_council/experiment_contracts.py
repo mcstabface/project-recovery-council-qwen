@@ -15,6 +15,7 @@ from project_recovery_council.model_client import ModelRequest, ModelResult
 RECOVERY_ANALYSIS_RESPONSE_SCHEMA = "project-recovery-council.qwen.recovery-analysis-response.v1"
 DIRECTOR_ROUTING_RESPONSE_SCHEMA = "project-recovery-council.qwen.director-routing-response.v1"
 SPECIALIST_FINDING_RESPONSE_SCHEMA = "project-recovery-council.qwen.specialist-finding-response.v1"
+EVIDENCE_AUDITOR_RESPONSE_SCHEMA = "project-recovery-council.qwen.evidence-auditor-response.v1"
 ARBITER_RESPONSE_SCHEMA = "project-recovery-council.qwen.arbiter-response.v1"
 LIVE_SMOKE_RESPONSE_SCHEMA = "project-recovery-council.qwen.live-smoke-response.v1"
 
@@ -50,6 +51,13 @@ class ClaimStatus(StrEnum):
     INCORRECT = "incorrect"
     UNSUPPORTED = "unsupported"
     AMBIGUOUS = "ambiguous"
+
+
+class AuditSupportStatus(StrEnum):
+    SUPPORTED = "supported"
+    CONTRADICTED = "contradicted"
+    UNSUPPORTED = "unsupported"
+    INSUFFICIENT_EVIDENCE = "insufficient_evidence"
 
 
 class EvaluationMetricId(StrEnum):
@@ -163,6 +171,78 @@ class SpecialistFindingResponse(ContractModel):
     def require_abstention_reason(self) -> "SpecialistFindingResponse":
         if self.status == ResponseStatus.ABSTAINED and not self.abstention_reason:
             raise ValueError("abstained specialist findings require abstention_reason")
+        return self
+
+
+class EvidenceAuditClaimAssessment(ContractModel):
+    support_status: AuditSupportStatus
+    citations: list[str] = Field(default_factory=list)
+    rationale: str | None = None
+    observed_value: Any = None
+    expected_value: Any = None
+    validation_reference: str | None = None
+
+
+class EvidenceAuditorResponse(ContractModel):
+    schema_version: Literal["project-recovery-council.qwen.evidence-auditor-response.v1"] = (
+        EVIDENCE_AUDITOR_RESPONSE_SCHEMA
+    )
+    agent_role: Literal["EvidenceAuditor"] = "EvidenceAuditor"
+    status: ResponseStatus
+    assessments_by_agent: dict[str, dict[str, EvidenceAuditClaimAssessment]] = Field(default_factory=dict)
+    claims: dict[str, dict[str, Any]] = Field(default_factory=dict)
+    citations: dict[str, dict[str, list[str]]] = Field(default_factory=dict)
+    unsupported_claims: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    abstention_reason: str | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def build_assessments_from_nested_claims(cls, data: Any) -> Any:
+        if not isinstance(data, dict):
+            return data
+        if (
+            data.get("agent_role") == AgentRole.EVIDENCE_AUDITOR.value
+            and data.get("schema_version") == SPECIALIST_FINDING_RESPONSE_SCHEMA
+        ):
+            data = dict(data)
+            data["schema_version"] = EVIDENCE_AUDITOR_RESPONSE_SCHEMA
+        claims = data.get("claims")
+        citations = data.get("citations")
+        assessments = data.get("assessments_by_agent")
+        if assessments is None and claims is None:
+            return data
+        if assessments is None:
+            if not isinstance(claims, dict):
+                raise ValueError("claims must be a nested object keyed by audited agent")
+            if not isinstance(citations, dict):
+                raise ValueError("citations must be a nested object keyed by audited agent")
+            assessments = _build_audit_assessments(claims, citations)
+            data = dict(data)
+            data["assessments_by_agent"] = assessments
+            return data
+        if claims is not None or citations is not None:
+            _validate_nested_audit_keys(claims or {}, citations or {}, assessments)
+        return data
+
+    @model_validator(mode="after")
+    def validate_audit_contract(self) -> "EvidenceAuditorResponse":
+        known_roles = {role.value for role in AgentRole if role != AgentRole.DETERMINISTIC_ORACLE}
+        unknown = sorted(set(self.assessments_by_agent) - known_roles)
+        if unknown:
+            raise ValueError(f"unknown audited agent roles: {unknown}")
+        claim_keys = {
+            agent: set(claims)
+            for agent, claims in self.claims.items()
+        }
+        citation_keys = {
+            agent: set(citations)
+            for agent, citations in self.citations.items()
+        }
+        if claim_keys and citation_keys and claim_keys != citation_keys:
+            raise ValueError("nested claims and citations must contain the same audited agents and claim keys")
+        if self.status == ResponseStatus.ABSTAINED and not self.abstention_reason:
+            raise ValueError("abstained evidence-auditor responses require abstention_reason")
         return self
 
 
@@ -346,6 +426,57 @@ SCHEMA_REGISTRY = {
     RECOVERY_ANALYSIS_RESPONSE_SCHEMA: RecoveryAnalysisResponse,
     DIRECTOR_ROUTING_RESPONSE_SCHEMA: DirectorRoutingResponse,
     SPECIALIST_FINDING_RESPONSE_SCHEMA: SpecialistFindingResponse,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA: EvidenceAuditorResponse,
     ARBITER_RESPONSE_SCHEMA: ArbiterResponse,
     LIVE_SMOKE_RESPONSE_SCHEMA: LiveSmokeResponse,
 }
+
+
+def _build_audit_assessments(
+    claims: dict[str, Any],
+    citations: dict[str, Any],
+) -> dict[str, dict[str, dict[str, Any]]]:
+    _validate_nested_audit_keys(claims, citations, claims)
+    assessments: dict[str, dict[str, dict[str, Any]]] = {}
+    for agent, agent_claims in claims.items():
+        if not isinstance(agent_claims, dict):
+            raise ValueError(f"claims for {agent} must be an object")
+        agent_citations = citations.get(agent)
+        if not isinstance(agent_citations, dict):
+            raise ValueError(f"citations for {agent} must be an object")
+        assessments[agent] = {}
+        for claim_key, claim_value in agent_claims.items():
+            if claim_key not in agent_citations:
+                raise ValueError(f"missing citation entry for {agent}.{claim_key}")
+            citation_list = agent_citations[claim_key]
+            if not isinstance(citation_list, list):
+                raise ValueError(f"citations for {agent}.{claim_key} must be a list")
+            if isinstance(claim_value, dict):
+                assessment = dict(claim_value)
+                if "support_status" not in assessment:
+                    raise ValueError(f"missing support_status for {agent}.{claim_key}")
+            else:
+                assessment = {"support_status": claim_value}
+            assessment["citations"] = [str(record_id) for record_id in citation_list]
+            assessments[agent][claim_key] = assessment
+    return assessments
+
+
+def _validate_nested_audit_keys(claims: Any, citations: Any, assessments: Any) -> None:
+    if not isinstance(claims, dict) or not isinstance(citations, dict):
+        return
+    claim_agents = set(claims)
+    citation_agents = set(citations)
+    if claim_agents != citation_agents:
+        raise ValueError("nested claims and citations must have matching audited agents")
+    for agent in sorted(claim_agents):
+        agent_claims = claims.get(agent)
+        agent_citations = citations.get(agent)
+        if not isinstance(agent_claims, dict) or not isinstance(agent_citations, dict):
+            raise ValueError(f"nested claims and citations for {agent} must be objects")
+        if set(agent_claims) != set(agent_citations):
+            raise ValueError(f"nested claims and citations must have matching claim keys for {agent}")
+    if isinstance(assessments, dict):
+        assessment_agents = set(assessments)
+        if claim_agents and assessment_agents != claim_agents:
+            raise ValueError("assessments_by_agent must match nested claim agents")

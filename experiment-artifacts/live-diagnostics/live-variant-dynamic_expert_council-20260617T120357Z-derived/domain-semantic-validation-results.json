@@ -1,0 +1,80 @@
+[
+  {
+    "checked_fields": [
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "mitigation_cost_usd",
+      "avoided_exposure_usd",
+      "gross_avoided_exposure_usd"
+    ],
+    "concise_findings": [
+      "commercial semantic violations: 1"
+    ],
+    "implemented": true,
+    "invalid_claim_keys": [
+      "gross_avoided_exposure_usd"
+    ],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "role": "CommercialExpert",
+    "semantic_violations": [
+      "gross_avoided_exposure_usd expected 147000, observed 195000"
+    ],
+    "valid": false,
+    "valid_claim_keys": [
+      "avoided_exposure_usd",
+      "delay_exposure_usd_per_day",
+      "forecast_milestone_slip_days",
+      "mitigation_cost_usd"
+    ],
+    "validator": "CommercialExpertSemanticValidator.v1"
+  },
+  {
+    "checked_fields": [],
+    "concise_findings": [
+      "no specialized semantic validator implemented for this role"
+    ],
+    "implemented": false,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "role": "RiskExpert",
+    "semantic_violations": [],
+    "valid": null,
+    "valid_claim_keys": [],
+    "validator": "not_implemented"
+  },
+  {
+    "checked_fields": [
+      "delivery_movement_days",
+      "installation_total_float_consumed_days",
+      "installation_total_float_remaining_days",
+      "forecast_milestone_slip_days",
+      "delivery_date_arithmetic",
+      "milestone_forecast_date_without_intervention"
+    ],
+    "concise_findings": [
+      "schedule semantic validation passed"
+    ],
+    "implemented": true,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "role": "ScheduleExpert",
+    "semantic_violations": [],
+    "valid": true,
+    "valid_claim_keys": [],
+    "validator": "ScheduleExpertSemanticValidator.v1"
+  },
+  {
+    "checked_fields": [],
+    "concise_findings": [
+      "no specialized semantic validator implemented for this role"
+    ],
+    "implemented": false,
+    "invalid_claim_keys": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "role": "EvidenceAuditor",
+    "semantic_violations": [],
+    "valid": null,
+    "valid_claim_keys": [],
+    "validator": "not_implemented"
+  }
+]

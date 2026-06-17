@@ -25,6 +25,12 @@ from project_recovery_council.commercial_semantics import (
     validate_commercial_semantics,
 )
 from project_recovery_council.contracts import ContractModel
+from project_recovery_council.evidence_auditor import (
+    CanonicalAuditFinding,
+    EvidenceAuditorValidationResult,
+    audit_findings_to_response_payload,
+    validate_and_convert_evidence_auditor_response,
+)
 from project_recovery_council.evaluation import evaluate_model_result
 from project_recovery_council.experiment_artifacts import (
     ExperimentArtifactEntry,
@@ -40,6 +46,7 @@ from project_recovery_council.experiment_contracts import (
     AgentInvocation,
     AgentRole,
     DirectorRoutingResponse,
+    EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
     EvaluationReport,
     ExperimentConfig,
     ExperimentVariant,
@@ -242,6 +249,8 @@ class LiveVariantRun:
         self.normalized_responses: list[dict[str, Any]] = []
         self.schedule_results: list[ScheduleSemanticValidationResult] = []
         self.commercial_results: list[CommercialSemanticValidationResult] = []
+        self.evidence_auditor_results: list[EvidenceAuditorValidationResult] = []
+        self.canonical_audit_findings: list[CanonicalAuditFinding] = []
         self.domain_results: list[DomainSemanticValidationResult] = []
         self.routing_decisions: list[dict[str, Any]] = []
         self.disagreements: list[dict[str, Any]] = []
@@ -407,12 +416,17 @@ class LiveVariantRun:
         step_id: str,
         specialist_context: list[dict[str, Any]] | None = None,
     ) -> ModelResult | None:
+        schema_id = (
+            EVIDENCE_AUDITOR_RESPONSE_SCHEMA
+            if role == AgentRole.EVIDENCE_AUDITOR.value
+            else SPECIALIST_FINDING_RESPONSE_SCHEMA
+        )
         prompt = (
             self._render_evidence_auditor_prompt(specialist_context)
             if role == AgentRole.EVIDENCE_AUDITOR.value and specialist_context
             else self._render_contextual_specialist_prompt(role, specialist_context)
             if specialist_context
-            else self._render_standard_prompt(role, SPECIALIST_FINDING_RESPONSE_SCHEMA)
+            else self._render_standard_prompt(role, schema_id)
         )
         selected_record_ids = (
             self._audit_selected_record_ids(specialist_context)
@@ -421,7 +435,7 @@ class LiveVariantRun:
         )
         result = self._invoke(
             role=role,
-            schema_id=SPECIALIST_FINDING_RESPONSE_SCHEMA,
+            schema_id=schema_id,
             step_id=step_id,
             prompt=prompt,
             selected_record_ids=selected_record_ids,
@@ -495,6 +509,9 @@ class LiveVariantRun:
 
     def _validate_specialist(self, *, role: str, result: ModelResult, selected_record_ids: list[str]) -> None:
         invocation_id = self.invocations[-1].invocation_id
+        if role == AgentRole.EVIDENCE_AUDITOR.value:
+            self._validate_evidence_auditor(result=result, selected_record_ids=selected_record_ids)
+            return
         normalization = normalize_claim_keys(
             invocation_id=invocation_id,
             role=role,
@@ -568,6 +585,88 @@ class LiveVariantRun:
                     concise_findings=["no specialized semantic validator implemented for this role"],
                 )
             )
+
+    def _validate_evidence_auditor(self, *, result: ModelResult, selected_record_ids: list[str]) -> None:
+        invocation_id = self.invocations[-1].invocation_id
+        audit_result = validate_and_convert_evidence_auditor_response(
+            invocation_id=invocation_id,
+            response_payload=result.parsed_response,
+            bundle=self.bundle,
+            original_claim_sources=_original_claim_sources(self.normalized_responses),
+        )
+        normalized_payload = audit_findings_to_response_payload(
+            response_payload=result.parsed_response,
+            validation=audit_result,
+        )
+        raw_claims = result.parsed_response.get("claims", {}) if isinstance(result.parsed_response, dict) else {}
+        normalized_claims = normalized_payload.get("claims", {}) if isinstance(normalized_payload, dict) else {}
+        normalization = ClaimNormalizationResult(
+            invocation_id=invocation_id,
+            role=AgentRole.EVIDENCE_AUDITOR.value,
+            raw_claims=raw_claims if isinstance(raw_claims, dict) else {},
+            normalized_claims=normalized_claims if isinstance(normalized_claims, dict) else {},
+            applied_aliases=[],
+            unknown_claim_keys=[],
+            conflicts=[],
+            valid=audit_result.valid,
+        )
+        citation_violations = [
+            error
+            for error in audit_result.errors
+            if "cites unknown evidence records" in error
+        ]
+        cited_record_ids = sorted(
+            {
+                record_id
+                for finding in audit_result.canonical_findings
+                for record_id in finding.citations
+            }
+        )
+        unselected = [record_id for record_id in cited_record_ids if record_id not in selected_record_ids]
+        citation_violations.extend(f"cited unselected record {record_id}" for record_id in unselected)
+        role_result = RoleValidationResult(
+            role=AgentRole.EVIDENCE_AUDITOR.value,
+            invocation_id=invocation_id,
+            valid=audit_result.valid and not citation_violations,
+            allowed_claims=[
+                f"{finding.audited_agent}.{finding.audited_claim_key}"
+                for finding in audit_result.canonical_findings
+            ],
+            prohibited_claims=[] if audit_result.valid else list(audit_result.errors),
+            allowed_warnings=[],
+            prohibited_warnings=[],
+            citation_policy_violations=citation_violations,
+            evidence_scope_violations=[],
+            concise_findings=[
+                "evidence auditor response contract valid"
+                if audit_result.valid and not citation_violations
+                else "evidence auditor response contract invalid"
+            ],
+        )
+        self.evidence_auditor_results.append(audit_result)
+        self.canonical_audit_findings.extend(audit_result.canonical_findings)
+        self.normalization_results.append(normalization)
+        self.normalized_responses.append(
+            {
+                "invocation_id": invocation_id,
+                "normalization_valid": normalization.valid,
+                "normalized_response": {
+                    **(normalized_payload or {}),
+                    "evidence_auditor_schema_valid": audit_result.valid,
+                },
+            }
+        )
+        self.role_results.append(role_result)
+        self.domain_results.append(
+            DomainSemanticValidationResult(
+                invocation_id=invocation_id,
+                role=AgentRole.EVIDENCE_AUDITOR.value,
+                validator="EvidenceAuditorResponseContract.v1",
+                implemented=False,
+                valid=None,
+                concise_findings=["dedicated evidence-auditor response contract validated separately"],
+            )
+        )
 
     def _set_final_result(self, result: ModelResult, invocation_id: str) -> None:
         if result.parsed_response and result.parsed_response.get("schema_version") == RECOVERY_ANALYSIS_RESPONSE_SCHEMA:
@@ -724,7 +823,12 @@ class LiveVariantRun:
         role: str,
         specialist_context: list[dict[str, Any]] | None,
     ) -> str:
-        base = self._render_standard_prompt(role, SPECIALIST_FINDING_RESPONSE_SCHEMA)
+        schema_id = (
+            EVIDENCE_AUDITOR_RESPONSE_SCHEMA
+            if role == AgentRole.EVIDENCE_AUDITOR.value
+            else SPECIALIST_FINDING_RESPONSE_SCHEMA
+        )
+        base = self._render_standard_prompt(role, schema_id)
         return (
             f"{base}\n"
             "## Prior validated specialist findings\n"
@@ -733,7 +837,6 @@ class LiveVariantRun:
 
     def _render_evidence_auditor_prompt(self, specialist_context: list[dict[str, Any]] | None) -> str:
         catalog = load_prompt_catalog(PROMPT_VERSION)
-        schema_model = SCHEMA_REGISTRY[SPECIALIST_FINDING_RESPONSE_SCHEMA]
         selected_record_ids = self._audit_selected_record_ids(specialist_context)
         packet = {
             "correlation_id": self.experiment_id,
@@ -751,8 +854,8 @@ class LiveVariantRun:
                 }
             ],
             "source_evidence": self._evidence_snippets(selected_record_ids),
-            "expected_response_schema": SPECIALIST_FINDING_RESPONSE_SCHEMA,
-            "expected_output_json_schema": schema_model.model_json_schema(),
+            "expected_response_schema": EVIDENCE_AUDITOR_RESPONSE_SCHEMA,
+            "required_output_shape": "Nested assessments_by_agent or matching nested claims/citations keyed by audited agent and claim.",
         }
         self._record_governance_payload(
             agent_role=AgentRole.EVIDENCE_AUDITOR.value,
@@ -772,7 +875,6 @@ class LiveVariantRun:
         disagreement_records: list[dict[str, Any]],
     ) -> str:
         catalog = load_prompt_catalog(PROMPT_VERSION)
-        schema_model = SCHEMA_REGISTRY[ARBITER_RESPONSE_SCHEMA]
         record_ids = sorted(
             {
                 record_id
@@ -796,7 +898,7 @@ class LiveVariantRun:
             },
             "source_evidence": self._evidence_snippets(record_ids),
             "expected_response_schema": ARBITER_RESPONSE_SCHEMA,
-            "expected_output_json_schema": schema_model.model_json_schema(),
+            "required_output_shape": "Resolve only the supplied disagreement records using cited evidence.",
         }
         self._record_governance_payload(
             agent_role=AgentRole.ARBITER.value,
@@ -865,6 +967,9 @@ class LiveVariantRun:
     def _audit_selected_record_ids(self, specialist_context: list[dict[str, Any]] | None) -> list[str]:
         record_ids: set[str] = {"PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"}
         for item in specialist_context or []:
+            agent_role = item.get("agent_role")
+            if isinstance(agent_role, str):
+                record_ids.update(selected_evidence_record_ids(self.bundle, agent_role))
             citations = item.get("citations", {})
             if isinstance(citations, dict):
                 for ids in citations.values():
@@ -894,10 +999,33 @@ class LiveVariantRun:
         return snippets
 
     def _record_governance_payload(self, *, agent_role: str, payload: dict[str, Any], selected_record_ids: list[str]) -> None:
+        serialized = json.dumps(to_jsonable(payload), sort_keys=True)
+        specialist_claim_count = 0
+        specialist_claims = payload.get("specialist_claims")
+        if isinstance(specialist_claims, list):
+            for item in specialist_claims:
+                if isinstance(item, dict) and isinstance(item.get("claims"), dict):
+                    specialist_claim_count += len(item["claims"])
+        citation_count = 0
+        for value in _walk_values(payload):
+            if isinstance(value, str) and value in self.bundle.evidence_by_id:
+                citation_count += 1
         self.governance_payloads.append(
             {
                 "agent_role": agent_role,
-                "payload_size_characters": len(json.dumps(to_jsonable(payload), sort_keys=True)),
+                "payload_size_characters": len(serialized),
+                "serialized_payload_bytes": len(serialized.encode("utf-8")),
+                "normalized_specialist_finding_count": specialist_claim_count,
+                "selected_evidence_record_count": len(selected_record_ids),
+                "citation_count": citation_count,
+                "raw_provider_response_envelopes_included": "raw_provider_response" in serialized
+                or "raw_response_text" in serialized
+                or "parsed_response" in serialized,
+                "prior_rendered_prompts_included": "system_instructions" in serialized
+                or "user_payload" in serialized
+                or "prompt_sha256" in serialized,
+                "repeated_schemas_included": "expected_output_json_schema" in serialized
+                or '"properties"' in serialized,
                 "selected_evidence_record_ids": selected_record_ids,
             }
         )
@@ -1187,6 +1315,18 @@ def write_live_variant_artifacts(
             run.commercial_results,
             bool(run.commercial_results),
         ),
+        (
+            "evidence-auditor-validation-results",
+            "evidence-auditor-validation-results.json",
+            run.evidence_auditor_results,
+            bool(run.evidence_auditor_results),
+        ),
+        (
+            "canonical-audit-findings",
+            "canonical-audit-findings.json",
+            run.canonical_audit_findings,
+            bool(run.canonical_audit_findings),
+        ),
         ("domain-semantic-validation-results", "domain-semantic-validation-results.json", run.domain_results, bool(run.domain_results)),
         (
             "validated-findings-envelope",
@@ -1297,6 +1437,9 @@ def compare_live_variant_runs(
         if not inspection.passed and not allow_incomplete:
             raise ValueError(f"invalid live run artifacts for {variant.value}: {inspection.errors}")
         summary = LiveVariantSummary.model_validate(read_json(path / "final-variant-result.json"))
+        compatibility_errors = _live_compare_compatibility_errors(variant=variant, path=path, summary=summary)
+        if compatibility_errors and not allow_incomplete:
+            raise ValueError(f"live run artifacts are not comparable for {variant.value}: {compatibility_errors}")
         if not summary.empirical_result_usable_for_comparison and not allow_incomplete:
             raise ValueError(f"live run is not usable for normal comparison: {variant.value}: {path.as_posix()}")
         if not summary.completed and not allow_incomplete:
@@ -1396,13 +1539,13 @@ def _append_manifest_entry(root: Path, *, name: str, relative_path: str, schema_
 
 
 def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariantSummary) -> LiveComparisonVariantRow:
-    evaluation = read_json(path / "evaluation-results.json")
+    evaluation = _read_optional_json(path / "evaluation-results.json", {})
     metrics = {}
     report = evaluation.get("report") if isinstance(evaluation, dict) else None
     if isinstance(report, dict):
         metrics = {item["metric_id"]: item.get("score") for item in report.get("metric_results", [])}
-    role_payload = read_json(path / "role-compliance-metrics.json")
-    schedule_payload = read_json(path / "schedule-semantic-metrics.json")
+    role_payload = _read_optional_json(path / "role-compliance-metrics.json", {})
+    schedule_payload = _read_optional_json(path / "schedule-semantic-metrics.json", {})
     role_applicability = _comparison_applicability(
         variant=variant,
         payload=role_payload,
@@ -1419,7 +1562,7 @@ def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariant
         generalist_reason="specialized semantic validation is not applicable to full-scope GeneralistAgent outputs",
         legacy_metric_key="schedule_semantic_compliance_rate",
     )
-    synthesis_payload = read_json(path / "synthesis-metrics.json")
+    synthesis_payload = _read_optional_json(path / "synthesis-metrics.json", {})
     if not isinstance(synthesis_payload, dict):
         synthesis_payload = {}
     return LiveComparisonVariantRow(
@@ -1481,6 +1624,43 @@ def _comparison_markdown(report: LiveComparisonReport) -> str:
             f"{_fmt(row.latency_seconds)} | {row.retry_count} |"
         )
     return "\n".join(lines) + "\n"
+
+
+def _live_compare_compatibility_errors(
+    *,
+    variant: ExperimentVariant,
+    path: Path,
+    summary: LiveVariantSummary,
+) -> list[str]:
+    errors: list[str] = []
+    for filename in ["final-variant-result.json", "evaluation-results.json", "artifact-manifest.json"]:
+        if not (path / filename).exists():
+            errors.append(f"missing core artifact: {filename}")
+    if errors:
+        return errors
+    if not summary.completed:
+        errors.append("run is incomplete")
+        return errors
+    if summary.derived_artifact_validation_failed:
+        errors.append("derived artifact validation failed")
+    if variant == ExperimentVariant.SINGLE_GENERALIST:
+        return errors
+    required = [
+        "synthesis-metrics.json",
+        "validated-findings-envelope.json",
+        "synthesis-input.json",
+        "recommendation-authorization-state.json",
+    ]
+    for filename in required:
+        if not (path / filename).exists():
+            errors.append(f"missing required specialist synthesis artifact: {filename}")
+    return errors
+
+
+def _read_optional_json(path: Path, default: Any) -> Any:
+    if not path.exists():
+        return default
+    return read_json(path)
 
 
 def _fmt(value: float | None) -> str:
@@ -1643,6 +1823,22 @@ def _last_normalized_response(items: list[dict[str, Any]], invocation_id: str) -
     return None
 
 
+def _original_claim_sources(normalized_responses: list[dict[str, Any]]) -> dict[tuple[str, str], str]:
+    sources: dict[tuple[str, str], str] = {}
+    for item in normalized_responses:
+        invocation_id = item.get("invocation_id")
+        response = item.get("normalized_response")
+        if not isinstance(invocation_id, str) or not isinstance(response, dict):
+            continue
+        agent_role = response.get("agent_role")
+        claims = response.get("claims", {})
+        if not isinstance(agent_role, str) or not isinstance(claims, dict):
+            continue
+        for claim_key in claims:
+            sources[(agent_role, str(claim_key))] = invocation_id
+    return sources
+
+
 def _embedded_record_ids(value: Any) -> set[str]:
     if not isinstance(value, dict):
         return set()
@@ -1652,6 +1848,17 @@ def _embedded_record_ids(value: Any) -> set[str]:
         if isinstance(ids, list):
             result.update(str(record_id) for record_id in ids)
     return result
+
+
+def _walk_values(value: Any) -> list[Any]:
+    values = [value]
+    if isinstance(value, dict):
+        for item in value.values():
+            values.extend(_walk_values(item))
+    elif isinstance(value, list):
+        for item in value:
+            values.extend(_walk_values(item))
+    return values
 
 
 def _live_efficiency_payload(run: LiveVariantRun) -> dict[str, Any]:
@@ -1829,6 +2036,8 @@ def _live_variant_schema_id_for(filename: str) -> str:
         "normalized-structured-responses.json": "project-recovery-council.qwen.live-normalized-structured-responses.v1",
         "schedule-semantic-validation.json": "project-recovery-council.qwen.live-schedule-semantic-validation.v1",
         "commercial-semantic-validation.json": "project-recovery-council.qwen.live-commercial-semantic-validation.v1",
+        "evidence-auditor-validation-results.json": "project-recovery-council.qwen.live-evidence-auditor-validation-results.v1",
+        "canonical-audit-findings.json": "project-recovery-council.qwen.live-canonical-audit-findings.v1",
         "domain-semantic-validation-results.json": "project-recovery-council.qwen.live-domain-semantic-validation-results.v1",
         "validated-findings-envelope.json": "project-recovery-council.qwen.live-validated-findings-envelope.v1",
         "excluded-findings.json": "project-recovery-council.qwen.live-excluded-findings.v1",

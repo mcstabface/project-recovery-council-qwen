@@ -29,6 +29,12 @@ ArbiterAgent runs only for substantive disagreements among eligible validated
 findings. Support-only audit records and unresolved human evidence gates do not
 by themselves trigger arbitration.
 
+EvidenceAuditor is not parsed through the generic specialist finding response
+contract. Fixed-chain and dynamic-council plans use
+`project-recovery-council.qwen.evidence-auditor-response.v1`, a nested
+per-agent audit matrix with explicit support statuses and matching nested
+citations.
+
 ## Output Artifacts
 
 Experiment outputs use:
@@ -167,10 +173,25 @@ and known contradiction candidates. ArbiterAgent, when required, receives only
 disagreement records, conflicting eligible findings, citations, limited
 supporting evidence, and human-gate status.
 
+EvidenceAuditor payload metrics are recorded in `governance-payloads.json`:
+serialized payload bytes, normalized specialist finding count, selected
+evidence-record count, citation count, and booleans indicating whether raw
+provider envelopes, prior prompt histories, or repeated schemas were included.
+The expected values for compact audit payloads are `false` for all three
+history/schema inclusion flags.
+
 `compare-live` requires completed and artifact-valid single-generalist,
 fixed-chain, and dynamic-council directories unless `--allow-incomplete` is
 supplied for diagnostics. The report deliberately does not claim statistical
 significance from one run per variant.
+
+Comparison artifact requirements are variant-aware. Specialist synthesis
+artifacts such as `validated-findings-envelope.json`, `role-validation-
+results.json`, and `synthesis-metrics.json` are not applicable to
+`single_generalist` runs. Completed fixed-chain runs must include synthesis
+artifacts, and dynamic-council runs must include them if the run reached
+synthesis. Failed or incomplete dynamic runs remain rejected for normal
+comparison.
 
 Live evaluation reports use live-provider limitations: one run is not
 statistically significant, hosted-model outputs may vary, and provider cost is

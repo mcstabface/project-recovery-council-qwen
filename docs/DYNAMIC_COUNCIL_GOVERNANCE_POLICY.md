@@ -18,6 +18,8 @@ deterministic processing defects were:
   `net_avoided_exposure_usd=147000`
 - support-only EvidenceAuditor findings were treated as substantive
   disagreements rather than verification records
+- EvidenceAuditor live output can be a coherent nested per-agent audit matrix,
+  which must not be forced into the generic flat specialist contract
 - ArbiterAgent was invoked even when no eligible findings disagreed
 - governance prompts carried more accumulated context than required for audit
   and arbitration
@@ -82,12 +84,24 @@ EvidenceAuditor receives normalized specialist claims, claim-attached
 citations, validation status, cited source evidence, and known contradiction
 candidates. It does not receive raw provider histories or full prompt text.
 
+EvidenceAuditor returns
+`project-recovery-council.qwen.evidence-auditor-response.v1`, with claim
+assessments grouped by audited agent and claim key. Nested responses are
+converted to canonical audit findings. A `supported` assessment may reinforce
+the corresponding specialist finding. `contradicted`, `unsupported`, and
+`insufficient_evidence` assessments remain visible and cite their source
+records, but they are excluded from positive synthesis and can make the audited
+specialist claim disputed or ineligible.
+
 ArbiterAgent, when required, receives only disagreement records, conflicting
 eligible findings, citations, limited supporting evidence, and human-gate
 status.
 
-`governance-payloads.json` records payload sizes and selected evidence IDs for
-governance invocations.
+`governance-payloads.json` records serialized payload bytes, normalized
+specialist finding count, selected evidence-record count, citation count, and
+flags for raw provider envelopes, prior rendered prompts, and repeated schemas.
+Compact EvidenceAuditor and Arbiter payloads must keep those three inclusion
+flags false.
 
 ## Failed-Run Diagnostics
 

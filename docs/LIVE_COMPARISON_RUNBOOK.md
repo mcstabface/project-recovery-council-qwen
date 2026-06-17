@@ -57,6 +57,12 @@ PYTHONPATH=src python -m project_recovery_council inspect-experiment <fixed-chai
 Review `selected-evidence-records.json`, `role-validation-results.json`,
 `domain-semantic-validation-results.json`, and
 `schedule-semantic-validation.json` before continuing. Also inspect
+`evidence-auditor-validation-results.json` and
+`canonical-audit-findings.json` when EvidenceAuditor ran; supported audit
+findings may reinforce specialist claims, while contradicted or unsupported
+findings must remain excluded from positive synthesis.
+
+Also inspect
 `validated-findings-envelope.json`, `excluded-findings.json`,
 `synthesis-input.json`, and `recommendation-authorization-state.json` to confirm
 validated claims and citations reached the planner and that recommendation is
@@ -86,6 +92,12 @@ PYTHONPATH=src python -m project_recovery_council inspect-experiment <dynamic-co
 Review `routing-decisions.json` to confirm the Director selected relevant
 specialists rather than defaulting to every role. Then review the synthesis
 handoff artifacts to confirm excluded findings did not enter normal synthesis.
+Check `governance-payloads.json` for EvidenceAuditor payload accounting: raw
+provider envelopes, prior rendered prompts, and repeated full schemas should be
+reported as not included. Review `evidence-auditor-validation-results.json` and
+`canonical-audit-findings.json` to confirm nested audit assessments validated
+and that contradicted or unsupported assessments were preserved without being
+promoted to eligible positive findings.
 Check that final preferred-option and approval-condition citations were
 preserved or deterministically merged from validated findings before comparing
 runs.
@@ -111,6 +123,10 @@ artifact-invalid runs unless `--allow-incomplete` is supplied for diagnostics.
 In the comparison report, role-scope compliance and specialized semantic
 validation are `N/A` for the single GeneralistAgent run. They are applicable
 only to specialist invocations where the corresponding validators ran.
+Historical completed `single_generalist` runs that predate
+`synthesis-metrics.json` remain comparable when their core final, manifest, and
+evaluation artifacts are valid. Missing synthesis metrics remain fatal for
+completed fixed-chain runs and for dynamic-council runs that reached synthesis.
 
 ## Optional Run Controls
 

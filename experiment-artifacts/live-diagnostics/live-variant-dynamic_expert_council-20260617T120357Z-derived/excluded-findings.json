@@ -1,0 +1,22 @@
+[
+  {
+    "assumptions": [],
+    "canonical_claim_key": "gross_avoided_exposure_usd",
+    "case_id": "PRC-EQ-DELAY-001",
+    "citations": [
+      "COST-SUMMARY-001"
+    ],
+    "claim_id": "gross_avoided_exposure_usd",
+    "contradiction_status": null,
+    "eligible_for_synthesis": false,
+    "exclusion_reason": "semantic validation failed",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "normalization_valid": true,
+    "role_scope_valid": true,
+    "schema_valid": true,
+    "semantic_validation_status": "failed",
+    "source_agent": "CommercialExpert",
+    "value": 195000,
+    "warnings": []
+  }
+]

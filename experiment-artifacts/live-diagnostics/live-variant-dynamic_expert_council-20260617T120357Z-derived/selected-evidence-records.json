@@ -1,0 +1,70 @@
+[
+  {
+    "agent_role": "DirectorAgent",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-01-directoragent",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001",
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001",
+      "RISK-001"
+    ]
+  },
+  {
+    "agent_role": "CommercialExpert",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001"
+    ]
+  },
+  {
+    "agent_role": "RiskExpert",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001",
+      "RISK-001"
+    ]
+  },
+  {
+    "agent_role": "ScheduleExpert",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001"
+    ]
+  },
+  {
+    "agent_role": "EvidenceAuditor",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "record_ids": [
+      "CASE-INTAKE-001",
+      "SCH-DELIVERY-001",
+      "PRG-ONSITE-001",
+      "SUP-NOT-ARRIVED-001",
+      "LOG-STATUS-001",
+      "COST-SUMMARY-001",
+      "CTR-DELAY-001",
+      "RISK-001"
+    ]
+  },
+  {
+    "agent_role": "ArbiterAgent",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-06-arbiteragent",
+    "record_ids": []
+  },
+  {
+    "agent_role": "RecoveryPlanner",
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-07-recoveryplanner",
+    "record_ids": []
+  }
+]

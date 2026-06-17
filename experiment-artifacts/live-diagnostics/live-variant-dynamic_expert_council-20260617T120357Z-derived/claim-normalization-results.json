@@ -1,0 +1,131 @@
+[
+  {
+    "applied_aliases": [
+      {
+        "canonical_key": "delay_exposure_usd_per_day",
+        "raw_key": "contractual_delay_exposure_usd_per_day",
+        "raw_value": 15000
+      },
+      {
+        "canonical_key": "avoided_exposure_usd",
+        "raw_key": "net_avoided_exposure_usd",
+        "raw_value": 147000
+      }
+    ],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "normalized_claims": {
+      "avoided_exposure_usd": 147000,
+      "delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 195000,
+      "mitigation_cost_usd": 48000
+    },
+    "raw_claims": {
+      "contractual_delay_exposure_usd_per_day": 15000,
+      "forecast_milestone_slip_days": 13,
+      "gross_avoided_exposure_usd": 195000,
+      "mitigation_cost_usd": 48000,
+      "net_avoided_exposure_usd": 147000
+    },
+    "role": "CommercialExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  },
+  {
+    "applied_aliases": [],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "normalized_claims": {
+      "escalation_requirement": "Human escalation is mandatory to reconcile conflicting onsite assertions and authorize recovery action; no automated resolution is permissible per RISK-001 mitigation directive.",
+      "milestone_slip_exposure": "Contractual milestone MS-COMMISSIONING-READY is forecast to slip 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery shift; installation float (8 days) is insufficient to absorb the delay without intervention.",
+      "onsite_status_conflict": "High-severity conflict exists: progress report (PRG-ONSITE-001) claims EQ-GEN-SKID-01 is onsite and released, but supplier correspondence (SUP-NOT-ARRIVED-001) and carrier logistics (LOG-STATUS-001) confirm it remains in transit with forecast arrival 2026-07-22.",
+      "recovery_approval_risk": "Approved recovery option REC-ACCEL-LOGISTICS is available subject to project approval (RISK-001), but human confirmation of actual onsite status is required before authorization \u2014 unresolved conflict blocks final approval."
+    },
+    "raw_claims": {
+      "escalation_requirement": "Human escalation is mandatory to reconcile conflicting onsite assertions and authorize recovery action; no automated resolution is permissible per RISK-001 mitigation directive.",
+      "milestone_slip_exposure": "Contractual milestone MS-COMMISSIONING-READY is forecast to slip 13 days (SCH-DELIVERY-001), directly driven by the 21-day delivery shift; installation float (8 days) is insufficient to absorb the delay without intervention.",
+      "onsite_status_conflict": "High-severity conflict exists: progress report (PRG-ONSITE-001) claims EQ-GEN-SKID-01 is onsite and released, but supplier correspondence (SUP-NOT-ARRIVED-001) and carrier logistics (LOG-STATUS-001) confirm it remains in transit with forecast arrival 2026-07-22.",
+      "recovery_approval_risk": "Approved recovery option REC-ACCEL-LOGISTICS is available subject to project approval (RISK-001), but human confirmation of actual onsite status is required before authorization \u2014 unresolved conflict blocks final approval."
+    },
+    "role": "RiskExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  },
+  {
+    "applied_aliases": [
+      {
+        "canonical_key": "delivery_baseline_date",
+        "raw_key": "baseline_delivery_date",
+        "raw_value": "2026-07-01"
+      },
+      {
+        "canonical_key": "milestone_baseline_date",
+        "raw_key": "baseline_milestone_date",
+        "raw_value": "2026-08-15"
+      },
+      {
+        "canonical_key": "delivery_forecast_date",
+        "raw_key": "forecast_delivery_date",
+        "raw_value": "2026-07-22"
+      },
+      {
+        "canonical_key": "milestone_forecast_date_without_intervention",
+        "raw_key": "forecast_milestone_date",
+        "raw_value": "2026-08-28"
+      },
+      {
+        "canonical_key": "installation_total_float_remaining_days",
+        "raw_key": "remaining_float_after_delivery_shift_days",
+        "raw_value": 0
+      }
+    ],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "normalized_claims": {
+      "delivery_baseline_date": "2026-07-01",
+      "delivery_forecast_date": "2026-07-22",
+      "delivery_movement_days": 21,
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 8,
+      "installation_total_float_remaining_days": 0,
+      "milestone_baseline_date": "2026-08-15",
+      "milestone_forecast_date_without_intervention": "2026-08-28"
+    },
+    "raw_claims": {
+      "baseline_delivery_date": "2026-07-01",
+      "baseline_milestone_date": "2026-08-15",
+      "delivery_movement_days": 21,
+      "forecast_delivery_date": "2026-07-22",
+      "forecast_milestone_date": "2026-08-28",
+      "forecast_milestone_slip_days": 13,
+      "installation_total_float_consumed_days": 8,
+      "remaining_float_after_delivery_shift_days": 0
+    },
+    "role": "ScheduleExpert",
+    "unknown_claim_keys": [],
+    "valid": true
+  },
+  {
+    "applied_aliases": [],
+    "conflicts": [],
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "normalized_claims": {
+      "delay_exposure_usd_per_day_support": "Supported: COST-SUMMARY-001 and CTR-DELAY-001 both state delay_exposure_usd_per_day = 15000.",
+      "delivery_shift_days_support": "Supported: SCH-DELIVERY-001 states delivery_shift_days = 21.",
+      "equipment_onsite_claim_conflict": "Contradiction confirmed: PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released; SUP-NOT-ARRIVED-001, LOG-STATUS-001, and RISK-001 uniformly confirm it has not arrived and remains in transit with forecast arrival 2026-07-22.",
+      "forecast_milestone_slip_days_support": "Supported: SCH-DELIVERY-001 explicitly states forecast_milestone_slip_days = 13.",
+      "installation_total_float_consumed_days_support": "Supported: SCH-DELIVERY-001 states installation_total_float_days = 8, and ScheduleExpert validation confirms full consumption (remaining = 0)."
+    },
+    "raw_claims": {
+      "delay_exposure_usd_per_day_support": "Supported: COST-SUMMARY-001 and CTR-DELAY-001 both state delay_exposure_usd_per_day = 15000.",
+      "delivery_shift_days_support": "Supported: SCH-DELIVERY-001 states delivery_shift_days = 21.",
+      "equipment_onsite_claim_conflict": "Contradiction confirmed: PRG-ONSITE-001 asserts EQ-GEN-SKID-01 is onsite and released; SUP-NOT-ARRIVED-001, LOG-STATUS-001, and RISK-001 uniformly confirm it has not arrived and remains in transit with forecast arrival 2026-07-22.",
+      "forecast_milestone_slip_days_support": "Supported: SCH-DELIVERY-001 explicitly states forecast_milestone_slip_days = 13.",
+      "installation_total_float_consumed_days_support": "Supported: SCH-DELIVERY-001 states installation_total_float_days = 8, and ScheduleExpert validation confirms full consumption (remaining = 0)."
+    },
+    "role": "EvidenceAuditor",
+    "unknown_claim_keys": [],
+    "valid": true
+  }
+]

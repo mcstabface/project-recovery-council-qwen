@@ -1,0 +1,51 @@
+[
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-01-directoragent",
+    "schema_id": "project-recovery-council.qwen.director-routing-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-02-commercialexpert",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-03-riskexpert",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-04-scheduleexpert",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-05-evidenceauditor",
+    "schema_id": "project-recovery-council.qwen.specialist-finding-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-06-arbiteragent",
+    "schema_id": "project-recovery-council.qwen.arbiter-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  },
+  {
+    "failure": null,
+    "invocation_id": "INV-live-variant-dynamic_expert_council-20260617T120357Z-07-recoveryplanner",
+    "schema_id": "project-recovery-council.qwen.recovery-analysis-response.v1",
+    "schema_valid": true,
+    "validation_errors": []
+  }
+]
