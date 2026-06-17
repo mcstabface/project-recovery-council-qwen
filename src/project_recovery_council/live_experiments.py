@@ -422,6 +422,7 @@ def _evaluation_for_result(
         variant=ExperimentVariant.SINGLE_GENERALIST,
         bundle=bundle,
         fixture_id=fixture_id,
+        report_provenance="live_provider",
     )
 
 

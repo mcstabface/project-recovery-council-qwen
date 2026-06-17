@@ -298,6 +298,11 @@ compared offline with `compare-live`; the comparison writes machine-readable
 JSON and concise Markdown and refuses incomplete or invalid runs unless a
 diagnostic override is supplied.
 
+Live evaluation reports use live-provider limitation text, not offline fixture
+warnings. Role-scope compliance and specialized semantic validation are marked
+`not_applicable` for full-scope `GeneralistAgent` outputs; they are scored only
+for specialist invocations where those validation layers actually ran.
+
 Offline experiment outputs use:
 
 ```text

@@ -1,0 +1,84 @@
+{
+  "manifest_version": "project-recovery-council.process-run-manifest.v1",
+  "created_at": "2026-06-17T00:00:00Z",
+  "run_label": "metric-applicability-and-live-report-provenance",
+  "repository": "project-recovery-council-qwen",
+  "git_commit": "261f7a5",
+  "dirty_working_tree": true,
+  "status": "complete",
+  "objectives": [
+    "Distinguish live empirical runs from offline simulated fixtures in evaluation limitations",
+    "Retain simulated-output limitation text for offline fixtures",
+    "Represent GeneralistAgent role-scope compliance as not applicable",
+    "Represent GeneralistAgent specialized semantic validation as not applicable",
+    "Preserve actual specialist compliance scores for specialist variants",
+    "Render not-applicable comparison metrics as N/A instead of 1.0 or 0.0",
+    "Avoid live network calls"
+  ],
+  "created_files": [
+    "decisions/ADR-0012-metric-applicability-and-live-report-provenance.md",
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_17_METRIC_APPLICABILITY_LIVE_PROVENANCE.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_17_METRIC_APPLICABILITY_LIVE_PROVENANCE.json"
+  ],
+  "modified_files": [
+    "README.md",
+    "docs/EXPERIMENT_DESIGN.md",
+    "docs/LIVE_COMPARISON_RUNBOOK.md",
+    "docs/METRICS.md",
+    "src/project_recovery_council/evaluation.py",
+    "src/project_recovery_council/live_experiments.py",
+    "src/project_recovery_council/live_variant_runner.py",
+    "tests/test_live_variant_runner.py",
+    "tests/test_qwen_evaluation.py"
+  ],
+  "applicability_statuses": [
+    "passed",
+    "failed",
+    "not_applicable",
+    "unavailable"
+  ],
+  "commands_run": [
+    {
+      "command": "python -m pytest tests/test_live_variant_runner.py tests/test_qwen_evaluation.py",
+      "exit_code": 0,
+      "result": "26 passed in 0.51s"
+    },
+    {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "result": "132 passed, 1 skipped in 6.26s"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "exit_code": 0,
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "exit_code": 0,
+      "result": "prompt validation passed"
+    }
+  ],
+  "test_results": {
+    "focused_pytest": {
+      "command": "python -m pytest tests/test_live_variant_runner.py tests/test_qwen_evaluation.py",
+      "exit_code": 0,
+      "summary": "26 passed in 0.51s"
+    },
+    "full_pytest": {
+      "command": "python -m pytest",
+      "exit_code": 0,
+      "summary": "132 passed, 1 skipped in 6.26s"
+    }
+  },
+  "network_status": {
+    "real_network_request_made": false,
+    "live_command_executed": false
+  },
+  "known_limitations": [
+    "Prior live artifacts are untouched",
+    "Only ScheduleExpert has a specialized semantic validator",
+    "Old live artifacts may still contain the previous reporting shape until rerun"
+  ],
+  "recommended_next_live_command": "export DASHSCOPE_API_KEY=\"<your-api-key>\" && PYTHONPATH=src python -m project_recovery_council live-variant --variant fixed_expert_chain --model qwen-plus --allow-network"
+}

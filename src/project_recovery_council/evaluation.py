@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, Literal
 
 from pydantic import ValidationError
 
@@ -254,6 +254,7 @@ def evaluate_model_result(
     invocation_results: list[ModelResult] | None = None,
     pricing_usd_per_1k_input_tokens: float | None = None,
     pricing_usd_per_1k_output_tokens: float | None = None,
+    report_provenance: Literal["offline_fixture", "live_provider"] = "offline_fixture",
 ) -> EvaluationReport:
     selected_variant = ExperimentVariant(variant)
     response, schema_valid, malformed, validation_errors = _coerce_response(result)
@@ -272,10 +273,7 @@ def evaluate_model_result(
         schema_valid=schema_valid,
         efficiency=efficiency,
     )
-    limitations = [
-        "Offline fixtures are simulated outputs for contract testing, not empirical Qwen results.",
-        "Token, latency, and cost metrics remain null unless a provider reports them or explicit pricing is supplied.",
-    ]
+    limitations = _limitations_for_report_provenance(report_provenance)
     if validation_errors:
         limitations.extend(validation_errors)
     return EvaluationReport(
@@ -294,6 +292,19 @@ def evaluate_model_result(
         disagreements=response.unresolved_disagreements if response else [],
         limitations=limitations,
     )
+
+
+def _limitations_for_report_provenance(provenance: str) -> list[str]:
+    if provenance == "live_provider":
+        return [
+            "One live run per variant is not statistically significant.",
+            "Hosted-model outputs may vary across runs even with fixed configuration.",
+            "Provider cost is unavailable unless explicit pricing is supplied.",
+        ]
+    return [
+        "Offline fixtures are simulated outputs for contract testing, not empirical Qwen results.",
+        "Token, latency, and cost metrics remain null unless a provider reports them or explicit pricing is supplied.",
+    ]
 
 
 def aggregate_efficiency_metrics(

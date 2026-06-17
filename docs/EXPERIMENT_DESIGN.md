@@ -135,6 +135,18 @@ fixed-chain, and dynamic-council directories unless `--allow-incomplete` is
 supplied for diagnostics. The report deliberately does not claim statistical
 significance from one run per variant.
 
+Live evaluation reports use live-provider limitations: one run is not
+statistically significant, hosted-model outputs may vary, and provider cost is
+unavailable unless explicit pricing is supplied. Offline fixture reports retain
+the simulated-output limitation because those fixtures are not empirical Qwen
+results.
+
+`single_generalist` receives the full evidence bundle, so role-scope compliance
+and specialized semantic validation are not applicable to that output. Live
+comparison JSON records `applicable: false`, `status: not_applicable`, and
+`score: null`; Markdown renders the values as `N/A`. Specialist variants retain
+their actual compliance scores.
+
 Validation layers are intentionally distinct:
 
 - JSON schema validation checks response shape.

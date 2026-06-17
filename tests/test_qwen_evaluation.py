@@ -43,6 +43,12 @@ def test_deterministic_evaluation_rules_pass_for_strong_modular_fixture() -> Non
     assert metric(report, EvaluationMetricId.PREFERRED_RECOVERY_OPTION) == 1.0
 
 
+def test_offline_fixture_limitations_retain_simulated_output_wording() -> None:
+    report = evaluate_offline_fixture("strong_modular_council", case_path=FIXTURE_PATH)
+
+    assert any("Offline fixtures are simulated outputs" in item for item in report.limitations)
+
+
 def test_generalist_fixture_scores_unsupported_onsite_assertion_and_bad_escalation() -> None:
     report = evaluate_offline_fixture("generalist_missed_onsite_contradiction", case_path=FIXTURE_PATH)
 

@@ -90,6 +90,10 @@ PYTHONPATH=src python -m project_recovery_council compare-live \
 The comparison command makes no network calls. It refuses incomplete or
 artifact-invalid runs unless `--allow-incomplete` is supplied for diagnostics.
 
+In the comparison report, role-scope compliance and specialized semantic
+validation are `N/A` for the single GeneralistAgent run. They are applicable
+only to specialist invocations where the corresponding validators ran.
+
 ## Optional Run Controls
 
 Use these controls for smaller, bounded live experiments:

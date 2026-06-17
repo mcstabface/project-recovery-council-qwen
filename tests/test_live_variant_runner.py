@@ -311,6 +311,31 @@ def test_successful_generalist_run_full_evidence_and_artifacts(tmp_path: Path, m
     assert [request.metadata["agent_role"] for request in client.requests] == [AgentRole.GENERALIST.value]
 
 
+def test_live_generalist_limitations_and_specialist_metrics_are_not_applicable(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    path, _client = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.SINGLE_GENERALIST,
+        [recovery_response(AgentRole.GENERALIST.value)],
+        experiment_id="generalist-applicability",
+    )
+    final = read_json(path / "final-variant-result.json")
+    evaluation = read_json(path / "evaluation-results.json")["report"]
+
+    assert not any("Offline fixtures are simulated outputs" in item for item in evaluation["limitations"])
+    assert any("One live run per variant is not statistically significant" in item for item in evaluation["limitations"])
+    assert any("Hosted-model outputs may vary" in item for item in evaluation["limitations"])
+    assert final["role_scope_compliance"]["status"] == "not_applicable"
+    assert final["role_scope_compliance"]["score"] is None
+    assert final["role_scope_compliance_rate"] is None
+    assert final["semantic_validation_compliance"]["status"] == "not_applicable"
+    assert final["semantic_validation_compliance"]["score"] is None
+    assert final["semantic_validation_compliance_rate"] is None
+
+
 def test_successful_fixed_chain_order_filtering_and_artifacts(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
     path, client = run_variant(
         tmp_path,
@@ -332,6 +357,26 @@ def test_successful_fixed_chain_order_filtering_and_artifacts(tmp_path: Path, mo
     schedule_records = next(item for item in selected if item["agent_role"] == AgentRole.SCHEDULE_EXPERT.value)
     assert schedule_records["record_ids"] == ["CASE-INTAKE-001", "SCH-DELIVERY-001"]
     assert read_json(path / "domain-semantic-validation-results.json")[1]["implemented"] is False
+
+
+def test_specialist_compliance_metrics_remain_applicable(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    path, _client = run_variant(
+        tmp_path,
+        monkeypatch,
+        ExperimentVariant.FIXED_EXPERT_CHAIN,
+        [schedule_response(), commercial_response(), auditor_response(), risk_response(), recovery_response()],
+        experiment_id="fixed-applicability",
+    )
+    final = read_json(path / "final-variant-result.json")
+
+    assert final["role_scope_compliance"]["applicable"] is True
+    assert final["role_scope_compliance"]["status"] in {"passed", "failed"}
+    assert final["role_scope_compliance"]["score"] is not None
+    assert final["role_scope_compliance_rate"] == final["role_scope_compliance"]["score"]
+    assert final["semantic_validation_compliance"]["applicable"] is True
+    assert final["semantic_validation_compliance"]["status"] == "passed"
+    assert final["semantic_validation_compliance"]["score"] == 1.0
+    assert final["semantic_validation_compliance_rate"] == 1.0
 
 
 def test_successful_dynamic_council_uses_director_selection(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
@@ -611,8 +656,18 @@ def test_live_comparison_generation_and_incomplete_rejection(tmp_path: Path, mon
         comparison_id="comparison-ok",
     )
     report = read_json(comparison / "live-comparison-report.json")
+    markdown = (comparison / "live-comparison-report.md").read_text(encoding="utf-8")
 
     assert report["rows"][0]["required_fact_accuracy"] == 1.0
+    assert report["rows"][0]["role_scope_compliance"]["status"] == "not_applicable"
+    assert report["rows"][0]["role_scope_compliance"]["score"] is None
+    assert report["rows"][0]["semantic_validation_compliance"]["status"] == "not_applicable"
+    assert report["rows"][0]["semantic_validation_compliance"]["score"] is None
+    assert report["rows"][1]["role_scope_compliance"]["applicable"] is True
+    assert report["rows"][1]["role_scope_compliance"]["score"] is not None
+    assert report["rows"][1]["semantic_validation_compliance"]["status"] == "passed"
+    assert "single_generalist | True | 1 | 1 | 1 | 1 |" in markdown
+    assert "N/A | N/A" in markdown
     assert (comparison / "live-comparison-report.md").is_file()
 
     incomplete, _ = run_variant(

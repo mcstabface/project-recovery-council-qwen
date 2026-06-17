@@ -68,6 +68,11 @@ overexposed evidence.
 The scope metrics are intended to show whether modular experts remain narrower
 and more governable than a generalist.
 
+Role-scope compliance is not applicable to full-scope `GeneralistAgent`
+outputs. Live reports represent that as `applicable: false`,
+`status: not_applicable`, and `score: null`; they do not convert it to 1.0 or
+0.0.
+
 ## Claim Normalization Metrics
 
 Claim normalization metrics apply between schema validation and role-scope
@@ -88,6 +93,10 @@ Schedule semantic metrics apply to `ScheduleExpert` outputs after schema
 validation and role-scope validation. They do not rewrite provider output; they
 record deterministic arithmetic agreement or disagreement with the schedule
 evidence.
+
+Specialized schedule semantic validation is not applicable when no
+`ScheduleExpert` invocation ran, including a single `GeneralistAgent` live
+variant. Live reports represent that as `N/A`.
 
 - `delivery_movement_correctness`: whether reported delivery movement matches
   the baseline-to-forecast delivery date delta.
@@ -125,3 +134,7 @@ any stopped-by-limit status.
 The comparison is descriptive. One live run per variant is not statistically
 significant, and the deterministic oracle remains the expected-result source
 rather than an AI competitor.
+
+Comparison reports distinguish `passed`, `failed`, `not_applicable`, and
+`unavailable` for role-scope and specialized semantic validation. Markdown
+renders `not_applicable` as `N/A`.

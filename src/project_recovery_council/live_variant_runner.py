@@ -9,7 +9,7 @@ from datetime import datetime, timezone
 from hashlib import sha256
 from pathlib import Path
 from time import monotonic
-from typing import Any, Callable
+from typing import Any, Callable, Literal
 
 from pydantic import Field, ValidationError
 
@@ -38,7 +38,6 @@ from project_recovery_council.experiment_contracts import (
     EvaluationReport,
     ExperimentConfig,
     ExperimentVariant,
-    MetricResult,
 )
 from project_recovery_council.experiments import build_experiment_plan
 from project_recovery_council.fixtures import CaseBundle, load_equipment_delay_case
@@ -111,6 +110,13 @@ class DomainSemanticValidationResult(ContractModel):
     concise_findings: list[str] = Field(default_factory=list)
 
 
+class MetricApplicability(ContractModel):
+    applicable: bool
+    status: Literal["passed", "failed", "not_applicable", "unavailable"]
+    score: float | None = None
+    reason: str | None = None
+
+
 class LiveVariantSummary(ContractModel):
     experiment_id: str = Field(min_length=1)
     case_id: str = Field(min_length=1)
@@ -123,6 +129,12 @@ class LiveVariantSummary(ContractModel):
     final_invocation_id: str | None = None
     final_response_available: bool = False
     evaluation_available: bool = False
+    role_scope_compliance: MetricApplicability = Field(
+        default_factory=lambda: _metric_unavailable("role-scope validation was not recorded")
+    )
+    semantic_validation_compliance: MetricApplicability = Field(
+        default_factory=lambda: _metric_unavailable("specialized semantic validation was not recorded")
+    )
     role_scope_compliance_rate: float | None = None
     semantic_validation_compliance_rate: float | None = None
     input_tokens: int | None = None
@@ -149,8 +161,12 @@ class LiveComparisonVariantRow(ContractModel):
     correct_human_escalation: float | None = None
     preferred_recovery_option: float | None = None
     schema_valid_response_rate: float | None = None
-    role_scope_compliance: float | None = None
-    semantic_validation_compliance: float | None = None
+    role_scope_compliance: MetricApplicability = Field(
+        default_factory=lambda: _metric_unavailable("role-scope validation was not recorded")
+    )
+    semantic_validation_compliance: MetricApplicability = Field(
+        default_factory=lambda: _metric_unavailable("specialized semantic validation was not recorded")
+    )
     input_tokens: int | None = None
     output_tokens: int | None = None
     total_tokens: int | None = None
@@ -483,6 +499,7 @@ class LiveVariantRun:
                 bundle=self.bundle,
                 fixture_id=self.experiment_id,
                 invocation_results=self.results,
+                report_provenance="live_provider",
             )
         else:
             self.failure_reason = self.failure_reason or "final response unavailable or not evaluable"
@@ -660,8 +677,8 @@ class LiveVariantRun:
 
     def summary(self) -> LiveVariantSummary:
         input_tokens, output_tokens, total_tokens = _token_totals(self.results)
-        role_metrics = role_compliance_metrics(self.role_results)
-        schedule_metrics = schedule_semantic_metrics(self.schedule_results)
+        role_applicability = _role_scope_applicability(self.role_results)
+        semantic_applicability = _schedule_semantic_applicability(self.schedule_results)
         status = "completed" if self.completed else "incomplete"
         if self.failure_reason and not self.stopped_by_limit:
             status = "failed"
@@ -677,8 +694,10 @@ class LiveVariantRun:
             final_invocation_id=self.final_invocation_id,
             final_response_available=self.final_result is not None and self.final_result.parsed_response is not None,
             evaluation_available=self.evaluation_report is not None,
-            role_scope_compliance_rate=role_metrics["scope_compliance_rate"],
-            semantic_validation_compliance_rate=schedule_metrics["schedule_semantic_compliance_rate"],
+            role_scope_compliance=role_applicability,
+            semantic_validation_compliance=semantic_applicability,
+            role_scope_compliance_rate=role_applicability.score,
+            semantic_validation_compliance_rate=semantic_applicability.score,
             input_tokens=input_tokens,
             output_tokens=output_tokens,
             total_tokens=total_tokens,
@@ -779,14 +798,19 @@ def write_live_variant_artifacts(
         ("disagreement-records", "disagreement-records.json", run.disagreements, False),
         ("final-variant-result", "final-variant-result.json", summary, True),
         ("evaluation-results", "evaluation-results.json", evaluation_payload, True),
-        ("role-compliance-metrics", "role-compliance-metrics.json", role_compliance_metrics(run.role_results), bool(run.role_results)),
+        ("role-compliance-metrics", "role-compliance-metrics.json", _role_compliance_payload(run.role_results), bool(run.role_results)),
         (
             "claim-normalization-metrics",
             "claim-normalization-metrics.json",
             claim_normalization_metrics(run.normalization_results),
             bool(run.normalization_results),
         ),
-        ("schedule-semantic-metrics", "schedule-semantic-metrics.json", schedule_semantic_metrics(run.schedule_results), bool(run.schedule_results)),
+        (
+            "schedule-semantic-metrics",
+            "schedule-semantic-metrics.json",
+            _schedule_semantic_payload(run.schedule_results),
+            bool(run.schedule_results),
+        ),
         ("reproducibility", "reproducibility.json", _reproducibility(run), True),
     ]
 
@@ -903,8 +927,24 @@ def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariant
     report = evaluation.get("report") if isinstance(evaluation, dict) else None
     if isinstance(report, dict):
         metrics = {item["metric_id"]: item.get("score") for item in report.get("metric_results", [])}
-    role_metrics = read_json(path / "role-compliance-metrics.json")
-    schedule_metrics = read_json(path / "schedule-semantic-metrics.json")
+    role_payload = read_json(path / "role-compliance-metrics.json")
+    schedule_payload = read_json(path / "schedule-semantic-metrics.json")
+    role_applicability = _comparison_applicability(
+        variant=variant,
+        payload=role_payload,
+        summary_applicability=summary.role_scope_compliance,
+        legacy_score=summary.role_scope_compliance_rate,
+        generalist_reason="role-scope validation is not applicable to full-scope GeneralistAgent outputs",
+        legacy_metric_key="scope_compliance_rate",
+    )
+    semantic_applicability = _comparison_applicability(
+        variant=variant,
+        payload=schedule_payload,
+        summary_applicability=summary.semantic_validation_compliance,
+        legacy_score=summary.semantic_validation_compliance_rate,
+        generalist_reason="specialized semantic validation is not applicable to full-scope GeneralistAgent outputs",
+        legacy_metric_key="schedule_semantic_compliance_rate",
+    )
     return LiveComparisonVariantRow(
         variant=variant,
         experiment_id=summary.experiment_id,
@@ -922,10 +962,8 @@ def _comparison_row(variant: ExperimentVariant, path: Path, summary: LiveVariant
         correct_human_escalation=metrics.get("correct_human_escalation"),
         preferred_recovery_option=metrics.get("preferred_recovery_option"),
         schema_valid_response_rate=metrics.get("schema_valid_response_rate"),
-        role_scope_compliance=role_metrics.get("scope_compliance_rate") if isinstance(role_metrics, dict) else None,
-        semantic_validation_compliance=schedule_metrics.get("schedule_semantic_compliance_rate")
-        if isinstance(schedule_metrics, dict)
-        else None,
+        role_scope_compliance=role_applicability,
+        semantic_validation_compliance=semantic_applicability,
         input_tokens=summary.input_tokens,
         output_tokens=summary.output_tokens,
         total_tokens=summary.total_tokens,
@@ -940,8 +978,8 @@ def _comparison_markdown(report: LiveComparisonReport) -> str:
         "",
         "One run per variant is not statistically significant.",
         "",
-        "| Variant | Complete | Invocations | Required facts | Schedule | Commercial | Cit. precision | Cit. recall | Unsupported | Human escalation | Preferred option | Tokens | Latency | Retries |",
-        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+        "| Variant | Complete | Invocations | Required facts | Schedule | Commercial | Cit. precision | Cit. recall | Unsupported | Human escalation | Preferred option | Role scope | Semantic | Tokens | Latency | Retries |",
+        "| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | ---: | --- | --- | ---: | ---: | ---: |",
     ]
     for row in report.rows:
         lines.append(
@@ -951,6 +989,8 @@ def _comparison_markdown(report: LiveComparisonReport) -> str:
             f"{_fmt(row.commercial_correctness)} | {_fmt(row.citation_precision)} | "
             f"{_fmt(row.citation_recall)} | {_fmt(row.unsupported_claim_count)} | "
             f"{_fmt(row.correct_human_escalation)} | {_fmt(row.preferred_recovery_option)} | "
+            f"{_fmt_applicability(row.role_scope_compliance)} | "
+            f"{_fmt_applicability(row.semantic_validation_compliance)} | "
             f"{row.total_tokens if row.total_tokens is not None else ''} | "
             f"{_fmt(row.latency_seconds)} | {row.retry_count} |"
         )
@@ -959,6 +999,110 @@ def _comparison_markdown(report: LiveComparisonReport) -> str:
 
 def _fmt(value: float | None) -> str:
     return "" if value is None else f"{value:.3g}"
+
+
+def _fmt_applicability(value: MetricApplicability) -> str:
+    if value.status == "not_applicable":
+        return "N/A"
+    if value.status == "unavailable":
+        return "unavailable"
+    return _fmt(value.score)
+
+
+def _metric_from_score(score: float | None, *, unavailable_reason: str) -> MetricApplicability:
+    if score is None:
+        return _metric_unavailable(unavailable_reason)
+    return MetricApplicability(
+        applicable=True,
+        status="passed" if score == 1.0 else "failed",
+        score=score,
+    )
+
+
+def _metric_not_applicable(reason: str) -> MetricApplicability:
+    return MetricApplicability(
+        applicable=False,
+        status="not_applicable",
+        score=None,
+        reason=reason,
+    )
+
+
+def _metric_unavailable(reason: str) -> MetricApplicability:
+    return MetricApplicability(
+        applicable=False,
+        status="unavailable",
+        score=None,
+        reason=reason,
+    )
+
+
+def _role_scope_applicability(results: list[RoleValidationResult]) -> MetricApplicability:
+    if not results:
+        return _metric_not_applicable(
+            "role-scope validation applies only to specialist invocations with role-specific evidence boundaries"
+        )
+    metrics = role_compliance_metrics(results)
+    return _metric_from_score(
+        metrics["scope_compliance_rate"],
+        unavailable_reason="role-scope validation score was unavailable",
+    )
+
+
+def _schedule_semantic_applicability(results: list[ScheduleSemanticValidationResult]) -> MetricApplicability:
+    if not results:
+        return _metric_not_applicable(
+            "specialized schedule semantic validation applies only to ScheduleExpert invocations"
+        )
+    metrics = schedule_semantic_metrics(results)
+    return _metric_from_score(
+        metrics["schedule_semantic_compliance_rate"],
+        unavailable_reason="schedule semantic validation score was unavailable",
+    )
+
+
+def _role_compliance_payload(results: list[RoleValidationResult]) -> dict[str, Any]:
+    metrics = role_compliance_metrics(results) if results else {}
+    return {
+        **metrics,
+        "applicability": _role_scope_applicability(results),
+    }
+
+
+def _schedule_semantic_payload(results: list[ScheduleSemanticValidationResult]) -> dict[str, Any]:
+    metrics = schedule_semantic_metrics(results) if results else {}
+    return {
+        **metrics,
+        "applicability": _schedule_semantic_applicability(results),
+    }
+
+
+def _comparison_applicability(
+    *,
+    variant: ExperimentVariant,
+    payload: Any,
+    summary_applicability: MetricApplicability,
+    legacy_score: float | None,
+    generalist_reason: str,
+    legacy_metric_key: str,
+) -> MetricApplicability:
+    if variant == ExperimentVariant.SINGLE_GENERALIST:
+        return _metric_not_applicable(generalist_reason)
+    if summary_applicability.status != "unavailable":
+        return summary_applicability
+    if isinstance(payload, dict):
+        applicability = payload.get("applicability")
+        if isinstance(applicability, dict):
+            return MetricApplicability.model_validate(applicability)
+        if legacy_metric_key in payload:
+            return _metric_from_score(
+                payload.get(legacy_metric_key),
+                unavailable_reason=f"{legacy_metric_key} was unavailable",
+            )
+    return _metric_from_score(
+        legacy_score,
+        unavailable_reason=f"{legacy_metric_key} was unavailable",
+    )
 
 
 def _token_totals(results: list[ModelResult]) -> tuple[int | None, int | None, int | None]:
