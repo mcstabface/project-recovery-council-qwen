@@ -39,9 +39,12 @@ Future fixed-chain and dynamic-council runs write:
 - `recommendation-authorization-state.json`
 - `synthesis-metrics.json`
 
-`parsed-structured-responses.json` still preserves raw parsed provider output
-for diagnostics. `synthesis-input.json` is the compact planner handoff and does
-not include raw prompts or raw specialist response blocks.
+`raw-provider-responses.json` preserves raw provider text for diagnostics.
+Accepted final parsed responses may include deterministic citation augmentation
+from the validated-findings envelope so evaluation can use claim-attached
+citations the planner did not repeat. `synthesis-input.json` is the compact
+planner handoff and does not include raw prompts or raw specialist response
+blocks.
 
 ## Citation Propagation
 
@@ -61,6 +64,12 @@ citations are carried in the synthesis input:
   `SUP-NOT-ARRIVED-001`, `LOG-STATUS-001`
 - preferred option: `COST-SUMMARY-001`, `SCH-DELIVERY-001`,
   `LOG-STATUS-001` where relevant
+- approval condition: `COST-SUMMARY-001`, `PRG-ONSITE-001`,
+  `SUP-NOT-ARRIVED-001`, `LOG-STATUS-001`
+
+The final citation merge only adds configured final-field source records that
+are already present in validated finding citations. It does not invent
+citations from prose or from the expected-result oracle.
 
 ## Recommendation Versus Authorization
 
@@ -71,6 +80,11 @@ The planner handoff explicitly separates recommendation from authorization:
 - human confirmation required does not require planner abstention
 - approval-pending recommendations should set `preferred_option_subject_to_approval`
   and `human_confirmation_required`
+- when onsite-status contradiction is unresolved and no recorded human decision
+  resolves `HDR-ONSITE-001`, authorization status must remain
+  `blocked_pending_human_confirmation`
+- only a recorded human decision for the blocking request may move
+  authorization to `ready_for_authorization`
 
 RecoveryPlanner should abstain only when there is insufficient validated
 evidence to form a recommendation.

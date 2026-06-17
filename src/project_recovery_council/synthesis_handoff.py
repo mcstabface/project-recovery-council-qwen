@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+from copy import deepcopy
 from typing import Any, Literal
 
 from pydantic import Field
@@ -74,6 +75,12 @@ FINAL_FIELD_SOURCE_KEYS: dict[str, set[str]] = {
     "gross_avoided_exposure_usd": {"gross_avoided_exposure_usd"},
     "human_confirmation_required": {"human_escalation_required", "recovery_approval_risk", "onsite_status_conflict"},
     "onsite_status_contradiction_detected": {"onsite_status_conflict", "C-ONSITE-ASSERTION", "contradiction"},
+    "preferred_option_id": {"unmitigated_exposure_usd", "mitigation_cost_usd", "gross_avoided_exposure_usd"},
+    "preferred_option_subject_to_approval": {
+        "recovery_approval_risk",
+        "onsite_status_conflict",
+        "C-ONSITE-ASSERTION",
+    },
 }
 
 
@@ -85,6 +92,12 @@ FINAL_CITATION_REQUIREMENTS = {
     "onsite_status_contradiction_detected": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
     "human_confirmation_required": ["PRG-ONSITE-001", "SUP-NOT-ARRIVED-001", "LOG-STATUS-001"],
     "preferred_option_id": ["COST-SUMMARY-001", "SCH-DELIVERY-001", "LOG-STATUS-001"],
+    "preferred_option_subject_to_approval": [
+        "COST-SUMMARY-001",
+        "PRG-ONSITE-001",
+        "SUP-NOT-ARRIVED-001",
+        "LOG-STATUS-001",
+    ],
 }
 
 
@@ -207,6 +220,7 @@ def build_recommendation_authorization_state(
     *,
     bundle: CaseBundle,
     validated_findings: list[ValidatedFinding],
+    resolved_human_decision_request_ids: set[str] | None = None,
 ) -> RecommendationAuthorizationState:
     keys = {finding.canonical_claim_key for finding in validated_findings}
     has_schedule = "forecast_milestone_slip_days" in keys or "projected_milestone_slip_days" in keys
@@ -215,19 +229,63 @@ def build_recommendation_authorization_state(
         "mitigation_cost_usd",
         "gross_avoided_exposure_usd",
     }.issubset(keys)
-    human_gate = _human_gate_required(validated_findings)
     contradiction = _onsite_contradiction_unresolved(validated_findings)
+    human_gate = _human_gate_required(validated_findings) or contradiction
+    request_id = "HDR-ONSITE-001" if human_gate and contradiction else None
+    resolved_request_ids = resolved_human_decision_request_ids or set()
+    blocked_by_human_gate = request_id is not None and request_id not in resolved_request_ids
     recommendation_available = has_schedule and has_commercial
     recommended_option_id = _preferred_recovery_option_id(bundle) if recommendation_available else None
     return RecommendationAuthorizationState(
         recommendation_available=recommendation_available,
         recommended_option_id=recommended_option_id,
-        recommendation_confidence="high" if recommendation_available and human_gate else ("medium" if recommendation_available else "none"),
-        authorization_status="blocked_pending_human_confirmation" if human_gate else "ready_for_authorization",
-        blocking_human_request="HDR-ONSITE-001" if human_gate else None,
-        unresolved_contradictions=["equipment_onsite_status"] if contradiction else [],
+        recommendation_confidence=(
+            "high" if recommendation_available and blocked_by_human_gate else ("medium" if recommendation_available else "none")
+        ),
+        authorization_status=(
+            "blocked_pending_human_confirmation" if blocked_by_human_gate else "ready_for_authorization"
+        ),
+        blocking_human_request=request_id if blocked_by_human_gate else None,
+        unresolved_contradictions=["equipment_onsite_status"] if blocked_by_human_gate else [],
         approval_required=True,
     )
+
+
+def merge_final_response_citations(
+    *,
+    response_payload: dict[str, Any] | None,
+    validated_findings: list[ValidatedFinding],
+    citation_requirements: dict[str, list[str]] | None = None,
+) -> dict[str, Any] | None:
+    """Return an accepted final response with validated claim citations merged in.
+
+    The provider payload is not mutated. Only configured final-field citation
+    requirements whose record IDs are present in validated findings are added.
+    """
+
+    if response_payload is None:
+        return None
+    merged = deepcopy(response_payload)
+    citations = merged.get("citations", {})
+    if not isinstance(citations, dict):
+        citations = {}
+    else:
+        citations = deepcopy(citations)
+    available_record_ids = {
+        record_id
+        for finding in validated_findings
+        for record_id in finding.citations
+    }
+    for field, required_record_ids in (citation_requirements or FINAL_CITATION_REQUIREMENTS).items():
+        if merged.get(field) is None:
+            continue
+        selected = [record_id for record_id in required_record_ids if record_id in available_record_ids]
+        if not selected:
+            continue
+        existing = _string_list(citations.get(field, []))
+        citations[field] = sorted(dict.fromkeys(existing + selected))
+    merged["citations"] = citations
+    return merged
 
 
 def synthesis_metrics(
@@ -387,9 +445,19 @@ def _contradiction_status(key: str, value: Any) -> str | None:
 def _human_gate_required(findings: list[ValidatedFinding]) -> bool:
     for finding in findings:
         text = f"{finding.canonical_claim_key} {finding.value}".lower()
-        if finding.canonical_claim_key in {"human_escalation_required", "recovery_approval_risk"}:
+        if finding.canonical_claim_key in {
+            "human_escalation_required",
+            "recovery_approval_risk",
+            "conflicting_onsite_status_requires_human_confirmation",
+            "recovery_option_approval_blocked",
+            "escalation_required_for_milestone_integrity",
+        }:
             return True
-        if "human confirmation" in text and ("required" in text or "before authorization" in text):
+        if "human confirmation" in text and (
+            "required" in text or "before authorization" in text or "requires" in text
+        ):
+            return True
+        if "approval" in text and ("blocked" in text or "pending" in text):
             return True
     return False
 
@@ -397,7 +465,12 @@ def _human_gate_required(findings: list[ValidatedFinding]) -> bool:
 def _onsite_contradiction_unresolved(findings: list[ValidatedFinding]) -> bool:
     for finding in findings:
         text = f"{finding.canonical_claim_key} {finding.value}".lower()
-        if finding.canonical_claim_key in {"onsite_status_conflict", "C-ONSITE-ASSERTION", "contradiction"}:
+        if finding.canonical_claim_key in {
+            "onsite_status_conflict",
+            "conflicting_onsite_status_requires_human_confirmation",
+            "C-ONSITE-ASSERTION",
+            "contradiction",
+        }:
             return True
         if "onsite" in text and ("conflict" in text or "contradiction" in text):
             return True

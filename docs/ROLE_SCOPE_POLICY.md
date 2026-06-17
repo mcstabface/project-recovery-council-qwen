@@ -31,19 +31,24 @@ Allowed claim keys include:
 - `installation_total_float_consumed_days`
 - `installation_total_float_remaining_days`
 - `float_consumption_status`
+- `delivery_movement_direction`
 - `milestone_baseline_date`
 - `milestone_forecast_date_without_intervention`
 - `forecast_milestone_slip_days`
 - `successor_testing_activity_id`
 - `successor_dependency_effect`
+- `equipment_id`
 
 These keys cover baseline and forecast dates, delivery movement, available
 installation float, float consumed, remaining float, projected milestone slip,
 qualitative float consumption status, and successor dependency effects.
+`delivery_movement_direction` must be one of `early`, `on_time`, or `late`
+and is checked by schedule-semantic validation.
 
 Supported aliases, such as `baseline_delivery_date`,
 `forecast_delivery_date`, `remaining_float_after_delivery_shift_days`,
 `remaining_total_float_days`,
+`remaining_total_float_after_delivery_shift_days`, `float_consumed_days`,
 `contractual_milestone_baseline_date`, and
 `contractual_milestone_forecast_without_intervention`, are normalized before
 role validation. They are not role-policy keys themselves.
@@ -72,8 +77,10 @@ support.
 Supported audit claim IDs are explicit and versioned for the synthetic case:
 `C-ONSITE-ASSERTION`, `C-MILESTONE-SLIP-13D`,
 `C-DELAY-EXPOSURE-15K-USD-PER-DAY`, `C-UNMITIGATED-EXPOSURE-195K-USD`, and
-`C-ACCEL-COST-48K-USD`. Arbitrary unknown audit claim IDs are not accepted as
-valid role-policy keys.
+`C-ACCEL-COST-48K-USD`. Observed lower-case live IDs such as
+`claim-onsite-assertion` and `claim-unmitigated-exposure-195000` are aliases to
+this registry. Arbitrary unknown audit claim IDs are not accepted as valid
+role-policy keys.
 
 ## RiskExpert
 
@@ -82,9 +89,12 @@ records. It must not make commercial exposure or recovery-option preference
 claims.
 
 Allowed risk claim keys include `onsite_status_conflict`,
-`recovery_approval_risk`, and `milestone_slip_impact`. A risk finding may state
-that authorization is blocked pending human confirmation; it must not convert
-that gate into a commercial recommendation or final approval decision.
+`recovery_approval_risk`, `milestone_slip_impact`,
+`conflicting_onsite_status_requires_human_confirmation`,
+`recovery_option_approval_blocked`, and
+`escalation_required_for_milestone_integrity`. A risk finding may state that
+authorization is blocked pending human confirmation; it must not convert that
+gate into a commercial recommendation or final approval decision.
 
 ## RecoveryPlanner
 
@@ -154,6 +164,8 @@ The validator checks the schedule arithmetic against `SCH-DELIVERY-001`:
   `fully_consumed`.
 - when consumed and remaining float are present, `float_consumption_status`
   agrees with those numeric fields.
+- `delivery_movement_direction` is one of `early`, `on_time`, or `late` and
+  agrees with the sign of `delivery_movement_days` when both are present.
 - `milestone_forecast_date_without_intervention` equals
   `milestone_baseline_date + forecast_milestone_slip_days` when both dates are
   present.

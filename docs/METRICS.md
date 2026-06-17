@@ -115,6 +115,9 @@ variant. Live reports represent that as `N/A`.
 - `float_consumption_status`: when present, the status must be one of
   `available`, `partially_consumed`, or `fully_consumed`, and must agree with
   reported consumed and remaining float values.
+- `delivery_movement_direction`: when present, the status must be one of
+  `early`, `on_time`, or `late`, and must agree with the sign of reported
+  delivery movement.
 - `milestone_slip_correctness`: whether reported net milestone slip equals
   `max(delivery_movement_days - available_total_float_days, 0)`.
 - `milestone_date_arithmetic_correctness`: whether the reported forecast
@@ -169,3 +172,10 @@ validated-findings envelope is built:
 
 Pending authorization is not counted as recommendation failure. It is a
 separate governance state.
+
+Artifact inspection also checks recommendation/authorization consistency for
+live synthesis runs. If a final response says human confirmation is required
+and the onsite-status contradiction is detected, the authorization state must
+record `blocked_pending_human_confirmation`, `HDR-ONSITE-001`, and the
+unresolved `equipment_onsite_status` contradiction unless a recorded human
+decision has cleared the gate.

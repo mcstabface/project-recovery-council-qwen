@@ -77,6 +77,7 @@ def schedule_response(**overrides: Any) -> dict[str, Any]:
         "installation_total_float_days": 8,
         "installation_total_float_consumed_days": 8,
         "installation_total_float_remaining_days": 0,
+        "delivery_movement_direction": "late",
         "milestone_baseline_date": "2026-08-15",
         "milestone_forecast_date_without_intervention": "2026-08-28",
         "forecast_milestone_slip_days": 13,
@@ -107,11 +108,13 @@ def test_new_schedule_claim_keys_are_allowed() -> None:
         "installation_total_float_consumed_days",
         "installation_total_float_remaining_days",
         "float_consumption_status",
+        "delivery_movement_direction",
         "milestone_baseline_date",
         "milestone_forecast_date_without_intervention",
         "forecast_milestone_slip_days",
         "successor_testing_activity_id",
         "successor_dependency_effect",
+        "equipment_id",
     ]:
         assert key in allowed
 
@@ -196,6 +199,39 @@ def test_invalid_float_consumption_status_fails() -> None:
 
     assert result.valid is False
     assert any("float_consumption_status must be one of" in item for item in result.semantic_violations)
+
+
+def test_delivery_movement_direction_late_passes() -> None:
+    result = validate_schedule_semantics(
+        invocation_id="INV-DIRECTION-OK",
+        response_payload=schedule_response(delivery_movement_direction="late"),
+        bundle=load_equipment_delay_case(FIXTURE_PATH),
+    )
+
+    assert result.valid is True
+    assert "delivery_movement_direction" in result.checked_fields
+
+
+def test_inconsistent_delivery_movement_direction_fails() -> None:
+    result = validate_schedule_semantics(
+        invocation_id="INV-DIRECTION-BAD",
+        response_payload=schedule_response(delivery_movement_direction="early"),
+        bundle=load_equipment_delay_case(FIXTURE_PATH),
+    )
+
+    assert result.valid is False
+    assert any("delivery_movement_direction expected late" in item for item in result.semantic_violations)
+
+
+def test_invalid_delivery_movement_direction_fails() -> None:
+    result = validate_schedule_semantics(
+        invocation_id="INV-DIRECTION-INVALID",
+        response_payload=schedule_response(delivery_movement_direction="delayed"),
+        bundle=load_equipment_delay_case(FIXTURE_PATH),
+    )
+
+    assert result.valid is False
+    assert any("delivery_movement_direction must be one of" in item for item in result.semantic_violations)
 
 
 def test_float_consumed_13_fails() -> None:

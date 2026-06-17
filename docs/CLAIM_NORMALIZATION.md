@@ -18,6 +18,7 @@ decisions are stored in `claim-normalization-results.json`.
 | `forecast_delivery_date` | `delivery_forecast_date` |
 | `delivery_shift_days` | `delivery_movement_days` |
 | `float_consumption_days` | `installation_total_float_consumed_days` |
+| `float_consumed_days` | `installation_total_float_consumed_days` |
 | `remaining_float_days` | `installation_total_float_remaining_days` |
 | `remaining_total_float_days` | `installation_total_float_remaining_days` |
 | `remaining_float_after_delivery_shift_days` | `installation_total_float_remaining_days` |
@@ -30,8 +31,8 @@ decisions are stored in `claim-normalization-results.json`.
 | `successor_dependency_effects` | `successor_dependency_effect` |
 
 Already canonical keys are retained unchanged.
-`float_consumption_status` is a canonical ScheduleExpert claim key, not an
-alias.
+`float_consumption_status`, `delivery_movement_direction`, and `equipment_id`
+are canonical ScheduleExpert claim keys, not aliases.
 
 ## CommercialExpert v1 Aliases
 
@@ -54,8 +55,22 @@ EvidenceAuditor supports explicit audit claim IDs for the synthetic case:
 - `C-UNMITIGATED-EXPOSURE-195K-USD`
 - `C-ACCEL-COST-48K-USD`
 
-RiskExpert supports `onsite_status_conflict`, `recovery_approval_risk`, and
-`milestone_slip_impact` in addition to the earlier risk claim keys.
+Observed live audit IDs are normalized into that explicit registry:
+
+| Raw key | Canonical key |
+| --- | --- |
+| `claim-onsite-assertion` | `C-ONSITE-ASSERTION` |
+| `claim-milestone-slip-13-days` | `C-MILESTONE-SLIP-13D` |
+| `claim-delay-exposure-15000-per-day` | `C-DELAY-EXPOSURE-15K-USD-PER-DAY` |
+| `claim-unmitigated-exposure-195000` | `C-UNMITIGATED-EXPOSURE-195K-USD` |
+| `claim-accelerated-logistics-cost-48000` | `C-ACCEL-COST-48K-USD` |
+
+RiskExpert supports `onsite_status_conflict`, `recovery_approval_risk`,
+`milestone_slip_impact`,
+`conflicting_onsite_status_requires_human_confirmation`,
+`recovery_option_approval_blocked`, and
+`escalation_required_for_milestone_integrity` in addition to the earlier risk
+claim keys.
 
 ## Conflict Rules
 

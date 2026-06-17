@@ -60,7 +60,11 @@ Review `selected-evidence-records.json`, `role-validation-results.json`,
 `validated-findings-envelope.json`, `excluded-findings.json`,
 `synthesis-input.json`, and `recommendation-authorization-state.json` to confirm
 validated claims and citations reached the planner and that recommendation is
-separate from authorization.
+separate from authorization. When human confirmation is required and the onsite
+contradiction is unresolved, `recommendation-authorization-state.json` must show
+`authorization_status: blocked_pending_human_confirmation`,
+`blocking_human_request: HDR-ONSITE-001`, and
+`unresolved_contradictions: ["equipment_onsite_status"]`.
 
 ## 5. Dynamic Expert Council
 
@@ -82,6 +86,9 @@ PYTHONPATH=src python -m project_recovery_council inspect-experiment <dynamic-co
 Review `routing-decisions.json` to confirm the Director selected relevant
 specialists rather than defaulting to every role. Then review the synthesis
 handoff artifacts to confirm excluded findings did not enter normal synthesis.
+Check that final preferred-option and approval-condition citations were
+preserved or deterministically merged from validated findings before comparing
+runs.
 
 ## 7. Offline Comparison
 

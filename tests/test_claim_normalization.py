@@ -89,6 +89,7 @@ def alias_schedule_response(**overrides: Any) -> dict[str, Any]:
         "installation_total_float_consumed_days": 8,
         "remaining_float_after_delivery_shift_days": 0,
         "float_consumption_status": "fully_consumed",
+        "delivery_movement_direction": "late",
         "contractual_milestone_baseline_date": "2026-08-15",
         "contractual_milestone_forecast_without_intervention": "2026-08-28",
         "forecast_milestone_slip_days": 13,
@@ -138,6 +139,11 @@ def test_each_schedule_alias_maps_to_canonical_key() -> None:
     assert aliases["baseline_delivery_date"] == "delivery_baseline_date"
     assert aliases["forecast_delivery_date"] == "delivery_forecast_date"
     assert aliases["remaining_float_after_delivery_shift_days"] == "installation_total_float_remaining_days"
+    payload_with_consumed_alias = alias_schedule_response(float_consumed_days=8)
+    consumed_result = normalize(payload_with_consumed_alias)
+    consumed_aliases = {item.raw_key: item.canonical_key for item in consumed_result.applied_aliases}
+
+    assert consumed_aliases["float_consumed_days"] == "installation_total_float_consumed_days"
     payload_with_total_float = alias_schedule_response(
         remaining_float_after_delivery_shift_days=0,
         remaining_total_float_days=0,
@@ -153,6 +159,52 @@ def test_each_schedule_alias_maps_to_canonical_key() -> None:
     )
     assert result.normalized_claims["delivery_baseline_date"] == "2026-07-01"
     assert result.normalized_claims["installation_total_float_remaining_days"] == 0
+
+
+def test_observed_schedule_remaining_float_alias_maps_to_canonical_key() -> None:
+    payload = alias_schedule_response(
+        remaining_float_after_delivery_shift_days=0,
+        remaining_total_float_after_delivery_shift_days=0,
+    )
+    result = normalize(payload)
+    aliases = {item.raw_key: item.canonical_key for item in result.applied_aliases}
+
+    assert result.valid is True
+    assert aliases["remaining_total_float_after_delivery_shift_days"] == "installation_total_float_remaining_days"
+    assert result.normalized_claims["installation_total_float_remaining_days"] == 0
+
+
+def test_evidence_auditor_claim_id_aliases_are_explicitly_versioned() -> None:
+    payload = {
+        "schema_version": SPECIALIST_FINDING_RESPONSE_SCHEMA,
+        "agent_role": AgentRole.EVIDENCE_AUDITOR.value,
+        "status": "completed",
+        "claims": {
+            "claim-onsite-assertion": {"assessment": "contradicted"},
+            "claim-milestone-slip-13-days": {"assessment": "supported"},
+            "claim-delay-exposure-15000-per-day": {"assessment": "supported"},
+            "claim-unmitigated-exposure-195000": {"assessment": "supported"},
+            "claim-accelerated-logistics-cost-48000": {"assessment": "supported"},
+        },
+        "citations": {},
+        "unsupported_claims": [],
+        "warnings": [],
+    }
+    result = normalize_claim_keys(
+        invocation_id="INV-AUDITOR-ALIASES",
+        role=AgentRole.EVIDENCE_AUDITOR.value,
+        response_payload=payload,
+    )
+
+    assert result.valid is True
+    assert result.unknown_claim_keys == []
+    assert set(result.normalized_claims) == {
+        "C-ONSITE-ASSERTION",
+        "C-MILESTONE-SLIP-13D",
+        "C-DELAY-EXPOSURE-15K-USD-PER-DAY",
+        "C-UNMITIGATED-EXPOSURE-195K-USD",
+        "C-ACCEL-COST-48K-USD",
+    }
 
 
 def test_raw_response_remains_unchanged_and_normalized_response_uses_canonical_keys() -> None:

@@ -403,6 +403,7 @@ def _validate_live_synthesis_handoff_artifacts(loaded_payloads: dict[str, Any]) 
     excluded = loaded_payloads.get("excluded-findings.json")
     synthesis_inputs = loaded_payloads.get("synthesis-input.json")
     recommendation_state = loaded_payloads.get("recommendation-authorization-state.json")
+    parsed_responses = loaded_payloads.get("parsed-structured-responses.json")
     for filename, payload, expected_type in [
         ("validated-findings-envelope.json", envelope, list),
         ("excluded-findings.json", excluded, list),
@@ -444,7 +445,33 @@ def _validate_live_synthesis_handoff_artifacts(loaded_payloads: dict[str, Any]) 
                 errors.append("recommendation-authorization-state.json does not match latest synthesis input")
             if recommendation_state.get("recommendation_available") is True and not recommendation_state.get("recommended_option_id"):
                 errors.append("available recommendation requires recommended_option_id")
+            final_response = _latest_recovery_response(parsed_responses)
+            if (
+                isinstance(final_response, dict)
+                and final_response.get("human_confirmation_required") is True
+                and final_response.get("onsite_status_contradiction_detected") is True
+            ):
+                if recommendation_state.get("authorization_status") == "ready_for_authorization":
+                    errors.append(
+                        "authorization cannot be ready while human confirmation is required and onsite contradiction is unresolved"
+                    )
+                if not recommendation_state.get("blocking_human_request"):
+                    errors.append("blocked authorization requires blocking_human_request")
+                if "equipment_onsite_status" not in recommendation_state.get("unresolved_contradictions", []):
+                    errors.append("blocked authorization requires unresolved equipment_onsite_status contradiction")
     return errors
+
+
+def _latest_recovery_response(parsed_responses: Any) -> dict[str, Any] | None:
+    if not isinstance(parsed_responses, list):
+        return None
+    for item in reversed(parsed_responses):
+        if not isinstance(item, dict):
+            continue
+        response = item.get("parsed_response")
+        if isinstance(response, dict) and response.get("schema_version") == "project-recovery-council.qwen.recovery-analysis-response.v1":
+            return response
+    return None
 
 
 def _now() -> str:

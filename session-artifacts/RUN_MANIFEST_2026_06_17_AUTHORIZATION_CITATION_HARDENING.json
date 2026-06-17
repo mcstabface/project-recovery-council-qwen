@@ -1,0 +1,67 @@
+{
+  "manifest_id": "RUN_MANIFEST_2026_06_17_AUTHORIZATION_CITATION_HARDENING",
+  "created_on": "2026-06-17",
+  "repository": "project-recovery-council-qwen",
+  "git_base": "dc1a308197c6d2eba506eb3c73346dfe8f5d6fe9",
+  "live_network_requests_made": false,
+  "scope": [
+    "authorization-state hardening for unresolved onsite human gate",
+    "explicit live claim alias support for ScheduleExpert and EvidenceAuditor",
+    "observed RiskExpert human-gate claim key support",
+    "final preferred-option citation propagation from validated findings",
+    "artifact inspection for inconsistent recommendation authorization state"
+  ],
+  "source_changes": [
+    "src/project_recovery_council/claim_normalization.py",
+    "src/project_recovery_council/experiment_artifacts.py",
+    "src/project_recovery_council/live_variant_runner.py",
+    "src/project_recovery_council/role_scope.py",
+    "src/project_recovery_council/schedule_semantics.py",
+    "src/project_recovery_council/synthesis_handoff.py"
+  ],
+  "test_changes": [
+    "tests/test_claim_normalization.py",
+    "tests/test_schedule_semantics.py",
+    "tests/test_validated_findings_handoff.py"
+  ],
+  "documentation_changes": [
+    "README.md",
+    "docs/CLAIM_NORMALIZATION.md",
+    "docs/LIVE_COMPARISON_RUNBOOK.md",
+    "docs/METRICS.md",
+    "docs/ROLE_SCOPE_POLICY.md",
+    "docs/VALIDATED_FINDINGS_HANDOFF.md",
+    "decisions/ADR-0014-authorization-state-and-final-citation-propagation.md"
+  ],
+  "process_artifacts": [
+    "session-artifacts/BUILD_CHECKPOINT_2026_06_17_AUTHORIZATION_CITATION_HARDENING.md",
+    "session-artifacts/RUN_MANIFEST_2026_06_17_AUTHORIZATION_CITATION_HARDENING.json"
+  ],
+  "commands": [
+    {
+      "command": "python -m pytest tests/test_validated_findings_handoff.py tests/test_claim_normalization.py tests/test_schedule_semantics.py tests/test_live_variant_runner.py tests/test_role_scope_policy.py",
+      "result": "70 passed in 0.74s"
+    },
+    {
+      "command": "python -m pytest",
+      "result": "144 passed, 1 skipped in 6.24s"
+    },
+    {
+      "command": "git diff --check",
+      "result": "passed with no output"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council check-schema-drift",
+      "result": "schema drift check passed"
+    },
+    {
+      "command": "PYTHONPATH=src python -m project_recovery_council validate-prompts",
+      "result": "prompt validation passed"
+    }
+  ],
+  "limitations": [
+    "No live network request was made in this build.",
+    "Prior live artifacts were not modified.",
+    "Frozen schemas/v1 and the deterministic oracle were not modified."
+  ]
+}

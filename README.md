@@ -295,7 +295,11 @@ RecoveryPlanner through `synthesis-input.json`; verbose raw provider responses
 remain preserved for diagnostics but are not used as the planner handoff.
 RecoveryPlanner is instructed to distinguish recommendation from
 authorization: accelerated logistics can be recommended while final
-authorization remains blocked pending human confirmation.
+authorization remains blocked pending human confirmation. Artifact inspection
+now rejects a ready-for-authorization state when the final response still
+requires human confirmation for an unresolved onsite-status contradiction.
+Final preferred-option and approval-condition citations are deterministically
+merged from validated specialist citations when the planner omits them.
 
 Controlled live variant artifacts are written under
 `experiment-artifacts/live/<experiment-id>/` and include execution plans,

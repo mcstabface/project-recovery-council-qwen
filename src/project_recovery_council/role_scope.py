@@ -56,6 +56,7 @@ SCHEDULE_ALLOWED_CLAIMS = [
     "installation_total_float_consumed_days",
     "installation_total_float_remaining_days",
     "float_consumption_status",
+    "delivery_movement_direction",
     "milestone_baseline_date",
     "milestone_forecast_date_without_intervention",
     "installation_total_float_days",
@@ -63,6 +64,7 @@ SCHEDULE_ALLOWED_CLAIMS = [
     "successor_testing_activity_id",
     "successor_dependency_effect",
     "successor_testing_constraint",
+    "equipment_id",
 ]
 
 
@@ -164,6 +166,9 @@ ROLE_SCOPE_POLICIES: dict[str, RoleScopePolicy] = {
             "onsite_status_conflict",
             "recovery_approval_risk",
             "milestone_slip_impact",
+            "conflicting_onsite_status_requires_human_confirmation",
+            "recovery_option_approval_blocked",
+            "escalation_required_for_milestone_integrity",
         ],
         prohibited_claim_categories=["commercial_exposure", "mitigation_cost", "preferred_recovery_option"],
         allowed_warning_categories=["risk", "evidence_conflict", "human_escalation"],

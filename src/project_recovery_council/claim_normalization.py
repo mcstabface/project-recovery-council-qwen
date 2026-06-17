@@ -48,12 +48,14 @@ SCHEDULE_CANONICAL_CLAIM_KEYS = [
     "installation_total_float_consumed_days",
     "installation_total_float_remaining_days",
     "float_consumption_status",
+    "delivery_movement_direction",
     "milestone_baseline_date",
     "milestone_forecast_date_without_intervention",
     "forecast_milestone_slip_days",
     "successor_testing_activity_id",
     "successor_dependency_effect",
     "successor_testing_constraint",
+    "equipment_id",
 ]
 
 
@@ -86,6 +88,9 @@ ROLE_CANONICAL_CLAIM_KEYS: dict[str, list[str]] = {
         "onsite_status_conflict",
         "recovery_approval_risk",
         "milestone_slip_impact",
+        "conflicting_onsite_status_requires_human_confirmation",
+        "recovery_option_approval_blocked",
+        "escalation_required_for_milestone_integrity",
     ],
     AgentRole.RECOVERY_PLANNER.value: [
         "preferred_option_id",
@@ -112,6 +117,7 @@ ROLE_CLAIM_ALIASES: dict[str, dict[str, str]] = {
         "forecast_delivery_date": "delivery_forecast_date",
         "delivery_shift_days": "delivery_movement_days",
         "float_consumption_days": "installation_total_float_consumed_days",
+        "float_consumed_days": "installation_total_float_consumed_days",
         "remaining_float_days": "installation_total_float_remaining_days",
         "remaining_total_float_days": "installation_total_float_remaining_days",
         "remaining_float_after_delivery_shift_days": "installation_total_float_remaining_days",
@@ -128,7 +134,14 @@ ROLE_CLAIM_ALIASES: dict[str, dict[str, str]] = {
     AgentRole.COMMERCIAL_EXPERT.value: {
         "contractual_delay_exposure_usd_per_day": "delay_exposure_usd_per_day",
         "unmitigated_delay_exposure_usd": "unmitigated_exposure_usd",
-    }
+    },
+    AgentRole.EVIDENCE_AUDITOR.value: {
+        "claim-onsite-assertion": "C-ONSITE-ASSERTION",
+        "claim-milestone-slip-13-days": "C-MILESTONE-SLIP-13D",
+        "claim-delay-exposure-15000-per-day": "C-DELAY-EXPOSURE-15K-USD-PER-DAY",
+        "claim-unmitigated-exposure-195000": "C-UNMITIGATED-EXPOSURE-195K-USD",
+        "claim-accelerated-logistics-cost-48000": "C-ACCEL-COST-48K-USD",
+    },
 }
 
 

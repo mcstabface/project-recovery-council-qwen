@@ -12,6 +12,7 @@ from project_recovery_council.fixtures import CaseBundle
 
 
 ALLOWED_FLOAT_CONSUMPTION_STATUSES = {"available", "partially_consumed", "fully_consumed"}
+ALLOWED_DELIVERY_MOVEMENT_DIRECTIONS = {"early", "on_time", "late"}
 
 
 class ScheduleSemanticValidationResult(ContractModel):
@@ -50,6 +51,7 @@ def validate_schedule_semantics(
         "installation_total_float_consumed_days": float_consumed,
         "installation_total_float_remaining_days": remaining_float,
         "float_consumption_status": _float_status(remaining_float, float_consumed, available_float),
+        "delivery_movement_direction": _movement_direction(delivery_movement),
         "forecast_milestone_slip_days": milestone_slip,
         "milestone_forecast_date_without_intervention": milestone_forecast.isoformat(),
     }
@@ -61,6 +63,7 @@ def validate_schedule_semantics(
             "installation_total_float_consumed_days",
             "installation_total_float_remaining_days",
             "float_consumption_status",
+            "delivery_movement_direction",
             "forecast_milestone_slip_days",
             "delivery_baseline_date",
             "delivery_forecast_date",
@@ -138,6 +141,18 @@ def validate_schedule_semantics(
                 violations.append(
                     f"float_consumption_status expected {expected_status}, observed {observed_status}"
                 )
+
+    observed_direction = _string_or_none(_observed_claim(claims, "delivery_movement_direction"))
+    if observed_direction is not None:
+        checked.append("delivery_movement_direction")
+        if observed_direction not in ALLOWED_DELIVERY_MOVEMENT_DIRECTIONS:
+            violations.append(
+                "delivery_movement_direction must be one of "
+                f"{sorted(ALLOWED_DELIVERY_MOVEMENT_DIRECTIONS)}, observed {observed_direction}"
+            )
+        expected_direction = _movement_direction(observed_delivery if observed_delivery is not None else delivery_movement)
+        if expected_direction is not None and observed_direction != expected_direction:
+            violations.append(f"delivery_movement_direction expected {expected_direction}, observed {observed_direction}")
 
     observed_slip = _int_or_none(
         _first_present(claims, ["forecast_milestone_slip_days", "projected_milestone_slip_days"])
@@ -258,6 +273,14 @@ def _float_status(remaining_float: int, consumed_float: int, available_float: in
     if remaining_float == 0:
         return "fully_consumed"
     return None
+
+
+def _movement_direction(delivery_movement_days: int) -> str | None:
+    if delivery_movement_days < 0:
+        return "early"
+    if delivery_movement_days == 0:
+        return "on_time"
+    return "late"
 
 
 def _observed_claim(claims: dict[str, Any], key: str) -> Any:

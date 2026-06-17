@@ -69,6 +69,7 @@ from project_recovery_council.synthesis_handoff import (
     SynthesisHandoff,
     SynthesisInput,
     build_synthesis_handoff,
+    merge_final_response_citations,
     synthesis_metrics,
 )
 from project_recovery_council.workflow import DEFAULT_CASE_PATH
@@ -508,6 +509,9 @@ class LiveVariantRun:
             )
 
     def _set_final_result(self, result: ModelResult, invocation_id: str) -> None:
+        if result.parsed_response and result.parsed_response.get("schema_version") == RECOVERY_ANALYSIS_RESPONSE_SCHEMA:
+            result = self._merge_final_citations(result)
+            self._replace_last_invocation_result(result)
         self.final_result = result
         self.final_invocation_id = invocation_id
         if result.parsed_response and result.parsed_response.get("schema_version") == RECOVERY_ANALYSIS_RESPONSE_SCHEMA:
@@ -521,6 +525,33 @@ class LiveVariantRun:
             )
         else:
             self.failure_reason = self.failure_reason or "final response unavailable or not evaluable"
+
+    def _merge_final_citations(self, result: ModelResult) -> ModelResult:
+        if not self.synthesis_handoffs:
+            return result
+        latest_handoff = self.synthesis_handoffs[-1]
+        merged_payload = merge_final_response_citations(
+            response_payload=result.parsed_response,
+            validated_findings=latest_handoff.validated_findings,
+            citation_requirements=latest_handoff.synthesis_input.citation_requirements,
+        )
+        if merged_payload == result.parsed_response:
+            return result
+        metadata = dict(result.provider_metadata)
+        metadata["final_citation_merge_applied"] = True
+        metadata["final_citation_merge_source"] = "validated-findings-envelope"
+        return result.model_copy(
+            update={
+                "parsed_response": merged_payload,
+                "provider_metadata": metadata,
+            }
+        )
+
+    def _replace_last_invocation_result(self, result: ModelResult) -> None:
+        if not self.invocations:
+            return
+        self.results[-1] = result
+        self.invocations[-1] = self.invocations[-1].model_copy(update={"result": result})
 
     def _director_selected_roles(self, result: ModelResult) -> list[str] | None:
         if result.finish_status != FinishStatus.COMPLETED or result.parsed_response is None:
